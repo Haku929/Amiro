@@ -1,0 +1,19 @@
+name: Merge Notification
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  notify:
+    # PRが「閉じられた」かつ「マージされた」場合のみ実行
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord Message Notify
+        run: |
+          curl -X POST -F content="🎉 **マージ完了！**
+          ${{ github.actor }} さんのPRが本体に取り込まれました！
+          
+          **タイトル:** ${{ github.event.pull_request.title }}
+          開発お疲れ様でした！😁" ${{ secrets.WEBHOOK_URL }}
