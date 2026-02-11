@@ -33,11 +33,11 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // 未ログイン かつ アクセス先が /login でない場合は /login へリダイレクト
-  if (!user && !request.nextUrl.pathname.startsWith("/login")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
+  // if (!user && !request.nextUrl.pathname.startsWith("/login")) {
+  //   const url = request.nextUrl.clone();
+  //   url.pathname = "/login";
+  //   return NextResponse.redirect(url);
+  // }
 
   // ログイン済み かつ アクセス先が /login の場合はホーム (/) へリダイレクト
   if (user && request.nextUrl.pathname.startsWith("/login")) {
