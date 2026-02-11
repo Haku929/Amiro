@@ -1,0 +1,16 @@
+name: PR Notification
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened] # PR作成、追記、再開時に実行
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord Message Notify
+        run: |
+          curl -X POST -F content="${{ github.actor }}がプルリクを出したよ！
+          タイトル: ${{ github.event.pull_request.title }}
+          URL: ${{ github.event.pull_request.html_url }}
+          確認お願いします！" ${{ secrets.WEBHOOK_URL }}
