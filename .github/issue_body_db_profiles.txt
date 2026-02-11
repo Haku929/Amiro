@@ -8,5 +8,11 @@
 ## 完了条件
 - 新規登録時に profiles 行が自動作成される
 
-## 参照
-仕様書 6. 実装 TODO リスト → DB [P0]
+## やり方（初心者向け）
+1. Supabase の SQL Editor または `supabase/migrations/` にマイグレーションを作成する。`profiles` テーブルを `user_id` (UUID, PRIMARY KEY, auth.users の id を参照)、`display_name`、`avatar_url` (TEXT, NULL 可) で定義する。
+2. Auth でユーザーが登録されたときに profiles に 1 行挿入するため、`auth.users` の INSERT 後に発火する Trigger を用意する。Trigger 用の関数で `NEW.id` を使って `profiles` に INSERT する。
+
+## 参考
+- Supabase Auth と DB 連携: https://supabase.com/docs/guides/auth/auth-hooks
+- Database Webhooks（または Trigger）: https://supabase.com/docs/guides/database/database-webhooks
+- 仕様書 6. 実装 TODO リスト → DB [P0]

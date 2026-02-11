@@ -1,9 +1,17 @@
 ## 目的
-会話配列を受け取り、分析結果をまとめて返す API を用意する。
+会話配列を受け取り、分析結果をまとめて返す **HTTP API** を用意する。`app/api/ai/analyze/route.ts` で POST を受け、body から messages を渡して **analyze 用の関数（selfVector を返す実装）** を呼び、その返却をレスポンスにする。
 
 ## やること
-- `/api/ai/analyze` のルートハンドラ実装
-- 会話配列を受け取り、selfVector / resonanceVector / personaSummary を返す
+- `POST /api/ai/analyze` のルートハンドラ実装（リクエスト: `{ messages }`、レスポンス: `{ selfVector, personaSummary }`）
+- body から messages を取得し、analyze 用プロンプト・関数（[AI] 会話ログから selfVector を返す実装）を呼ぶ。返却を Zod 検証し、OK なら `Response.json` で返す。認証が必要なら getSession 等でユーザーを確認する
 
-## 参照
-仕様書 5.6, 6. 実装 TODO リスト → AI 連携 [P1]
+## やり方（初心者向け）
+1. Next.js の `app/api/ai/analyze/route.ts` で POST を受け取り、body から `messages` を取得する。
+2. 既存の analyze 用プロンプト・関数（selfVector + personaSummary を 1 回で返す）を呼び出す。
+3. 返却を Zod で検証し、OK なら `Response.json({ selfVector, personaSummary })` で返す。NG ならリトライ（上限あり）または 500。
+4. 認証が必要なら Supabase の getSession 等でユーザーを確認する。
+
+## 参考
+- Next.js Route Handlers: https://nextjs.org/docs/app/building-your-application/routing/route-handlers
+- Gemini 構造化出力: https://ai.google.dev/gemini-api/docs/structured-output
+- 仕様書 5.8 AI 分析、6. 実装 TODO リスト → AI 連携 [P1]

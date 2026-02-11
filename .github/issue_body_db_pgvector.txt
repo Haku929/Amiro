@@ -11,5 +11,12 @@
 ## 依存
 slots テーブル作成済みであること
 
-## 参照
-仕様書 6. 実装 TODO リスト → DB [P1]
+## やり方（初心者向け）
+1. Supabase の SQL Editor で `CREATE EXTENSION IF NOT EXISTS vector;` を実行する（またはマイグレーションに含める）。
+2. `slots` の `self_vector` が `vector(5)` 型であることを確認する。まだなら ALTER TABLE で型変更する。
+3. ベクトル類似度検索用のインデックスを作成する。例: `CREATE INDEX ON slots USING ivfflat (self_vector vector_cosine_ops) WITH (lists = 100);`（データ量に応じて lists を調整）。cosine 類似度を使う場合は `vector_cosine_ops` を指定する。
+
+## 参考
+- pgvector 拡張: https://github.com/pgvector/pgvector
+- Supabase と pgvector: https://supabase.com/docs/guides/ai/vector-columns
+- 仕様書 6. 実装 TODO リスト → DB [P1]

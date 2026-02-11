@@ -1,8 +1,17 @@
 ## 目的
-会話ログからユーザーの Big5（自己ベクトル）を推定する。
+会話ログから、1 回の AI 呼び出しでユーザーの Big5（selfVector）と要約（personaSummary）を推定する。**HTTP の外**のロジック（プロンプト・Gemini 呼び出し・パース・検証）。ルートハンドラから呼ばれる関数として実装する。
 
 ## やること
-- 会話ログを渡して Big5 の selfVector を返すプロンプト・関数の実装
+- 会話ログを渡し、Gemini の構造化出力で `{ selfVector: Big5Vector, personaSummary: string }` を返すプロンプト・関数の実装
+- 出力は JSON のみ（説明や markdown を付けない）とプロンプトで明示
+- サーバー側でパース後、Zod 等でスキーマ検証し、検証 OK のみ利用。失敗時はリトライまたは 500
 
-## 参照
-仕様書 6. 実装 TODO リスト → AI 連携 [P1]
+## やり方（初心者向け）
+1. Gemini の Generate Content API で、`responseMimeType: "application/json"` または `responseSchema`（JSON Schema）を指定し、LLM の出力を JSON に固定する。
+2. プロンプトでは「会話からユーザーの Big5（o, c, e, a, n を 0〜1）と分人要約文を推定し、指定の JSON 形式のみを出力すること」と書く。
+3. 返却文字列を `JSON.parse` したあと、Zod の `z.object({ selfVector: big5Schema, personaSummary: z.string() })` で検証する。検証失敗時はリトライ（回数制限あり）または 500 を返す。
+
+## 参考
+- Gemini 構造化出力（JSON Mode）: https://ai.google.dev/gemini-api/docs/structured-output
+- Zod スキーマ検証: https://zod.dev/
+- 仕様書 5.8 AI 分析、6. 実装 TODO リスト → AI 連携 [P1]

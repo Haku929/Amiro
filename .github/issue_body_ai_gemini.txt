@@ -2,7 +2,16 @@
 Gemini API を呼び出すクライアントを用意する。
 
 ## やること
-- Gemini API クライアントの初期化（APIキーは環境変数）
+- Gemini API クライアントの初期化（APIキーは環境変数から読み込む）
 
-## 参照
-仕様書 6. 実装 TODO リスト → AI 連携 [P0]
+## やり方（初心者向け）
+1. Google AI Studio または Google Cloud で API キーを取得する。本番では環境変数（例: `GEMINI_API_KEY` または `GOOGLE_GENERATIVE_AI_API_KEY`）に設定し、コード内にハードコードしない。
+2. `@google/generative-ai` パッケージをインストールする（`npm install @google/generative-ai`）。
+3. 初期化用のモジュール（例: `lib/gemini.ts`）で `new GoogleGenerativeAI(process.env.GEMINI_API_KEY)` のようにクライアントを作成する。モデルは仕様書に合わせて Gemini 2.5 Flash 等を指定する。
+4. 他ルート（chat, analyze）からこのクライアントを import して `model.generateContent()` を呼ぶ。
+
+## 参考
+- Google AI for JavaScript: https://ai.google.dev/gemini-api/docs/get-started/tutorial
+- パッケージ npm: https://www.npmjs.com/package/@google/generative-ai
+- 環境変数の扱い（Next.js）: https://nextjs.org/docs/app/building-your-application/configuring/environment-variables
+- 仕様書 6. 実装 TODO リスト → AI 連携 [P0]

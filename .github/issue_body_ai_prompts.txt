@@ -1,11 +1,18 @@
 ## 目的
-会話から Big5 と要約を導くプロンプトを整える。
+会話から Big5（selfVector）と要約（personaSummary）を導くプロンプトを整える。
 
 ## やること
-- 会話から Big5 を推定するプロンプトテンプレート（入力: 会話ログ、出力: JSON の selfVector）
-- 理想の相手（resonanceVector）を導くプロンプトテンプレート
-- personaSummary 用の要約プロンプト作成
+- 会話から Big5 と要約を 1 回で返すプロンプトテンプレート（入力: 会話ログ、出力: JSON の `{ selfVector, personaSummary }`）
+- 構造化出力（Gemini の `responseMimeType: "application/json"` や JSON Schema）で形式を固定
+- プロンプトで「この JSON のみ出力。説明や markdown は付けない」と明示
 - 分析結果の妥当性を確認するためのテスト会話パターンと期待値のメモ
 
-## 参照
-仕様書 6. 実装 TODO リスト → AI・プロンプト [P1]
+## やり方（初心者向け）
+1. プロンプトに「会話履歴から、ユーザーの Big5（o, c, e, a, n を 0〜1 の数値）と、その分人を一文で表す要約（100 字以内）を推定し、指定の JSON のみを出力すること」と書く。
+2. Gemini では `generationConfig.responseMimeType = "application/json"` や `responseSchema` で `{ selfVector: { o, c, e, a, n }, personaSummary: string }` を指定する。
+3. 出力をパース・Zod 検証し、失敗時はリトライまたは 500。テスト会話では、短い会話サンプルと期待に近い selfVector/personaSummary をメモし、実装の妥当性を確認する。
+
+## 参考
+- Gemini 構造化出力（JSON Schema）: https://ai.google.dev/gemini-api/docs/structured-output
+- プロンプト設計のベストプラクティス: https://ai.google.dev/gemini-api/docs/prompting-intro
+- 仕様書 5.8 AI 分析、6. 実装 TODO リスト → AI・プロンプト [P1]

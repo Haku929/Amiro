@@ -1,0 +1,12 @@
+## 目的
+二人の関係性を AI が解説する **HTTP API** のルートハンドラを用意する（AI 担当が実装）。POST を受け、body と認証からスロット情報を揃え、**解説用関数（共鳴詳細用プロンプト）** を呼び、その返却をレスポンスにする。
+
+## やること
+- `app/api/matching/explain/route.ts` で POST を受け、body の `otherUserId`（と必要なら `matchedSlotIndexSelf` / `matchedSlotIndexOther`）を取得する。認証で自ユーザーを特定し、DB から共鳴スコアを実現したスロットの自・相手の selfVector・resonanceVector・personaSummary を取得する。
+- それらを解説用関数（[AI] 共鳴詳細用「二人の関係性を解説」プロンプト）に渡し、返却の `explanation` を `Response.json({ explanation })` で返す。
+
+## 依存
+解説用プロンプト・関数（同上 AI Issue）
+
+## 参照
+仕様書 5.5、6. 実装 TODO リスト → AI・プロンプト [P2]

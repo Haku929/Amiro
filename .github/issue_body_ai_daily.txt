@@ -1,9 +1,12 @@
 ## 目的
-日替わりで異なる性格の AI を提示する。
+鏡キャラで 1 発言を返すチャット API を用意する。
 
 ## やること
-- 日替わりで出現する AI の性格パターン（プロンプトのバリエーション）を 3 種類以上用意
-- ホームで「今日の3体」をランダムに選ぶロジックと、選ばれた AI に応じたシステムプロンプトの適用（日付 UTC シード）
+- `POST /api/ai/chat` を実装する。リクエストに messages（履歴）・シチュエーション・鏡の Big5 を含め、AI が鏡のキャラで 1 発言を返す。1 往復ごとにフロントが本 API を呼ぶ。
 
-## 参照
-仕様書 6. 実装 TODO リスト → AI・プロンプト [P1]
+## やり方（初心者向け）
+1. `app/api/ai/chat/route.ts` で POST を受け、body の messages・situation・mirrorBig5 をシステムプロンプトに組み込み、Gemini で 1 発言を生成して `{ content: string }` で返す。
+
+## 参考
+- Next.js Route Handlers: https://nextjs.org/docs/app/building-your-application/routing/route-handlers
+- 仕様書 5.7 AI チャット、6. 実装 TODO リスト → AI 連携 [P1]
