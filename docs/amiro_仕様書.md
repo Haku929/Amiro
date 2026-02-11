@@ -194,11 +194,11 @@
 
 | 担当 | 人数 | 担当者 | 主なタスク | 備考 |
 | --- | --- | --- | --- | --- |
-| **インフラ・DB** | 1人 | （記入欄） | 本セクション「DB」の TODO すべて。Supabase 作成、profiles / slots、Auth Trigger、RLS、pgvector、共鳴スコア RPC。 | 初日にスキーマを確定し、他に共有。終わったら API の RPC 呼び出しなどを支援可能。 |
-| **API** | 1人 | （記入欄） | 本セクション「API」の TODO すべて。users/me（GET・PATCH）、slots（POST・PUT・DELETE）、matching（GET）、matching/explain（POST）。 | DB のスキーマ・RPC のインターフェースに依存。初日に DB 担当と契約を合わせる。 |
-| **AI・プロンプト** | 1人 | （記入欄） | 本セクション「AI 連携」＋「AI・プロンプト」の TODO。Gemini クライアント、分析用・日替わり・共鳴解説のプロンプト、`/api/ai/analyze` の実装。 | 他とほぼ独立。分析 API の入出力だけ仕様書と揃える。 |
-| **フロント A** | 1人 | （記入欄） | UI 基盤、認証ページ、ホーム、チャット、分人レポート、チャート、フロー（ログイン〜レポート保存まで）。 | レポートは `/api/ai/analyze` と slots/users/me に依存。 |
-| **フロント B** | 1人 | （記入欄） | プロフィール管理、共鳴マッチング一覧、共鳴詳細、フロー（プロフィール・マッチング周り）。 | プロフィールは users/me と slots 系 API、マッチングは GET /api/matching に依存。 |
+| **インフラ・DB** | 1人 | Sakimi-Yamashita | 本セクション「DB」の TODO すべて。Supabase 作成、profiles / slots、Auth Trigger、RLS、pgvector、共鳴スコア RPC。 | 初日にスキーマを確定し、他に共有。終わったら API の RPC 呼び出しなどを支援可能。 |
+| **API** | 1人 | Haku929 | 本セクション「API」の TODO すべて。users/me（GET・PATCH）、slots（POST・PUT・DELETE）、matching（GET）、matching/explain（POST）。 | DB のスキーマ・RPC のインターフェースに依存。初日に DB 担当と契約を合わせる。 |
+| **AI・プロンプト** | 1人 | ayatakami | 本セクション「AI 連携」＋「AI・プロンプト」の TODO。Gemini クライアント、分析用・日替わり・共鳴解説のプロンプト、`/api/ai/analyze` の実装。 | 他とほぼ独立。分析 API の入出力だけ仕様書と揃える。 |
+| **フロント A** | 1人 | KukimiCan | UI 基盤、認証ページ、ホーム、チャット、分人レポート、チャート、フロー（ログイン〜レポート保存まで）。 | レポートは `/api/ai/analyze` と slots/users/me に依存。 |
+| **フロント B** | 1人 | KFugaku | プロフィール管理、共鳴マッチング一覧、共鳴詳細、フロー（プロフィール・マッチング周り）。 | プロフィールは users/me と slots 系 API、マッチングは GET /api/matching に依存。 |
 
 共通で決めること：レイアウト・共通コンポーネント・ルーティング規約は初日または早めに A/B で揃えると衝突が減る。
 
