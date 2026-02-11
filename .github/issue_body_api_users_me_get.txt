@@ -1,0 +1,12 @@
+## 目的
+認証ユーザーのプロフィールとスロット一覧を取得する API を用意する。
+
+## やること
+- `GET /api/users/me` の実装
+- レスポンス: UserProfile（profiles + slots）
+
+## 依存
+DB（profiles, slots）, Supabase Auth
+
+## 参照
+仕様書 5.2 / 6. 実装 TODO リスト → API [P0]

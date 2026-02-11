@@ -1,0 +1,9 @@
+## 目的
+会話配列を受け取り、分析結果をまとめて返す API を用意する。
+
+## やること
+- `/api/ai/analyze` のルートハンドラ実装
+- 会話配列を受け取り、selfVector / resonanceVector / personaSummary を返す
+
+## 参照
+仕様書 5.6, 6. 実装 TODO リスト → AI 連携 [P1]

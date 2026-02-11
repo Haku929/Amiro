@@ -1,0 +1,9 @@
+## 目的
+指定スロットを削除する。
+
+## やること
+- `DELETE /api/slots/:slotIndex` の実装
+- レスポンス: 204 No Content
+
+## 参照
+仕様書 5.3 / 6. 実装 TODO リスト → API [P1]

@@ -1,0 +1,12 @@
+## 目的
+分人スロット（最大3つ）のデータを保存するテーブルを用意する。
+
+## やること
+- `slots` テーブル作成（user_id, slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at）
+- slot_index は 1〜3 の UNIQUE 制約
+
+## 完了条件
+- スキーマが仕様書・API スキーマと整合している
+
+## 参照
+仕様書 3.1, 5.3 / 6. 実装 TODO リスト → DB [P0]

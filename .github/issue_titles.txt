@@ -1,0 +1,6 @@
+[DB] Supabase プロジェクト作成と接続情報の管理
+[DB] profiles テーブル作成と Auth Trigger
+[DB] slots テーブル作成
+[DB] RLS ポリシー設定
+[DB] pgvector 拡張とベクトルインデックス
+[DB] 共鳴スコア計算 RPC

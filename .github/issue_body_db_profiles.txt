@@ -1,0 +1,12 @@
+## 目的
+ユーザー基本情報を保存するテーブルを用意する。
+
+## やること
+- `profiles` テーブル作成（user_id, display_name, avatar_url）
+- Auth 登録時に自動作成する Trigger を用意
+
+## 完了条件
+- 新規登録時に profiles 行が自動作成される
+
+## 参照
+仕様書 6. 実装 TODO リスト → DB [P0]

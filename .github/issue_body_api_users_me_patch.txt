@@ -1,0 +1,8 @@
+## 目的
+表示名・アバターURLを更新する。
+
+## やること
+- `PATCH /api/users/me` の実装（display_name, avatar_url）
+
+## 参照
+仕様書 5.2 / 6. 実装 TODO リスト → API [P1]
