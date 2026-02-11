@@ -6,6 +6,18 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  // 1. 【バイパス設定】テスト用クッキーがあるか確認
+  const isTestSession = request.cookies.get('amiro-test-session')?.value === 'true';
+
+  // 2. テストセッションがある場合、Supabaseのチェックを完全にスキップ
+  if (isTestSession) {
+    // ログイン済みで /login にアクセスした場合はホームへ
+    if (request.nextUrl.pathname.startsWith("/login")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
