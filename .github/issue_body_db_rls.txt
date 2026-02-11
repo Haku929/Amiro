@@ -10,5 +10,11 @@
 - 他ユーザーの profiles/slots を直接書き換えできない
 - 共鳴スコア計算で他ユーザーのスロットは読める
 
-## 参照
-仕様書 6. 実装 TODO リスト → DB [P0]
+## やり方（初心者向け）
+1. `profiles` と `slots` で `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` を実行する。
+2. 自分の行のみ操作可能にするポリシーを作る。例: `CREATE POLICY "自分の profiles のみ" ON profiles FOR ALL USING (auth.uid() = user_id)`。同様に `slots` も `user_id = auth.uid()` のときのみ SELECT / INSERT / UPDATE / DELETE を許可する。
+3. マッチング用に「他ユーザーの slots は SELECT のみ許可」するポリシーを追加する。認証ユーザーなら誰でも slots を読める（書き換えは不可）にすると、API 側で共鳴スコア計算時に他ユーザーのスロットを読める。
+
+## 参考
+- Supabase RLS: https://supabase.com/docs/guides/auth/row-level-security
+- 仕様書 6. 実装 TODO リスト → DB [P0]

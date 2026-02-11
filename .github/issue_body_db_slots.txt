@@ -8,5 +8,10 @@
 ## 完了条件
 - スキーマが仕様書・API スキーマと整合している
 
-## 参照
-仕様書 3.1, 5.3 / 6. 実装 TODO リスト → DB [P0]
+## やり方（初心者向け）
+1. `slots` テーブルをマイグレーションで作成する。カラム: `user_id` (UUID, auth.users 参照)、`slot_index` (1〜3 の整数、UNIQUE(user_id, slot_index))、`self_vector`（ベクトル型。pgvector を使う場合は `vector(5)` や float 配列）、`resonance_vector`、`persona_icon` (TEXT)、`persona_summary` (TEXT)、`created_at` (TIMESTAMPTZ)。
+2. 仕様書 5.3 の SaveSlotRequest と一致するよう、各ベクトルは 5 次元（o, c, e, a, n）を保存できる型にする。pgvector 導入前なら `float[]` や JSONB で一時保存してもよい。
+
+## 参考
+- Supabase マイグレーション: https://supabase.com/docs/guides/cli/local-development#database-migrations
+- 仕様書 3.1 保存されるデータ項目、5.3 分人スロット、6. 実装 TODO リスト → DB [P0]

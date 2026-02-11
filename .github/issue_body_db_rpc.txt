@@ -11,5 +11,12 @@
 ## 依存
 pgvector・slots が利用可能であること
 
-## 参照
-仕様書 3.2 マッチングの計算アルゴリズム / 6. 実装 TODO リスト → DB [P1]
+## やり方（初心者向け）
+1. 仕様書 3.2 の相互共鳴ロジックに従い、「自分→相手」（自分の resonance_vector と相手の self_vector の類似度）と「相手→自分」（相手の resonance_vector と自分の self_vector の類似度）の両方を計算する。
+2. Supabase で RPC として公開する。例: `get_matching_scores(my_user_id UUID, limit_n INT)` のような関数を定義し、全他ユーザーとのスロット組み合わせについて両方向の類似度を算出し、スコアが高い順に返す。pgvector の `<=>` (cosine distance) や `1 - (a <=> b)` で類似度に変換できる。
+3. GET /api/matching の実装側でこの RPC を呼び出し、結果を limit/offset で整形して返す。
+
+## 参考
+- pgvector の演算子: https://github.com/pgvector/pgvector#querying
+- Supabase RPC: https://supabase.com/docs/guides/database/functions
+- 仕様書 3.2 マッチングの計算アルゴリズム、6. 実装 TODO リスト → DB [P1]

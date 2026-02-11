@@ -9,5 +9,12 @@
 - プロジェクトが作成済み
 - 環境変数で SUPABASE_URL / SUPABASE_ANON_KEY 等を参照できる
 
-## 参照
-仕様書 6. 実装 TODO リスト → DB [P0]
+## やり方（初心者向け）
+1. https://supabase.com にログインし、New Project でプロジェクトを作成する。リージョンと DB パスワードを設定する。
+2. ダッシュボードの Settings → API で Project URL と anon public key をコピーする。
+3. プロジェクトルートに `.env.local` を作成し、`NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` を設定する。`.env.example` には変数名だけ記載し、値はコミットしない。
+
+## 参考
+- Supabase クイックスタート: https://supabase.com/docs/guides/getting-started/quickstarts/nextjs
+- 環境変数（Next.js）: https://nextjs.org/docs/app/building-your-application/configuring/environment-variables
+- 仕様書 6. 実装 TODO リスト → DB [P0]

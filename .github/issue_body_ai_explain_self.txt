@@ -1,0 +1,15 @@
+## 目的
+自・相手のスロット情報から「二人の関係性」の解説文を返す。**HTTP の外**のロジック（プロンプト・Gemini 呼び出し）。ルートハンドラから呼ばれる関数として実装する。
+
+## やること
+- 自・相手の selfVector・resonanceVector・personaSummary（仕様書 5.5 の AI への入力）を受け取り、プロンプトを組み立て、Gemini の `generateContent` で解説文を生成し、`{ explanation: string }` を返す関数の実装。
+- プロンプトでは「二人の自己・共鳴ベクトルと要約を踏まえ、なぜこの二人だと『好きな自分』でいられるかを、ユーザー向けに 2〜3 文で解説すること」と指示する。
+
+## やり方（初心者向け）
+1. 引数で自・相手のスロット情報（各 selfVector, resonanceVector, personaSummary）を受け取る関数を用意する（例: `lib/explain.ts` や `lib/prompts/` 内）。
+2. プロンプトに上記 6 項目を埋め込み、Gemini で 1 発言を生成する。構造化出力で `{ explanation: string }` にしてもよい。
+3. ルートハンドラ（[AI] explain ルート）が DB から取得したスロット情報をこの関数に渡し、返却をそのままレスポンスに載せる。
+
+## 参考
+- Gemini テキスト生成: https://ai.google.dev/gemini-api/docs/get-started/tutorial
+- 仕様書 5.5 共鳴詳細（AI解説）、6. 実装 TODO リスト → AI・プロンプト [P2]
