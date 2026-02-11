@@ -6,6 +6,18 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  // 1. 【バイパス設定】テスト用クッキーがあるか確認
+  const isTestSession = request.cookies.get('amiro-test-session')?.value === 'true';
+
+  // 2. テストセッションがある場合、Supabaseのチェックを完全にスキップ
+  if (isTestSession) {
+    // ログイン済みで /login にアクセスした場合はホームへ
+    if (request.nextUrl.pathname.startsWith("/login")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,11 +45,11 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // 未ログイン かつ アクセス先が /login でない場合は /login へリダイレクト
-  // if (!user && !request.nextUrl.pathname.startsWith("/login")) {
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/login";
-  //   return NextResponse.redirect(url);
-  // }
+  if (!user && !request.nextUrl.pathname.startsWith("/login")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
 
   // ログイン済み かつ アクセス先が /login の場合はホーム (/) へリダイレクト
   if (user && request.nextUrl.pathname.startsWith("/login")) {
