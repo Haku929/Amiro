@@ -499,10 +499,10 @@ export default function SlotManager() {
               : 'bg-zinc-900 text-white hover:bg-zinc-800 shadow-sm'
           }`}
         >
-          ＋ 分人スロットを追加
+          ＋ 分人を追加
         </button>
         {isFull && (
-          <p className="text-sm text-red-500 font-medium">※分人スロットは最大3つまでです</p>
+          <p className="text-sm text-red-500 font-medium">※分人は最大3つまでです</p>
         )}
       </div>
     </div>
