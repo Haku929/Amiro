@@ -246,8 +246,8 @@ import { User } from 'lucide-react'; // アイコンをインポート
 
 const MAX_SLOTS = 3;
 
-// ベクトルの項目名
-const VECTOR_TRAITS = ['神経症傾向', '誠実性', '外向性', '協調性', '開放性'];
+const VECTOR_TRAITS = ['神経症傾向', '誠実性', '外向性', '協調性', '開放性'] as const;
+const VECTOR_KEYS: (keyof import('@/lib/types').Big5Vector)[] = ['n', 'c', 'e', 'a', 'o'];
 
 export default function SlotManager() {
   const [slots, setSlots] = useState<Record<number, Slot | null>>({
@@ -268,7 +268,7 @@ export default function SlotManager() {
           const data: Slot[] = await response.json();
           const slotsMap: Record<number, Slot | null> = { 1: null, 2: null, 3: null };
           data.forEach(slot => {
-            slotsMap[slot.slot_index] = slot;
+            slotsMap[slot.slotIndex] = slot;
           });
           setSlots(slotsMap);
         }
@@ -281,18 +281,19 @@ export default function SlotManager() {
     fetchSlots();
   }, []);
 
+  const defaultVector = { o: 0.5, c: 0.5, e: 0.5, a: 0.5, n: 0.5 };
   const handleSaveSlot = async (slotIndex: number, slotData: Partial<Slot>) => {
-    // タイムスタンプ用の現在時刻を生成
+    const existing = slots[slotIndex] ?? null;
     const now = new Date();
-    const timestamp = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    const newSlot = { 
-      slot_index: slotIndex, 
-      title: slotData.title || '', 
-      content: slotData.content || '',
-      updated_at: timestamp // タイムスタンプを保存
-    } as Slot;
-    
+    const createdAt = now.toISOString();
+    const newSlot: Slot = {
+      slotIndex: (slotData.slotIndex ?? slotIndex) as 1 | 2 | 3,
+      selfVector: slotData.selfVector ?? existing?.selfVector ?? defaultVector,
+      resonanceVector: slotData.resonanceVector ?? existing?.resonanceVector ?? defaultVector,
+      personaIcon: slotData.personaIcon ?? existing?.personaIcon ?? '',
+      personaSummary: slotData.personaSummary ?? existing?.personaSummary ?? '',
+      createdAt: slotData.createdAt ?? existing?.createdAt ?? createdAt,
+    };
     setSlots(prev => ({ ...prev, [slotIndex]: newSlot }));
 
     try {
@@ -334,10 +335,8 @@ export default function SlotManager() {
 
   const handleConfirmAdd = () => {
     if (addingIndex !== null && newTitle.trim() !== "") {
-      // AIから生成される「分人要約文」のプレースホルダーとしてセット
-      handleSaveSlot(addingIndex, { 
-        title: newTitle, 
-        content: "この分人は、相手の話を丁寧に聴き、共感を示す傾向が強く表れています。リラックスした関係性を築く際に活性化しやすいペルソナです。" 
+      handleSaveSlot(addingIndex, {
+        personaSummary: newTitle.trim() + " — この分人は、相手の話を丁寧に聴き、共感を示す傾向が強く表れています。",
       });
       setAddingIndex(null);
       setNewTitle("");
@@ -410,9 +409,9 @@ export default function SlotManager() {
                 
                 {/* 1. 左上: スロット名 / 5. 右上: タイムスタンプ */}
                 <div className="flex justify-between items-start w-full z-10">
-                  <h4 className="font-bold text-zinc-900 text-base">{slot.title}</h4>
+                  <h4 className="font-bold text-zinc-900 text-base">{slot.personaSummary.slice(0, 20)}{slot.personaSummary.length > 20 ? '…' : ''}</h4>
                   <span className="text-[10px] text-zinc-400 font-mono">
-                    {slot.updated_at || "2026/02/11 12:00"}
+                    {slot.createdAt ? new Date(slot.createdAt).toLocaleString('ja-JP') : "—"}
                   </span>
                 </div>
 
@@ -430,23 +429,22 @@ export default function SlotManager() {
                   <div className="space-y-2">
                     <p className="text-xs font-bold text-zinc-800 text-center border-b border-zinc-100 pb-1">自己ベクトル</p>
                     <div className="space-y-1">
-                      {VECTOR_TRAITS.map(trait => (
+                      {VECTOR_TRAITS.map((trait, i) => (
                         <div key={`self-${trait}`} className="flex justify-between items-center text-[11px] text-zinc-600">
                           <span>{trait}</span>
-                          <span className="font-mono bg-zinc-100 px-1.5 rounded">50</span>
+                          <span className="font-mono bg-zinc-100 px-1.5 rounded">{Math.round((slot.selfVector[VECTOR_KEYS[i]] ?? 0.5) * 100)}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* 右: 共鳴ベクトル */}
                   <div className="space-y-2">
                     <p className="text-xs font-bold text-zinc-800 text-center border-b border-zinc-100 pb-1">共鳴ベクトル</p>
                     <div className="space-y-1">
-                      {VECTOR_TRAITS.map(trait => (
+                      {VECTOR_TRAITS.map((trait, i) => (
                         <div key={`res-${trait}`} className="flex justify-between items-center text-[11px] text-zinc-600">
                           <span>{trait}</span>
-                          <span className="font-mono bg-zinc-100 px-1.5 rounded">50</span>
+                          <span className="font-mono bg-zinc-100 px-1.5 rounded">{Math.round((slot.resonanceVector[VECTOR_KEYS[i]] ?? 0.5) * 100)}</span>
                         </div>
                       ))}
                     </div>
@@ -459,7 +457,7 @@ export default function SlotManager() {
                   <div className="bg-zinc-50 rounded-lg p-3 border border-zinc-100">
                     <p className="text-[10px] font-semibold text-zinc-400 mb-1 text-center">分人要約文</p>
                     <p className="text-xs text-zinc-700 leading-relaxed text-center">
-                      {slot.content}
+                      {slot.personaSummary}
                     </p>
                   </div>
                 </div>
@@ -468,8 +466,8 @@ export default function SlotManager() {
                 <div className="flex gap-2 pt-4 border-t border-zinc-100 mt-auto">
                   <button 
                     onClick={() => {
-                      const newTitle = prompt("新しいスロット名", slot.title);
-                      if(newTitle) handleSaveSlot(index, { ...slot, title: newTitle });
+                      const nextSummary = prompt("分人要約文を編集", slot.personaSummary);
+                      if (nextSummary != null) handleSaveSlot(index, { ...slot, personaSummary: nextSummary });
                     }}
                     className="flex-1 px-3 py-2 text-xs font-medium bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors"
                   >
