@@ -1,8 +1,23 @@
-export interface Slot {
-  id?: string;
-  slot_index: number; // 1, 2, 3 のいずれか
-  title: string;
-  content: string;
-  created_at?: string;
-  updated_at?: string;
-}
+export type Big5Vector = {
+  o: number;
+  c: number;
+  e: number;
+  a: number;
+  n: number;
+};
+
+export type Slot = {
+  slotIndex: 1 | 2 | 3;
+  selfVector: Big5Vector;
+  resonanceVector: Big5Vector;
+  personaIcon: string;
+  personaSummary: string;
+  createdAt: string;
+};
+
+export type UserProfile = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  slots: Slot[];
+};
