@@ -54,7 +54,6 @@ const issues = [
   { title: "[API] GET /api/users/me の実装", body: readBody("issue_body_api_users_me_get.txt"), labels: ["backend"] },
   { title: "[API] POST /api/slots の実装", body: readBody("issue_body_api_slots_post.txt"), labels: ["backend"] },
   { title: "[API] PUT /api/slots/:slotIndex の実装", body: readBody("issue_body_api_slots_put.txt"), labels: ["backend"] },
-  { title: "[API] DELETE /api/slots/:slotIndex の実装", body: readBody("issue_body_api_slots_delete.txt"), labels: ["backend"] },
   { title: "[API] GET /api/matching の実装", body: readBody("issue_body_api_matching_get.txt"), labels: ["backend"] },
   { title: "[API] PATCH /api/users/me の実装", body: readBody("issue_body_api_users_me_patch.txt"), labels: ["backend"] },
   { title: "[API] POST /api/matching/explain の実装", body: readBody("issue_body_api_matching_explain.txt"), labels: ["backend"] },
