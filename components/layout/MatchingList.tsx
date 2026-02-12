@@ -51,19 +51,19 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
         <Link 
           key={match.id} 
           href={`/matching/${match.id}?slot=${currentSlotIndex}`}
-          className="block flex flex-col xl:flex-row items-stretch gap-4 p-4 border border-zinc-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group"
+          className="block flex flex-col xl:flex-row items-stretch gap-6 p-5 border border-zinc-200 rounded-2xl bg-white shadow-sm hover:shadow-md hover:border-rose-200 transition-all cursor-pointer group"
         >
-          {/* 左側: アイコンと名前 (w-40でMyProfileCardと統一) */}
-          <div className="flex items-center gap-4 xl:w-40 xl:border-r xl:border-zinc-100 xl:pr-4 shrink-0">
-            <div className="w-14 h-14 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-inner group-hover:scale-105 transition-transform">
-              <User strokeWidth={1.5} size={28} />
+          {/* 左側: アイコンと名前 (w-64でMyProfileCardと統一) */}
+          <div className="flex xl:flex-col items-center xl:justify-center gap-4 xl:w-64 xl:border-r xl:border-zinc-100 xl:pr-6 shrink-0">
+            <div className="w-16 h-16 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-inner group-hover:scale-105 transition-transform group-hover:bg-rose-50 group-hover:text-rose-400 group-hover:border-rose-100">
+              <User strokeWidth={1.5} size={32} />
             </div>
-            <div className="flex flex-col justify-center items-start min-w-0">
-              <h3 className="text-lg font-bold text-zinc-900 group-hover:text-rose-600 transition-colors truncate w-full">{match.name}</h3>
+            <div className="flex flex-col xl:items-center justify-center items-start min-w-0 flex-1 xl:flex-none xl:w-full text-left xl:text-center">
+              <h3 className="text-xl font-bold text-zinc-900 group-hover:text-rose-600 transition-colors truncate w-full">{match.name}</h3>
               
-              <div className="mt-1.5 bg-rose-50 px-3 py-1 rounded-lg border border-rose-100/50 flex flex-col items-center min-w-[70px]">
-                <span className="text-[9px] font-bold text-rose-400 uppercase tracking-wider leading-none mb-0.5">共鳴スコア</span>
-                <span className="text-xl font-black text-rose-500 leading-none">
+              <div className="mt-2 bg-rose-50 px-4 py-1.5 rounded-lg border border-rose-100/50 flex flex-col items-center min-w-[80px]">
+                <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider leading-none mb-1">共鳴スコア</span>
+                <span className="text-2xl font-black text-rose-500 leading-none">
                   {match.resonanceScore}
                 </span>
               </div>
@@ -71,7 +71,7 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
           </div>
 
           {/* 右側: ベクトル ＋ 要約文 */}
-          <div className="flex flex-1 flex-col gap-3">
+          <div className="flex flex-1 flex-col gap-4">
             <div className="flex flex-col sm:flex-row gap-4">
               
               {/* 1. 自己ベクトル */}

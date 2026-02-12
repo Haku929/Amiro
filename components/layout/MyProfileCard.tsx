@@ -35,27 +35,27 @@ interface MyProfileCardProps {
 
 export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyProfileCardProps) {
   return (
-    <div className="w-full bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm">
-      <div className="flex flex-col xl:flex-row items-stretch gap-4">
+    <div className="w-full bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm">
+      <div className="flex flex-col xl:flex-row items-stretch gap-6">
         
-        {/* 1. 左ブロック：基本情報 & スイッチ (w-40でリストと統一) */}
-        <div className="flex flex-col items-center justify-center gap-3 xl:w-40 shrink-0 xl:border-r xl:border-zinc-100 xl:pr-4">
+        {/* 1. 左ブロック：基本情報 & スイッチ (w-64でリストと統一) */}
+        <div className="flex flex-col items-center justify-center gap-4 xl:w-64 shrink-0 xl:border-r xl:border-zinc-100 xl:pr-6">
           <div className="relative">
-            <div className="w-14 h-14 bg-zinc-50 border-2 border-zinc-100 rounded-full flex items-center justify-center text-zinc-400 shadow-sm">
-              <User strokeWidth={1.5} size={28} />
+            <div className="w-16 h-16 bg-zinc-50 border-2 border-zinc-100 rounded-full flex items-center justify-center text-zinc-400 shadow-sm">
+              <User strokeWidth={1.5} size={32} />
             </div>
           </div>
           
           <div className="text-center w-full">
-            <h2 className="text-lg font-bold text-zinc-900">あなた</h2>
-            <div className="flex gap-1.5 mt-2 flex-wrap justify-center">
+            <h2 className="text-xl font-bold text-zinc-900">あなた</h2>
+            <div className="flex gap-2 mt-3 flex-wrap justify-center">
               {slots.map((slot) => (
                 <button
                   key={slot.slotIndex}
                   onClick={() => onSlotChange(slot.slotIndex)}
-                  className={`px-2 py-1 text-[10px] font-bold rounded-full transition-all border ${
+                  className={`px-3 py-1 text-xs font-bold rounded-full transition-all border ${
                     currentSlot.slotIndex === slot.slotIndex
-                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-sm'
+                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-md transform scale-105'
                       : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50'
                   }`}
                 >
@@ -67,7 +67,7 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
         </div>
 
         {/* 2. 右ブロック：ベクトル表示 & 要約 */}
-        <div className="flex-1 flex flex-col gap-3">
+        <div className="flex-1 flex flex-col gap-4">
           
           {/* 上段: ベクトル2カラム */}
           <div className="flex flex-col sm:flex-row gap-4">

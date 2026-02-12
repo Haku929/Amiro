@@ -139,38 +139,43 @@ export default function MatchingContainer() {
   }, [baseMatches, activeFilter, currentSlot]);
 
   return (
-    <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col h-screen bg-zinc-50/30 overflow-hidden">
+    <div className="lg:pl-20 h-screen flex flex-col bg-zinc-50/30 overflow-hidden">
       
       {/* 1. 上部固定エリア (タイトル + 自分カード) */}
-      <div className="shrink-0 bg-white border-b border-zinc-200 z-20 shadow-sm relative">
-        <div className="w-full max-w-5xl mx-auto px-4 lg:px-6 pt-3 pb-6">
+      <div className="shrink-0 bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-sm z-30 relative">
+        <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
           
-          {/* タイトル (左上、小さく) */}
-          <div className="mb-3">
-             <h1 className="text-lg font-bold text-zinc-500 tracking-tight flex items-center gap-2">
-               <span className="w-2 h-2 bg-rose-500 rounded-full"></span>
+          {/* タイトル (独立した行) */}
+          <div>
+             <h1 className="text-2xl font-bold text-zinc-800 tracking-tight flex items-center gap-2.5">
+               <span className="w-3 h-3 bg-rose-500 rounded-full animate-pulse"></span>
                共鳴マッチング
              </h1>
+             <p className="text-xs text-zinc-500 ml-6 mt-1">あなたの「分人」と共鳴する相手を見つけます</p>
           </div>
 
-          {/* 横長の自分カード (相手リストと幅・位置を統一) */}
-          <MyProfileCard slots={MOCK_SLOTS} currentSlot={currentSlot} onSlotChange={handleSlotChange} />
+          {/* 自分カード */}
+          <div className="w-full">
+             <MyProfileCard slots={MOCK_SLOTS} currentSlot={currentSlot} onSlotChange={handleSlotChange} />
+          </div>
 
         </div>
 
         {/* ロード中表示 */}
-        {isSearching && (
-          <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
+        <div className={`absolute inset-0 bg-white/60 backdrop-blur-[1px] z-50 flex items-center justify-center transition-opacity duration-300 ${isSearching ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-xs font-bold text-rose-500 tracking-wider">SEARCHING...</span>
+            </div>
+        </div>
       </div>
 
       {/* 2. 下部スクロールエリア (相手リスト) */}
-      <div className="flex-1 overflow-y-auto p-4 lg:p-6 scroll-smooth overscroll-contain bg-zinc-50/50">
-        <div className="w-full max-w-5xl mx-auto">
-          <MatchingList matches={filteredMatches} currentSlotIndex={currentSlotIndex} />
-          <div className="h-32" />
+      <div className="flex-1 overflow-y-auto bg-zinc-50/50">
+        <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-6">
+           {/* 相手リスト (スペーサーなし、幅一杯でMyCardと揃う) */}
+           <MatchingList matches={filteredMatches} currentSlotIndex={currentSlotIndex} />
+           <div className="h-32" />
         </div>
       </div>
 
