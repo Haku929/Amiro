@@ -20,6 +20,10 @@ function mapSlot(row: {
   };
 }
 
+/**
+ * 認証ユーザーのプロフィールとスロット一覧を取得する。
+ * @returns 200: `UserProfile` (userId, displayName, avatarUrl, slots). 401: `{ error: "Unauthorized" }`. 404: `{ error: "Profile not found" }`. 500: `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
+ */
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -87,6 +91,11 @@ async function fetchUserProfile(
   return { profile, slots };
 }
 
+/**
+ * 認証ユーザーのプロフィール（表示名・アバターURL）を部分的に更新する。body にない項目は変更しない。
+ * @param request - JSON body: `{ displayName?: string; avatarUrl?: string | null }` のいずれかまたは両方。Auth required.
+ * @returns 200: 更新後の `UserProfile`. 401: `{ error: "Unauthorized" }`. 400: `{ error: "Invalid JSON" }`. 404: `{ error: "Profile not found" }`. 500: `{ error: "Profile update failed" }`, `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
+ */
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient();
