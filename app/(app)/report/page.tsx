@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Big5BarChart } from "@/components/chart/Big5BarChart"; // 追加
+import { Big5SliderChart } from "@/components/chart/Big5SliderChart";
 import { Big5Vector, Slot } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -16,32 +16,7 @@ import { cn } from "@/lib/utils";
 // 型定義・定数 (BIG5_LABELS等はコンポーネント側に移動したため削除)
 // -----------------------------------------------------------------------------
 
-const MOCK_EXISTING_SLOTS: Slot[] = [
-  {
-    slotIndex: 1,
-    selfVector: { o: 0.2, c: 0.8, e: 0.5, a: 0.4, n: 0.6 },
-    resonanceVector: { o: 0.3, c: 0.7, e: 0.6, a: 0.5, n: 0.5 },
-    personaIcon: "/avatars/slot1.png",
-    personaSummary: "論理的で冷静な分析家",
-    createdAt: "2026-02-10T10:00:00Z",
-  },
-  {
-    slotIndex: 2,
-    selfVector: { o: 0.8, c: 0.2, e: 0.9, a: 0.7, n: 0.3 },
-    resonanceVector: { o: 0.7, c: 0.3, e: 0.8, a: 0.6, n: 0.4 },
-    personaIcon: "/avatars/slot2.png",
-    personaSummary: "情熱的な冒険者",
-    createdAt: "2026-02-11T15:30:00Z",
-  },
-  {
-    slotIndex: 3,
-    selfVector: { o: 0.5, c: 0.5, e: 0.5, a: 0.9, n: 0.2 },
-    resonanceVector: { o: 0.5, c: 0.5, e: 0.5, a: 0.8, n: 0.3 },
-    personaIcon: "/avatars/slot3.png",
-    personaSummary: "穏やかな聞き手",
-    createdAt: "2026-02-12T09:00:00Z",
-  },
-];
+
 
 // -----------------------------------------------------------------------------
 // メインコンポーネント
@@ -77,30 +52,53 @@ export default function ReportPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkSlots = async () => {
-      const useFullSlotsMock = false; 
-
-      if (useFullSlotsMock) {
-        setExistingSlots(MOCK_EXISTING_SLOTS);
-        setIsFull(true);
-      } else {
-        setExistingSlots([MOCK_EXISTING_SLOTS[0]]);
-        setIsFull(false);
+    const fetchSlots = async () => {
+      try {
+        const res = await fetch("/api/slots");
+        if (res.ok) {
+          const data = await res.json();
+          setExistingSlots(data);
+          if (data.length >= 3) {
+            setIsFull(true);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch slots", err);
       }
     };
-    checkSlots();
+    fetchSlots();
   }, []);
 
   const handleSave = async () => {
     setLoading(true);
     setError(null);
     try {
+      // Mock save functionality (Backend/DB is not ready for frontend testing)
+      // const body = {
+      //   selfVector,
+      //   resonanceVector,
+      //   personaIcon: "🧩", 
+      //   personaSummary: summary,
+      // };
+
       if (isFull && selectedSlotIndex === null) {
-        setError("上書きするスロットを選択してください");
-        setLoading(false);
-        return;
+          setError("上書きするスロットを選択してください");
+          setLoading(false);
+          return;
       }
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // if (isFull) {
+      //   // Overwrite existing slot
+      //   const res = await fetch(`/api/slots/${selectedSlotIndex}`, { ... });
+      // } else {
+      //   // Create new slot
+      //   const res = await fetch("/api/slots", { ... });
+      // }
+      
+      alert("保存しました（モック）");
       router.push("/profile");
     } catch (err) {
       console.error(err);
@@ -139,14 +137,14 @@ export default function ReportPage() {
       {/* 2. Big5 上下分割比較エリア */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">性格特性の共鳴</CardTitle>
+          <CardTitle className="text-lg">性格特性</CardTitle>
           <CardDescription>
-            あなたと相手の波長の比較
+            あなたと会話相手の波長の比較
           </CardDescription>
         </CardHeader>
         <CardContent>
           {/* コンポーネント呼び出し */}
-          <Big5BarChart 
+          <Big5SliderChart 
             selfVector={selfVector} 
             resonanceVector={resonanceVector} 
           />
