@@ -43,17 +43,7 @@ export default function Header() {
         >
           <Compass className="w-6 h-6" strokeWidth={2} />
         </Link>
-        <Link 
-          href="/chat" 
-          className={`p-3 rounded-xl transition-all ${
-            pathname.startsWith("/chat") 
-              ? "bg-zinc-100 text-zinc-900 shadow-sm"
-              : "text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100"
-          }`} 
-          title="チャット"
-        >
-          <Sparkles className="w-6 h-6" strokeWidth={2} />
-        </Link>
+
       </nav>
 
       {/* 下部: プロフィールと設定 */}

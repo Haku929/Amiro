@@ -22,54 +22,7 @@ type Big5 = {
   n: number;
 };
 
-// -----------------------------------------------------------------------------
-// モック API 関数 (本来はサーバーサイド実装)
-// -----------------------------------------------------------------------------
 
-// 会話APIのモック
-const mockChatApi = async (
-  message: string,
-  situation: string,
-  big5: Big5
-): Promise<string> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 簡易的な性格反映ロジック（デモ用）
-      let prefix = "";
-      if (big5.e > 0.6) prefix += "（元気よく）";
-      if (big5.n > 0.6) prefix += "（少し心配そうに）";
-      if (big5.o > 0.6) prefix += "なるほど、興味深いですね！";
-      
-      const responses = [
-        `その件について、${situation}の観点から考えるとどう思いますか？`,
-        "それは新しい発見ですね。詳しく教えてください。",
-        "ふむふむ、それで？",
-        `今の言葉、すごくあなたらしい響きがしました。`,
-      ];
-      
-      const randomRes = responses[Math.floor(Math.random() * responses.length)];
-      resolve(`${prefix} ${message}ですね。${randomRes}`);
-    }, 1000); // 1秒の遅延
-  });
-};
-
-// 分析APIのモック
-const mockAnalyzeApi = async (messages: Message[]): Promise<{ selfVector: Big5; summary: string }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        selfVector: {
-          o: Math.random(),
-          c: Math.random(),
-          e: Math.random(),
-          a: Math.random(),
-          n: Math.random(),
-        },
-        summary: "今回の会話から、あなたは非常に論理的でありながら、新しい可能性に対して開かれた姿勢を持っていることが読み取れました。特に後半の問いかけには、自身の内面を深く見つめようとする意志が感じられます。",
-      });
-    }, 2000); // 2秒の遅延
-  });
-};
 
 // -----------------------------------------------------------------------------
 // メインコンポーネント
@@ -106,13 +59,47 @@ export default function ChatPage() {
     }
   }, [messages, loading]);
 
-  // 初回メッセージ（オプション：鏡からの挨拶を入れる場合）
+  // 初回メッセージ（AIから会話を開始）
+  const hasStarted = useRef(false);
+
   useEffect(() => {
-    if (messages.length === 0) {
-       // ここで初期メッセージを入れることも可能ですが、
-       // 仕様では「ユーザー送信のたびに...」とあるため、最初は空か、システムメッセージのみとします。
+    if (messages.length === 0 && !hasStarted.current && situation !== "未設定のシチュエーション") {
+       hasStarted.current = true;
+       const startChat = async () => {
+         setLoading(true);
+         try {
+           // システムからの指示として、AIに挨拶を求める（ユーザーには見せないメッセージ）
+           const hiddenInitiatorMessage = { 
+             role: "user" as const, 
+             content: "（システム指示：このシチュエーションで、あなたからユーザーに話しかけて会話を始めてください。100文字以内で、自然な問いかけや挨拶を行ってください。）" 
+           };
+           
+           const res = await fetch("/api/ai/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [hiddenInitiatorMessage],
+              situation,
+              mirrorBig5,
+            }),
+          });
+    
+          if (!res.ok) throw new Error("Init chat failed");
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+
+          // AIの応答のみをメッセージ履歴に追加
+          setMessages([{ role: "model", content: data.content }]);
+         } catch (e) {
+           console.error("Auto start chat failed", e);
+           // 失敗時は何も表示しないか、エラーを表示（今回は静観し、ユーザー入力を待つ）
+         } finally {
+           setLoading(false);
+         }
+       };
+       startChat();
     }
-  }, []);
+  }, [situation]);
 
   // 送信ハンドラ
   const handleSend = async () => {
@@ -120,19 +107,38 @@ export default function ChatPage() {
 
     const userMsg = input;
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    const newMessages = [...messages, { role: "user" as const, content: userMsg }];
+    setMessages(newMessages);
     setLoading(true);
 
     try {
-      // 1. AI応答の取得 (Mock)
-      const aiResponse = await mockChatApi(userMsg, situation, mirrorBig5);
+      // 1. AI応答の取得 (Real API)
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages,
+          situation,
+          mirrorBig5,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Chat API error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
       
-      setMessages((prev) => [...prev, { role: "model", content: aiResponse }]);
+      setMessages((prev) => [...prev, { role: "model", content: data.content }]);
       setTurnCount((prev) => prev + 1);
 
     } catch (error) {
       console.error("Chat Error:", error);
       // エラー処理（トーストなどを出すのが望ましい）
+      setMessages((prev) => [...prev, { role: "model", content: "すみません、エラーが発生しました。" }]);
     } finally {
       setLoading(false);
     }
@@ -144,8 +150,21 @@ export default function ChatPage() {
     setAnalyzing(true);
 
     try {
-      // 1. 分析実行 (Mock)
-      const result = await mockAnalyzeApi(messages);
+      // 1. 分析実行 (Real API)
+      const res = await fetch("/api/ai/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Analyze API error: ${res.status}`);
+      }
+
+      const result = await res.json();
+      if (result.error) {
+        throw new Error(result.error);
+      }
 
       // 2. レポートページへ遷移 (クエリパラメータで結果を渡す)
       const query = new URLSearchParams({
@@ -155,7 +174,7 @@ export default function ChatPage() {
         s_e: result.selfVector.e.toString(),
         s_a: result.selfVector.a.toString(),
         s_n: result.selfVector.n.toString(),
-        summary: result.summary,
+        summary: result.personaSummary, // API returns personaSummary
         // 鏡の設定 (Resonanceとして保存するため引き継ぐ)
         r_o: mirrorBig5.o.toString(),
         r_c: mirrorBig5.c.toString(),
@@ -169,6 +188,7 @@ export default function ChatPage() {
 
     } catch (error) {
       console.error("Analysis Error:", error);
+      alert("分析中にエラーが発生しました。");
       setAnalyzing(false);
     }
   };
