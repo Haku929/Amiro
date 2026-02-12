@@ -8,7 +8,7 @@ import MatchingList from './MatchingList';
 import { Slot, Big5Vector } from '@/lib/types';
 
 type VectorKey = keyof Big5Vector;
-const VECTOR_TRAITS = ['神経症傾向', '誠実性', '外向性', '協調性', '開放性'] as const;
+const VECTOR_TRAITS = ['情動性', '勤勉性', '外向性', '協調性', '創造性'] as const;
 const VECTOR_KEYS: VectorKey[] = ['n', 'c', 'e', 'a', 'o'];
 
 export interface MatchUser {
