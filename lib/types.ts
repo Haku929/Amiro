@@ -15,6 +15,13 @@ export type Slot = {
   createdAt: string;
 };
 
+export type SaveSlotRequest = {
+  selfVector: Big5Vector;
+  resonanceVector: Big5Vector;
+  personaIcon: string;
+  personaSummary: string;
+};
+
 export type UserProfile = {
   userId: string;
   displayName: string;
