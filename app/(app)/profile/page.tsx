@@ -1,41 +1,51 @@
 // app/(app)/profile/page.tsx
 import SlotManager from '@/components/layout/SlotManager';
+import { User } from 'lucide-react';
 
-// ※メタデータを設定する場合はここに追加
 export const metadata = {
   title: 'プロフィール管理 | Amiro',
 };
 
+// ▼ ユーザー情報のモックデータ
+const MOCK_USER = {
+  name: 'Sample User',
+  iconUrl: null, 
+};
+
 export default function ProfilePage() {
   return (
-    // 親の layout.tsx でサイドバー分の余白 (ml-20 など) が設定されている前提のスタイリングです
-    <div className="max-w-5xl mx-auto p-6 md:p-10">
+    // 画面全体の高さを固定し、中央寄せ
+    <div className="h-[calc(100vh-1rem)] flex flex-col p-4 lg:p-8 overflow-hidden w-full max-w-5xl mx-auto">
       
-      {/* ページヘッダー */}
-      <div className="mb-10 border-b pb-6">
-        <h1 className="text-3xl font-bold text-zinc-900">プロフィール</h1>
-        <p className="text-zinc-500 mt-2">
-          あなたのアカウント情報と、マッチング用のスロットを管理します。
-        </p>
+      {/* 1. ページヘッダー & ユーザー情報 (固定エリア) */}
+      <div className="shrink-0 mb-4 flex items-end justify-between border-b border-zinc-200 pb-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-zinc-900 tracking-tight">プロフィール</h1>
+          <p className="text-xs text-zinc-500 mt-1">
+            アカウント情報とマッチングスロットの管理
+          </p>
+          
+          <div className="flex items-center gap-3 mt-3">
+            <div className="w-10 h-10 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-sm overflow-hidden">
+              {MOCK_USER.iconUrl ? (
+                <img src={MOCK_USER.iconUrl} alt={MOCK_USER.name} className="w-full h-full object-cover" />
+              ) : (
+                <User strokeWidth={1.5} size={20} />
+              )}
+            </div>
+            <div>
+              <p className="text-base font-bold text-zinc-900 leading-none">{MOCK_USER.name}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-12">
-        {/* --- プロフィール基本情報エリア (今回はプレースホルダー) --- */}
-        <section>
-          <h2 className="text-xl font-semibold text-zinc-800 mb-4">基本情報</h2>
-          <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
-            <p className="text-zinc-500 text-sm">※ここにユーザー名やアイコンなどの設定項目が入ります</p>
-          </div>
-        </section>
-
-        {/* --- スロット管理エリア --- */}
-        <section>
-          <h2 className="text-xl font-semibold text-zinc-800 mb-4">マッチングスロット設定</h2>
-          <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-200">
-            {/* 作成した SlotManager コンポーネントを配置 */}
-            <SlotManager />
-          </div>
-        </section>
+      {/* 2. スクロール領域ラッパー */}
+      <div className="flex-1 overflow-y-auto min-h-0 w-full rounded-3xl">
+        {/* 背景色付きのコンテナ: h-fit で中身に合わせる */}
+        <div className="bg-zinc-50 rounded-3xl border border-zinc-200 p-4 lg:p-6 shadow-inner h-fit min-h-min w-full">
+          <SlotManager />
+        </div>
       </div>
       
     </div>
