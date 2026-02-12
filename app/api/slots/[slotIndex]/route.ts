@@ -8,6 +8,12 @@ function parseSlotIndex(value: string): (1 | 2 | 3) | null {
   return null;
 }
 
+/**
+ * 指定スロット番号の分人データを上書き更新する。
+ * @param request - JSON body: SaveSlotRequest (selfVector, resonanceVector, personaIcon, personaSummary). Auth required.
+ * @param context - params.slotIndex: "1" | "2" | "3".
+ * @returns 200: `Slot`. 400: `{ error: "Invalid slot index" }` or `{ error: "Invalid request body" }`. 401: `{ error: "Unauthorized" }`. 404: `{ error: "Slot not found" }`. 500: `{ error: "Failed to update slot" }` or `{ error: "Internal server error" }`.
+ */
 export async function PUT(
   request: Request,
   context: { params: Promise<{ slotIndex: string }> }

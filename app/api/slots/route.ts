@@ -5,6 +5,11 @@ import {
   buildSlot,
 } from "@/lib/slot-request";
 
+/**
+ * 空いているスロット（1〜3のうち未使用）に新規分人データを保存する。
+ * @param request - JSON body: SaveSlotRequest (selfVector, resonanceVector, personaIcon, personaSummary). Auth required.
+ * @returns 201: `Slot`. 401: `{ error: "Unauthorized" }`. 400: `{ error: "Invalid request body" }`. 409: `{ error: "No slot available" }`. 500: `{ error: "Failed to save slot" }` or `{ error: "Internal server error" }`.
+ */
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
