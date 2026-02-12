@@ -11,7 +11,7 @@ const VECTOR_KEYS: (keyof Big5Vector)[] = ['n', 'c', 'e', 'a', 'o'];
 
 interface MatchingListProps {
   matches: MatchUser[];
-  currentSlotIndex: number; // 【追加】選択中のスロット番号を受け取る
+  currentSlotIndex: number;
 }
 
 export default function MatchingList({ matches, currentSlotIndex }: MatchingListProps) {
@@ -28,7 +28,6 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
   return (
     <div className="space-y-6">
       {matches.map((match) => (
-        // 【修正】クエリパラメータ (?slot=...) を付与して遷移
         <Link 
           key={match.id} 
           href={`/matching/${match.id}?slot=${currentSlotIndex}`}
@@ -39,18 +38,22 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
             <div className="w-16 h-16 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-inner group-hover:scale-105 transition-transform">
               <User strokeWidth={1.5} size={32} />
             </div>
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center items-start">
               <h3 className="text-xl font-bold text-zinc-900 group-hover:text-rose-600 transition-colors">{match.name}</h3>
-              <p className="text-sm font-bold text-rose-500 mt-1 bg-rose-50 px-2 py-0.5 rounded-md inline-block">
-                共鳴度: {match.resonanceScore}%
-              </p>
+              
+              {/* 【修正】共鳴スコアの表示デザイン変更 */}
+              <div className="mt-2 bg-rose-50 px-4 py-1.5 rounded-xl border border-rose-100/50 flex flex-col items-center min-w-[80px]">
+                <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider leading-none mb-0.5">共鳴スコア</span>
+                <span className="text-2xl font-black text-rose-500 leading-none">
+                  {match.resonanceScore}
+                </span>
+              </div>
+
             </div>
           </div>
 
           {/* 右側: ベクトル ＋ 要約文 */}
           <div className="flex flex-1 flex-col gap-4">
-            
-            {/* 上段: ベクトル2種 */}
             <div className="flex flex-col sm:flex-row gap-4">
               {/* 共鳴ベクトル */}
               <div className="flex-1 bg-rose-50/50 rounded-2xl p-4 border border-rose-100 relative overflow-hidden">
@@ -88,14 +91,12 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
               </div>
             </div>
 
-            {/* 下段: 分人要約文 */}
             <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 mt-2">
               <p className="text-xs font-semibold text-zinc-400 mb-1">分人要約文</p>
               <p className="text-sm text-zinc-700 leading-relaxed">
                 {match.personaSummary}
               </p>
             </div>
-
           </div>
         </Link>
       ))}
