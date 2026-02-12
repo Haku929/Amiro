@@ -1,6 +1,6 @@
 // app/(app)/profile/page.tsx
 import SlotManager from '@/components/layout/SlotManager';
-import { User, Settings } from 'lucide-react';
+import { User } from 'lucide-react';
 
 export const metadata = {
   title: 'プロフィール管理 | Amiro',
@@ -9,50 +9,43 @@ export const metadata = {
 // ▼ ユーザー情報のモックデータ
 const MOCK_USER = {
   name: 'Sample User',
-  email: 'user@example.com',
-  iconUrl: null, // 画像があればURL、なければnull
+  iconUrl: null, 
 };
 
 export default function ProfilePage() {
   return (
-    // 画面固定のための高さ指定 (サイドバーやヘッダーの有無で調整が必要ですが、ここでは100vh基準で調整)
-    // h-screen からパディング等を引いて、画面内に収まるようにしています
-    <div className="h-[calc(100vh-2rem)] flex flex-col p-6 lg:p-8 overflow-hidden">
+    // 画面全体の高さを固定し、中央寄せ
+    <div className="h-[calc(100vh-1rem)] flex flex-col p-4 lg:p-8 overflow-hidden w-full max-w-5xl mx-auto">
       
-      {/* 1. ページヘッダー & ユーザー情報 */}
-      <div className="shrink-0 mb-6 flex items-end justify-between border-b border-zinc-200 pb-6">
+      {/* 1. ページヘッダー & ユーザー情報 (固定エリア) */}
+      <div className="shrink-0 mb-4 flex items-end justify-between border-b border-zinc-200 pb-4">
         <div>
           <h1 className="text-2xl font-extrabold text-zinc-900 tracking-tight">プロフィール</h1>
           <p className="text-xs text-zinc-500 mt-1">
             アカウント情報とマッチングスロットの管理
           </p>
           
-          {/* ユーザー情報 (New) */}
-          <div className="flex items-center gap-3 mt-4">
-            <div className="w-12 h-12 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 mt-3">
+            <div className="w-10 h-10 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-sm overflow-hidden">
               {MOCK_USER.iconUrl ? (
                 <img src={MOCK_USER.iconUrl} alt={MOCK_USER.name} className="w-full h-full object-cover" />
               ) : (
-                <User strokeWidth={1.5} size={24} />
+                <User strokeWidth={1.5} size={20} />
               )}
             </div>
             <div>
-              <p className="text-lg font-bold text-zinc-900 leading-none">{MOCK_USER.name}</p>
-              <p className="text-xs text-zinc-400 font-mono mt-0.5">{MOCK_USER.email}</p>
+              <p className="text-base font-bold text-zinc-900 leading-none">{MOCK_USER.name}</p>
             </div>
           </div>
         </div>
-
-        {/* 設定ボタン (飾り) */}
-        <button className="text-zinc-400 hover:text-zinc-600 p-2 hover:bg-zinc-100 rounded-full transition-colors">
-          <Settings size={20} />
-        </button>
       </div>
 
-      {/* 2. スロット管理エリア (残り高さいっぱいを使う) */}
-      <div className="flex-1 min-h-0 bg-zinc-50 rounded-3xl border border-zinc-200 p-6 shadow-inner overflow-hidden">
-        {/* コンポーネント自体で高さ調整を行っているため、ここでは配置のみ */}
-        <SlotManager />
+      {/* 2. スクロール領域ラッパー */}
+      <div className="flex-1 overflow-y-auto min-h-0 w-full rounded-3xl">
+        {/* 背景色付きのコンテナ: h-fit で中身に合わせる */}
+        <div className="bg-zinc-50 rounded-3xl border border-zinc-200 p-4 lg:p-6 shadow-inner h-fit min-h-min w-full">
+          <SlotManager />
+        </div>
       </div>
       
     </div>
