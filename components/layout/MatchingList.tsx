@@ -41,31 +41,48 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
             <div className="flex flex-col justify-center items-start">
               <h3 className="text-xl font-bold text-zinc-900 group-hover:text-rose-600 transition-colors">{match.name}</h3>
               
-              {/* 【修正】共鳴スコアの表示デザイン変更 */}
               <div className="mt-2 bg-rose-50 px-4 py-1.5 rounded-xl border border-rose-100/50 flex flex-col items-center min-w-[80px]">
                 <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider leading-none mb-0.5">共鳴スコア</span>
                 <span className="text-2xl font-black text-rose-500 leading-none">
                   {match.resonanceScore}
                 </span>
               </div>
-
             </div>
           </div>
 
           {/* 右側: ベクトル ＋ 要約文 */}
           <div className="flex flex-1 flex-col gap-4">
             <div className="flex flex-col sm:flex-row gap-4">
-              {/* 共鳴ベクトル */}
+              
+              {/* 1. 自己ベクトル (強調表示: Rose) */}
+              {/* 自分の「共鳴ベクトル(理想)」と、相手の「自己ベクトル(現実)」がマッチするため、こちらを強調します */}
               <div className="flex-1 bg-rose-50/50 rounded-2xl p-4 border border-rose-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-rose-400 rounded-l-2xl"></div>
                 <p className="text-sm font-bold text-rose-800 border-b border-rose-200 pb-2 mb-3 text-center tracking-wider">
+                  自己ベクトル
+                </p>
+                <div className="space-y-2">
+                  {VECTOR_TRAITS.map((trait, idx) => (
+                    <div key={`self-${trait}`} className="flex justify-between items-center text-sm text-rose-900 font-medium px-1">
+                      <span>{trait}</span>
+                      <span className="font-mono bg-rose-100/80 px-2 py-0.5 rounded-md">
+                        {Math.round((match.selfVector[VECTOR_KEYS[idx]] ?? 0.5) * 100)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. 共鳴ベクトル (通常表示: Zinc) */}
+              <div className="flex-1 bg-zinc-50 rounded-2xl p-4 border border-zinc-100 opacity-90">
+                <p className="text-xs font-bold text-zinc-500 border-b border-zinc-200 pb-2 mb-3 text-center tracking-wider">
                   共鳴ベクトル
                 </p>
                 <div className="space-y-2">
                   {VECTOR_TRAITS.map((trait, idx) => (
-                    <div key={`res-${trait}`} className="flex justify-between items-center text-sm text-rose-900 font-medium px-1">
+                    <div key={`res-${trait}`} className="flex justify-between items-center text-xs text-zinc-500 px-1">
                       <span>{trait}</span>
-                      <span className="font-mono bg-rose-100/80 px-2 py-0.5 rounded-md">
+                      <span className="font-mono bg-zinc-200/50 px-2 py-0.5 rounded-md">
                         {Math.round((match.resonanceVector[VECTOR_KEYS[idx]] ?? 0.5) * 100)}
                       </span>
                     </div>
@@ -73,22 +90,6 @@ export default function MatchingList({ matches, currentSlotIndex }: MatchingList
                 </div>
               </div>
 
-              {/* 自己ベクトル */}
-              <div className="flex-1 bg-zinc-50 rounded-2xl p-4 border border-zinc-100 opacity-90">
-                <p className="text-xs font-bold text-zinc-500 border-b border-zinc-200 pb-2 mb-3 text-center tracking-wider">
-                  自己ベクトル
-                </p>
-                <div className="space-y-2">
-                  {VECTOR_TRAITS.map((trait, idx) => (
-                    <div key={`self-${trait}`} className="flex justify-between items-center text-xs text-zinc-500 px-1">
-                      <span>{trait}</span>
-                      <span className="font-mono bg-zinc-200/50 px-2 py-0.5 rounded-md">
-                        {Math.round((match.selfVector[VECTOR_KEYS[idx]] ?? 0.5) * 100)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 mt-2">
