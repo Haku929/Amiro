@@ -13,18 +13,18 @@ const TRAIT_CONFIG = [
   { 
     key: "e", 
     label: "外向性", 
-    left: "内向的", 
-    right: "外向的", 
+    left: "外向(E)", 
+    right: "内向(I)", 
     color: "bg-orange-500", 
     lightColor: "bg-orange-100",
     dotColor: "bg-orange-500",
-    mirrorDotColor: "bg-orange-200 border-orange-500" // Lighter with border for distinction
+    mirrorDotColor: "bg-orange-200 border-orange-500" 
   },
   { 
     key: "a", 
     label: "協調性", 
-    left: "独立的", 
-    right: "協調的", 
+    left: "協調(A)", 
+    right: "排他(H)", 
     color: "bg-emerald-500", 
     lightColor: "bg-emerald-100",
     dotColor: "bg-emerald-500",
@@ -33,8 +33,8 @@ const TRAIT_CONFIG = [
   { 
     key: "c", 
     label: "勤勉性", 
-    left: "衝動的", 
-    right: "計画的", 
+    left: "勤勉(C)", 
+    right: "怠惰(R)", 
     color: "bg-blue-500", 
     lightColor: "bg-blue-100",
     dotColor: "bg-blue-500",
@@ -43,8 +43,8 @@ const TRAIT_CONFIG = [
   { 
     key: "n", 
     label: "情動性", 
-    left: "安定", 
-    right: "敏感", 
+    left: "論理(N)", 
+    right: "情動(T)", 
     color: "bg-rose-500", 
     lightColor: "bg-rose-100",
     dotColor: "bg-rose-500",
@@ -53,8 +53,8 @@ const TRAIT_CONFIG = [
   { 
     key: "o", 
     label: "創造性", 
-    left: "保守的", 
-    right: "革新的", 
+    left: "創造(O)", 
+    right: "保守(S)", 
     color: "bg-purple-500", 
     lightColor: "bg-purple-100",
     dotColor: "bg-purple-500",
