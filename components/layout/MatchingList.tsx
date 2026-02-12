@@ -1,8 +1,9 @@
 // components/layout/MatchingList.tsx
 'use client';
 
+import Link from 'next/link';
 import { User } from 'lucide-react';
-import { MatchUser } from './MatchingContainer'; // 型定義をインポート
+import { MatchUser } from './MatchingContainer';
 import { Big5Vector } from '@/lib/types';
 
 const VECTOR_TRAITS = ['神経症傾向', '誠実性', '外向性', '協調性', '開放性'] as const;
@@ -10,9 +11,10 @@ const VECTOR_KEYS: (keyof Big5Vector)[] = ['n', 'c', 'e', 'a', 'o'];
 
 interface MatchingListProps {
   matches: MatchUser[];
+  currentSlotIndex: number; // 【追加】選択中のスロット番号を受け取る
 }
 
-export default function MatchingList({ matches }: MatchingListProps) {
+export default function MatchingList({ matches, currentSlotIndex }: MatchingListProps) {
   
   if (matches.length === 0) {
     return (
@@ -26,9 +28,11 @@ export default function MatchingList({ matches }: MatchingListProps) {
   return (
     <div className="space-y-6">
       {matches.map((match) => (
-        <div 
+        // 【修正】クエリパラメータ (?slot=...) を付与して遷移
+        <Link 
           key={match.id} 
-          className="flex flex-col xl:flex-row items-stretch gap-6 p-6 border border-zinc-200 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group"
+          href={`/matching/${match.id}?slot=${currentSlotIndex}`}
+          className="block flex flex-col xl:flex-row items-stretch gap-6 p-6 border border-zinc-200 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all cursor-pointer group"
         >
           {/* 左側: アイコンと名前・スコア */}
           <div className="flex items-center gap-5 xl:w-48 xl:border-r xl:border-zinc-100 xl:pr-6 shrink-0">
@@ -36,7 +40,7 @@ export default function MatchingList({ matches }: MatchingListProps) {
               <User strokeWidth={1.5} size={32} />
             </div>
             <div className="flex flex-col justify-center">
-              <h3 className="text-xl font-bold text-zinc-900">{match.name}</h3>
+              <h3 className="text-xl font-bold text-zinc-900 group-hover:text-rose-600 transition-colors">{match.name}</h3>
               <p className="text-sm font-bold text-rose-500 mt-1 bg-rose-50 px-2 py-0.5 rounded-md inline-block">
                 共鳴度: {match.resonanceScore}%
               </p>
@@ -84,7 +88,7 @@ export default function MatchingList({ matches }: MatchingListProps) {
               </div>
             </div>
 
-            {/* 下段: 分人要約文 (content -> personaSummary) */}
+            {/* 下段: 分人要約文 */}
             <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 mt-2">
               <p className="text-xs font-semibold text-zinc-400 mb-1">分人要約文</p>
               <p className="text-sm text-zinc-700 leading-relaxed">
@@ -93,7 +97,7 @@ export default function MatchingList({ matches }: MatchingListProps) {
             </div>
 
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

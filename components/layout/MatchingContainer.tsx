@@ -25,7 +25,7 @@ export interface MatchUser {
 const MOCK_SLOTS: Slot[] = [
   { 
     slotIndex: 1, 
-    personaSummary: '週末用リラックス — 相手の話を丁寧に聴き、共感を示す傾向が強く表れています。', 
+    personaSummary: '相手の話を丁寧に聴き、共感を示す傾向が強く表れています。', 
     personaIcon: '',
     selfVector: { n: 0.5, c: 0.5, e: 0.5, a: 0.5, o: 0.5 }, 
     resonanceVector: { n: 0.4, c: 0.6, e: 0.5, a: 0.8, o: 0.7 },
@@ -33,7 +33,7 @@ const MOCK_SLOTS: Slot[] = [
   },
   { 
     slotIndex: 2, 
-    personaSummary: '仕事モード — 効率とロジックを重視し、知的な会話を好むペルソナです。', 
+    personaSummary: '効率とロジックを重視し、知的な会話を好むペルソナです。', 
     personaIcon: '',
     selfVector: { n: 0.3, c: 0.8, e: 0.4, a: 0.4, o: 0.6 }, 
     resonanceVector: { n: 0.6, c: 0.7, e: 0.4, a: 0.6, o: 0.5 },
@@ -41,7 +41,7 @@ const MOCK_SLOTS: Slot[] = [
   },
   { 
     slotIndex: 3, 
-    personaSummary: '趣味全開 — 新しいことへの好奇心が旺盛で、感情表現が豊かな状態です。', 
+    personaSummary: '新しいことへの好奇心が旺盛で、感情表現が豊かな状態です。', 
     personaIcon: '',
     selfVector: { n: 0.6, c: 0.4, e: 0.8, a: 0.6, o: 0.9 }, 
     resonanceVector: { n: 0.5, c: 0.5, e: 0.9, a: 0.7, o: 0.8 },
@@ -138,8 +138,6 @@ export default function MatchingContainer() {
   }, [baseMatches, activeFilter, currentSlot]);
 
   return (
-    // 【修正】 fixed inset-0 で画面枠に強制固定。z-0 はヘッダー(z-50)より下にするため。
-    // lg:pl-20 はサイドバー(w-20)の裏に隠れないように余白を確保。
     <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col lg:flex-row bg-white overflow-hidden overscroll-none">
       
       {/* 左カラム：自分のカード */}
@@ -149,9 +147,6 @@ export default function MatchingContainer() {
           <p className="text-zinc-500 mt-2 text-sm lg:text-base">あなたの現在の分人データと、共鳴スコアが高いユーザーを一覧表示しています。</p>
         </div>
         
-        {/* カード自体も画面内に収まらない場合はスクロールさせる必要があるかもしれませんが、
-            今回は「固定」要望なので、高さを超えたら隠れるか、このエリア内のみスクロール可にします。
-            安全のため overflow-y-auto をつけておきますが、基本は固定表示に見えます。 */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
            <MyProfileCard slots={MOCK_SLOTS} currentSlot={currentSlot} onSlotChange={handleSlotChange} />
         </div>
@@ -167,7 +162,7 @@ export default function MatchingContainer() {
           </div>
         )}
 
-        {/* 検索フィルターバー（固定） */}
+        {/* 検索フィルターバー */}
         <div className="shrink-0 p-6 lg:p-10 pb-2 z-20">
           <div className="bg-white p-4 rounded-2xl border border-zinc-200 flex flex-col xl:flex-row gap-4 xl:items-center shadow-sm">
             <div className="text-sm font-bold text-zinc-700 flex items-center gap-2 shrink-0">
@@ -208,9 +203,10 @@ export default function MatchingContainer() {
           </div>
         </div>
 
-        {/* リスト表示エリア（ここだけスクロール） */}
+        {/* リスト表示エリア */}
         <div className="flex-1 overflow-y-auto p-6 lg:p-10 pt-4 scroll-smooth overscroll-contain">
-          <MatchingList matches={filteredMatches} />
+          {/* 【修正】ここが重要！ currentSlotIndex を props として渡します */}
+          <MatchingList matches={filteredMatches} currentSlotIndex={currentSlotIndex} />
           <div className="h-20" />
         </div>
       </div>
