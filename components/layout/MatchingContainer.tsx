@@ -139,7 +139,7 @@ export default function MatchingContainer() {
   }, [baseMatches, activeFilter, currentSlot]);
 
   return (
-    <div className="lg:pl-20 h-screen flex flex-col bg-zinc-50/30 overflow-hidden">
+    <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col h-screen bg-zinc-50/30 overflow-hidden">
       
       {/* 1. 上部固定エリア (タイトル + 自分カード) */}
       <div className="shrink-0 bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-sm z-30 relative">
@@ -171,12 +171,12 @@ export default function MatchingContainer() {
       </div>
 
       {/* 2. 下部スクロールエリア (相手リスト) */}
-      <div className="flex-1 overflow-y-auto bg-zinc-50/50">
-        <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-6">
-           {/* 相手リスト (スペーサーなし、幅一杯でMyCardと揃う) */}
-           <MatchingList matches={filteredMatches} currentSlotIndex={currentSlotIndex} />
-           <div className="h-32" />
-        </div>
+      <div className="flex-1 overflow-y-auto scroll-smooth overscroll-contain bg-zinc-50/50">
+          <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-6">
+             {/* 相手リスト (スペーサーなし、幅一杯でMyCardと揃う) */}
+             <MatchingList matches={filteredMatches} currentSlotIndex={currentSlotIndex} />
+             <div className="h-32" />
+          </div>
       </div>
 
       {/* 3. 右下固定: 再検索設定パネル */}
