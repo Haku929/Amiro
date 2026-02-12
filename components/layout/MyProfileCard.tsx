@@ -1,83 +1,151 @@
 // components/layout/MyProfileCard.tsx
 'use client';
 
-import { User, ChevronDown } from 'lucide-react';
-import { Slot, Big5Vector } from '@/lib/types';
+import { User } from 'lucide-react';
+import { Slot } from '@/lib/types';
 
-// 定数定義（MatchingContainerと共通化が望ましいが、ここでは再定義）
-const VECTOR_TRAITS = ['神経症傾向', '誠実性', '外向性', '協調性', '開放性'] as const;
-const VECTOR_KEYS: (keyof Big5Vector)[] = ['n', 'c', 'e', 'a', 'o'];
+const TRAIT_MAPPING = [
+  { 
+    key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
+    color: 'bg-orange-500 border-orange-600', barColor: 'bg-orange-50/50' 
+  },
+  { 
+    key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
+    color: 'bg-emerald-500 border-emerald-600', barColor: 'bg-emerald-50/50' 
+  },
+  { 
+    key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
+    color: 'bg-blue-500 border-blue-600', barColor: 'bg-blue-50/50' 
+  },
+  { 
+    key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
+    color: 'bg-rose-500 border-rose-600', barColor: 'bg-rose-50/50' 
+  },
+  { 
+    key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
+    color: 'bg-purple-500 border-purple-600', barColor: 'bg-purple-50/50' 
+  },
+] as const;
 
 interface MyProfileCardProps {
   slots: Slot[];
   currentSlot: Slot;
-  onSlotChange: (slotIndex: number) => void;
+  onSlotChange: (index: number) => void;
 }
 
 export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyProfileCardProps) {
   return (
-    <div className="bg-white border border-zinc-200 rounded-3xl p-8 shadow-sm">
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-24 h-24 bg-zinc-100 border-2 border-white rounded-full flex items-center justify-center text-zinc-400 shadow-md mb-4 ring-4 ring-zinc-50">
-          <User strokeWidth={1.5} size={48} />
-        </div>
-        <h2 className="text-2xl font-bold text-zinc-900">あなた</h2>
+    <div className="w-full bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm">
+      <div className="flex flex-col xl:flex-row items-stretch gap-6">
         
-        <div className="mt-3 relative inline-block group">
-          <select 
-            value={currentSlot.slotIndex}
-            onChange={(e) => onSlotChange(Number(e.target.value))}
-            className="appearance-none bg-zinc-100 text-sm font-bold text-zinc-700 py-2 pl-5 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer border border-zinc-200 hover:bg-zinc-200 hover:text-zinc-900 transition-all shadow-sm"
-          >
-            {slots.map(slot => (
-              <option key={slot.slotIndex} value={slot.slotIndex}>分人 {slot.slotIndex}</option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-zinc-500 group-hover:text-zinc-900 transition-colors">
-            <ChevronDown size={16} strokeWidth={3} />
+        {/* 1. 左ブロック：基本情報 & スイッチ (w-64でリストと統一) */}
+        <div className="flex flex-col items-center justify-center gap-4 xl:w-64 shrink-0 xl:border-r xl:border-zinc-100 xl:pr-6">
+          <div className="relative">
+            <div className="w-16 h-16 bg-zinc-50 border-2 border-zinc-100 rounded-full flex items-center justify-center text-zinc-400 shadow-sm">
+              <User strokeWidth={1.5} size={32} />
+            </div>
+          </div>
+          
+          <div className="text-center w-full">
+            <h2 className="text-xl font-bold text-zinc-900">あなた</h2>
+            <div className="flex gap-2 mt-3 flex-wrap justify-center">
+              {slots.map((slot) => (
+                <button
+                  key={slot.slotIndex}
+                  onClick={() => onSlotChange(slot.slotIndex)}
+                  className={`px-3 py-1 text-xs font-bold rounded-full transition-all border ${
+                    currentSlot.slotIndex === slot.slotIndex
+                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-md transform scale-105'
+                      : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50'
+                  }`}
+                >
+                  分人{slot.slotIndex}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {/* 左: 自己ベクトル */}
-        <div className="space-y-3 bg-zinc-50 p-4 rounded-2xl border border-zinc-100">
-          <p className="text-sm font-bold text-zinc-600 text-center border-b border-zinc-200 pb-2">自己ベクトル</p>
-          <div className="space-y-2">
-            {VECTOR_TRAITS.map((trait, idx) => (
-              <div key={`my-self-${trait}`} className="flex justify-between items-center text-sm text-zinc-600 px-1">
-                <span>{trait}</span>
-                <span className="font-mono bg-zinc-200/50 px-2 py-0.5 rounded-md">
-                  {/* オブジェクト形式の値(0.0-1.0)を%表記に変換 */}
-                  {Math.round((currentSlot.selfVector[VECTOR_KEYS[idx]] ?? 0.5) * 100)}
-                </span>
+        {/* 2. 右ブロック：ベクトル表示 & 要約 */}
+        <div className="flex-1 flex flex-col gap-4">
+          
+          {/* 上段: ベクトル2カラム */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* 自己ベクトル */}
+            <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
+              <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
+                自己ベクトル (現実)
+              </p>
+              <div className="space-y-3">
+                {TRAIT_MAPPING.map((trait) => {
+                  const val = (currentSlot.selfVector[trait.key] ?? 0.5) * 100;
+                  return (
+                    <div key={`my-self-${trait.key}`} className="relative h-4">
+                      <div className="relative flex justify-between items-end mb-1 px-1 h-3">
+                        <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
+                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
+                          {trait.label}
+                        </span>
+                        <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
+                      </div>
+
+                      <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
+                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
+                         {/* ドットを小さく w-2.5 h-2.5 */}
+                         <div 
+                           className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
+                           style={{ left: `calc(${val}% - 5px)` }}
+                         ></div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* 右: 共鳴ベクトル */}
-        <div className="space-y-3 bg-rose-50/50 p-4 rounded-2xl border border-rose-100 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-rose-400 rounded-l-2xl"></div>
-          <p className="text-sm font-bold text-rose-800 text-center border-b border-rose-200 pb-2">共鳴ベクトル</p>
-          <div className="space-y-2">
-            {VECTOR_TRAITS.map((trait, idx) => (
-              <div key={`my-res-${trait}`} className="flex justify-between items-center text-sm text-rose-900 font-medium px-1">
-                <span>{trait}</span>
-                <span className="font-mono bg-rose-100/80 px-2 py-0.5 rounded-md">
-                  {Math.round((currentSlot.resonanceVector[VECTOR_KEYS[idx]] ?? 0.5) * 100)}
-                </span>
+            {/* 共鳴ベクトル */}
+            <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
+              <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
+                共鳴ベクトル (理想)
+              </p>
+              <div className="space-y-3">
+                {TRAIT_MAPPING.map((trait) => {
+                  const val = (currentSlot.resonanceVector[trait.key] ?? 0.5) * 100;
+                  return (
+                    <div key={`my-res-${trait.key}`} className="relative h-4">
+                      <div className="relative flex justify-between items-end mb-1 px-1 h-3">
+                        <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
+                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
+                          {trait.label}
+                        </span>
+                        <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
+                      </div>
+
+                      <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
+                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
+                         {/* ドットを小さく w-2.5 h-2.5 */}
+                         <div 
+                           className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
+                           style={{ left: `calc(${val}% - 5px)` }}
+                         ></div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="mt-8 bg-zinc-50 rounded-2xl p-5 border border-zinc-100">
-        <p className="text-xs font-semibold text-zinc-400 mb-2 text-center tracking-widest">分人要約文</p>
-        <p className="text-sm text-zinc-700 leading-relaxed text-center">
-          {currentSlot.personaSummary}
-        </p>
+          {/* 下段: 要約文 */}
+          <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
+            <p className="text-[10px] font-semibold text-zinc-400 mb-0.5">分人要約文</p>
+            <p className="text-xs text-zinc-700 leading-relaxed line-clamp-2">
+              {currentSlot.personaSummary}
+            </p>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );
