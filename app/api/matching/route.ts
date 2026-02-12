@@ -26,6 +26,11 @@ type RpcRow = {
   matched_slot_index_other: number;
 };
 
+/**
+ * 認証ユーザーと共鳴スコアの高い他ユーザーを取得する。RPC get_matching_scores の結果にプロフィールを結合して返す。
+ * @param request - URL query: `limit` (optional, default 20, max 100), `offset` (optional, default 0). Auth required.
+ * @returns 200: `MatchingResult[]` (userId, displayName, avatarUrl, resonanceScore, matchedSlotIndexSelf, matchedSlotIndexOther). 401: `{ error: "Unauthorized" }`. 503: `{ error: "Matching scores unavailable" }`. 500: `{ error: "Profiles fetch failed" }` or `{ error: "Internal server error" }`.
+ */
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
