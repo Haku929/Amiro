@@ -20,6 +20,10 @@ function mapSlot(row: {
   };
 }
 
+/**
+ * 認証ユーザーのプロフィールとスロット一覧を取得する。
+ * @returns 200: `UserProfile` (userId, displayName, avatarUrl, slots). 401: `{ error: "Unauthorized" }`. 404: `{ error: "Profile not found" }`. 500: `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
+ */
 export async function GET() {
   try {
     const supabase = await createClient();
