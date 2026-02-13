@@ -28,3 +28,12 @@ export type UserProfile = {
   avatarUrl: string | null;
   slots: Slot[];
 };
+
+export type MatchingResult = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  resonanceScore: number;
+  matchedSlotIndexSelf: number;
+  matchedSlotIndexOther: number;
+};
