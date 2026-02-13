@@ -1,7 +1,7 @@
 // components/layout/MatchingContainer.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, X, Settings2 } from 'lucide-react';
 import MyProfileCard from './MyProfileCard';
 import MatchingList from './MatchingList';
@@ -20,34 +20,7 @@ export interface MatchUser {
   selfVector: Big5Vector;
 }
 
-// ▼ モックデータ
-const MOCK_SLOTS: Slot[] = [
-  { 
-    slotIndex: 1, 
-    personaSummary: '相手の話を丁寧に聴き、共感を示す傾向が強く表れています。', 
-    personaIcon: '',
-    selfVector: { n: 0.2, c: 0.6, e: 0.3, a: 0.8, o: 0.5 }, 
-    resonanceVector: { n: 0.3, c: 0.5, e: 0.8, a: 0.6, o: 0.9 },
-    createdAt: new Date().toISOString()
-  },
-  { 
-    slotIndex: 2, 
-    personaSummary: '効率とロジックを重視し、知的な会話を好むペルソナです。', 
-    personaIcon: '',
-    selfVector: { n: 0.2, c: 0.9, e: 0.6, a: 0.4, o: 0.6 }, 
-    resonanceVector: { n: 0.2, c: 0.8, e: 0.5, a: 0.5, o: 0.8 },
-    createdAt: new Date().toISOString()
-  },
-  { 
-    slotIndex: 3, 
-    personaSummary: '新しいことへの好奇心が旺盛で、感情表現が豊かな状態です。', 
-    personaIcon: '',
-    selfVector: { n: 0.5, c: 0.3, e: 0.9, a: 0.7, o: 0.9 }, 
-    resonanceVector: { n: 0.2, c: 0.6, e: 0.7, a: 0.8, o: 0.6 },
-    createdAt: new Date().toISOString()
-  },
-];
-
+// ▼ モックデータ (相手)
 const MOCK_MATCHES: Record<number, MatchUser[]> = {
   1: [
     { 
@@ -96,12 +69,73 @@ const MOCK_MATCHES: Record<number, MatchUser[]> = {
 type FilterType = 'none' | 'self' | 'res';
 
 export default function MatchingContainer() {
+  const [slots, setSlots] = useState<Slot[]>([]);
   const [currentSlotIndex, setCurrentSlotIndex] = useState<number>(1);
   const [isSearching, setIsSearching] = useState(false);
   const [filterInput, setFilterInput] = useState<{ type: FilterType, vectorKey: VectorKey }>({ type: 'none', vectorKey: 'n' });
   const [activeFilter, setActiveFilter] = useState<{ type: FilterType, vectorKey: VectorKey }>({ type: 'none', vectorKey: 'n' });
   
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(true);
+
+  // Helper to parse vector (string or array) to Big5 object
+  const parseVector = (v: any) => {
+      let arr = v;
+      if (typeof v === 'string') {
+        try {
+          arr = JSON.parse(v);
+        } catch (e) {
+          console.error("Failed to parse vector string", v);
+          arr = []; // Fallback
+        }
+      }
+      if (Array.isArray(arr) && arr.length >= 5) {
+        // Order: O, C, E, A, N (must match toVectorString in POST)
+        return { o: arr[0], c: arr[1], e: arr[2], a: arr[3], n: arr[4] };
+      }
+      // Check if it's already an object
+      if (typeof v === 'object' && v !== null && 'o' in v) {
+          return v;
+      }
+      // Default fallback
+      return { o: 0.5, c: 0.5, e: 0.5, a: 0.5, n: 0.5 };
+  };
+
+  useEffect(() => {
+    const fetchMySlots = async () => {
+      try {
+        const res = await fetch('/api/slots');
+        if (res.ok) {
+          const rawData: any[] = await res.json();
+          const data: Slot[] = rawData.map((s: any) => ({
+              ...s,
+              selfVector: parseVector(s.selfVector),
+              resonanceVector: parseVector(s.resonanceVector),
+          }));
+
+          setSlots(data);
+          // デフォルトで最初のスロットを選択（もしあれば）
+          // ただし、既に選択されている場合は維持したいが、初期ロード時は1になっている
+          if (data.length > 0) {
+            // ここではあえて強制的にセットせず、ユーザーの選択を尊重するか、
+            // データが存在する最初のindexにするなどのロジックが必要だが、
+            // シンプルにデータロード時にindex 1が含まれていなければ利用可能な最初のものにするなどが安全。
+            // 今回はシンプルに、データロード完了時に currentSlotIndex がデータ内に存在しなければ先頭にする。
+            
+            // setSlots(data) しただけでは currentSlotIndex は変わらない。
+            // 描画時に currentSlot が undefined になるのを防ぐため、
+            // 描画ロジック側でフォールバックする。
+            // Note: Since we want to update the view immediately with the fetched slot, setting it here is fine for initial load
+            if (data.findIndex(s => s.slotIndex === currentSlotIndex) === -1) {
+                 setCurrentSlotIndex(data[0].slotIndex);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch slots", error);
+      }
+    };
+    fetchMySlots();
+  }, []);
 
   const handleSlotChange = (slotIndex: number) => {
     if (slotIndex === currentSlotIndex) return;
@@ -118,7 +152,20 @@ export default function MatchingContainer() {
     setTimeout(() => { setIsSearching(false); }, 600);
   };
 
-  const currentSlot = MOCK_SLOTS.find(s => s.slotIndex === currentSlotIndex) || MOCK_SLOTS[0];
+  // 自分のスロット: データがあればそこから検索、なければダミーを表示しないといけないが、
+  // ここではデータロード前 or データ空の場合は安全策として空オブジェクトに近いものを返すかロード中表示が望ましい。
+  // 一旦、データ空の場合は仮のプレースホルダーを出すか、nullチェックをする。
+  // MyProfileCardは Slot[] と currentSlot を期待している。
+  
+  const currentSlot = slots.find(s => s.slotIndex === currentSlotIndex) || slots[0] || {
+    slotIndex: 1,
+    personaSummary: 'データ読み込み中...',
+    personaIcon: '',
+    selfVector: { n: 0.5, c: 0.5, e: 0.5, a: 0.5, o: 0.5 },
+    resonanceVector: { n: 0.5, c: 0.5, e: 0.5, a: 0.5, o: 0.5 },
+    createdAt: new Date().toISOString()
+  } as Slot;
+
   const baseMatches = MOCK_MATCHES[currentSlotIndex] || [];
 
   const filteredMatches = useMemo(() => {
@@ -156,7 +203,7 @@ export default function MatchingContainer() {
 
           {/* 自分カード */}
           <div className="w-full">
-             <MyProfileCard slots={MOCK_SLOTS} currentSlot={currentSlot} onSlotChange={handleSlotChange} />
+             <MyProfileCard slots={slots} currentSlot={currentSlot} onSlotChange={handleSlotChange} />
           </div>
 
         </div>

@@ -30,25 +30,7 @@ const TRAIT_MAPPING = [
   },
 ] as const;
 
-// ▼ モックデータ
-const MOCK_DB_DATA: Slot[] = [
-  {
-    slotIndex: 1,
-    personaSummary: '論理的思考を好み、効率性を重視するエンジニア気質の分人。',
-    personaIcon: '',
-    selfVector: { n: 0.2, c: 0.8, e: 0.4, a: 0.5, o: 0.7 },
-    resonanceVector: { n: 0.3, c: 0.6, e: 0.6, a: 0.7, o: 0.8 },
-    createdAt: '2023-10-01T10:00:00Z',
-  },
-  {
-    slotIndex: 2,
-    personaSummary: '親しい友人と過ごす時の、冗談を好みリラックスした分人。',
-    personaIcon: '',
-    selfVector: { n: 0.4, c: 0.3, e: 0.8, a: 0.9, o: 0.6 },
-    resonanceVector: { n: 0.2, c: 0.5, e: 0.7, a: 0.8, o: 0.5 },
-    createdAt: '2023-10-05T14:30:00Z',
-  },
-];
+// ▼ モックデータ削除
 
 export default function SlotManager() {
   const [slots, setSlots] = useState<Record<number, Slot | null>>({
@@ -56,15 +38,45 @@ export default function SlotManager() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper to parse vector (string or array) to Big5 object
+  const parseVector = (v: any) => {
+      let arr = v;
+      if (typeof v === 'string') {
+        try {
+          arr = JSON.parse(v);
+        } catch (e) {
+          console.error("Failed to parse vector string", v);
+          arr = []; // Fallback
+        }
+      }
+      if (Array.isArray(arr) && arr.length >= 5) {
+        // Order: O, C, E, A, N (must match toVectorString in POST)
+        return { o: arr[0], c: arr[1], e: arr[2], a: arr[3], n: arr[4] };
+      }
+      // Check if it's already an object
+      if (typeof v === 'object' && v !== null && 'o' in v) {
+          return v;
+      }
+      // Default fallback
+      return { o: 0.5, c: 0.5, e: 0.5, a: 0.5, n: 0.5 };
+  };
+
   const fetchSlots = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 600)); 
-      const data = MOCK_DB_DATA;
+      const res = await fetch('/api/slots');
+      if (!res.ok) throw new Error('Failed to fetch slots');
+      const rawData: any[] = await res.json();
       
       const slotsMap: Record<number, Slot | null> = { 1: null, 2: null, 3: null };
-      data.forEach(slot => {
-        if (slot.slotIndex >= 1 && slot.slotIndex <= MAX_SLOTS) {
+      rawData.forEach((s: any) => {
+        if (s.slotIndex >= 1 && s.slotIndex <= MAX_SLOTS) {
+          // Parse vectors here
+          const slot: Slot = {
+              ...s,
+              selfVector: parseVector(s.selfVector),
+              resonanceVector: parseVector(s.resonanceVector),
+          };
           slotsMap[slot.slotIndex] = slot;
         }
       });
@@ -81,19 +93,28 @@ export default function SlotManager() {
   }, []);
 
   const handleDeleteSlot = async (slotIndex: number) => {
+    alert("削除機能は現在未実装です。");
+    // Original implementation disabled as per request
+    /*
     if (!confirm(`スロット${slotIndex}のデータを削除してもよろしいですか？`)) return;
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const targetIndex = MOCK_DB_DATA.findIndex(s => s.slotIndex === slotIndex);
-      if (targetIndex !== -1) {
-        MOCK_DB_DATA.splice(targetIndex, 1);
+      const res = await fetch('/api/slots', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slotIndex }),
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to delete slot');
       }
+
       await fetchSlots();
     } catch (error) {
       console.error("削除エラー", error);
       setIsLoading(false);
     }
+    */
   };
 
   const activeSlotCount = Object.values(slots).filter(slot => slot !== null).length;
@@ -160,9 +181,8 @@ export default function SlotManager() {
                 </div>
               </div>
 
-              {/* ベクトル情報 (2カラム) */}
-              <div className="grid grid-cols-2 gap-x-3 gap-y-4 mb-4">
-                {/* 左: 自己ベクトル */}
+              {/* ベクトル情報 (1カラム: 自己ベクトルのみ) */}
+              <div className="mb-4">
                 <div>
                   <p className="text-[9px] font-bold text-zinc-500 text-center border-b border-zinc-100 pb-1 mb-2 tracking-wider">
                     自己 (Real)
@@ -172,34 +192,6 @@ export default function SlotManager() {
                       const val = (slot.selfVector[trait.key] ?? 0.5) * 100;
                       return (
                         <div key={`self-${trait.key}`} className="relative h-3">
-                          <div className="relative flex justify-between items-end mb-0.5 px-0.5 h-2.5">
-                            <span className="text-[8px] text-zinc-400 scale-90 origin-left">{trait.leftLabel}</span>
-                            <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[8px] font-bold text-zinc-600 scale-90">{trait.label}</span>
-                            <span className="text-[8px] text-zinc-400 scale-90 origin-right">{trait.rightLabel}</span>
-                          </div>
-                          <div className={`h-1 w-full rounded-full relative ${trait.barColor}`}>
-                             <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
-                             <div 
-                               className={`absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border shadow-sm ${trait.color}`}
-                               style={{ left: `calc(${val}% - 4px)` }}
-                             ></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 右: 共鳴ベクトル */}
-                <div>
-                  <p className="text-[9px] font-bold text-rose-400 text-center border-b border-rose-50 pb-1 mb-2 tracking-wider">
-                    共鳴 (Ideal)
-                  </p>
-                  <div className="space-y-2.5">
-                    {TRAIT_MAPPING.map((trait) => {
-                      const val = (slot.resonanceVector[trait.key] ?? 0.5) * 100;
-                      return (
-                        <div key={`res-${trait.key}`} className="relative h-3">
                           <div className="relative flex justify-between items-end mb-0.5 px-0.5 h-2.5">
                             <span className="text-[8px] text-zinc-400 scale-90 origin-left">{trait.leftLabel}</span>
                             <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[8px] font-bold text-zinc-600 scale-90">{trait.label}</span>
