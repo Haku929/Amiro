@@ -26,6 +26,7 @@ export type UserProfile = {
   userId: string;
   displayName: string;
   avatarUrl: string | null;
+  bio: string | null;
   slots: Slot[];
 };
 
