@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Slot, Big5Vector } from '@/lib/types';
+import { Slot } from '@/lib/types'; // Slot型定義はプロジェクトに合わせてインポート
 import { User, Trash2, RefreshCw, Plus } from 'lucide-react';
 
 const MAX_SLOTS = 3;
@@ -30,37 +30,23 @@ const TRAIT_MAPPING = [
   },
 ] as const;
 
-// ▼ モックデータ
-const MOCK_DB_DATA: Slot[] = [
-  {
-    slotIndex: 1,
-    personaSummary: '論理的思考を好み、効率性を重視するエンジニア気質の分人。',
-    personaIcon: '',
-    selfVector: { n: 0.2, c: 0.8, e: 0.4, a: 0.5, o: 0.7 },
-    resonanceVector: { n: 0.3, c: 0.6, e: 0.6, a: 0.7, o: 0.8 },
-    createdAt: '2023-10-01T10:00:00Z',
-  },
-  {
-    slotIndex: 2,
-    personaSummary: '親しい友人と過ごす時の、冗談を好みリラックスした分人。',
-    personaIcon: '',
-    selfVector: { n: 0.4, c: 0.3, e: 0.8, a: 0.9, o: 0.6 },
-    resonanceVector: { n: 0.2, c: 0.5, e: 0.7, a: 0.8, o: 0.5 },
-    createdAt: '2023-10-05T14:30:00Z',
-  },
-];
-
 export default function SlotManager() {
   const [slots, setSlots] = useState<Record<number, Slot | null>>({
     1: null, 2: null, 3: null
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  // ▼ APIからスロットデータを取得
   const fetchSlots = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 600)); 
-      const data = MOCK_DB_DATA;
+      const res = await fetch('/api/slots');
+      
+      if (!res.ok) {
+        throw new Error('スロットデータの取得に失敗しました');
+      }
+
+      const data: Slot[] = await res.json();
       
       const slotsMap: Record<number, Slot | null> = { 1: null, 2: null, 3: null };
       data.forEach(slot => {
@@ -70,7 +56,7 @@ export default function SlotManager() {
       });
       setSlots(slotsMap);
     } catch (error) {
-      console.error("スロットの取得に失敗しました", error);
+      console.error("スロットの取得エラー:", error);
     } finally {
       setIsLoading(false);
     }
@@ -80,18 +66,25 @@ export default function SlotManager() {
     fetchSlots();
   }, []);
 
+  // ▼ API経由でスロットを削除
   const handleDeleteSlot = async (slotIndex: number) => {
-    if (!confirm(`スロット${slotIndex}のデータを削除してもよろしいですか？`)) return;
+    if (!confirm(`スロット${slotIndex}のデータを削除してもよろしいですか？\nこの操作は取り消せません。`)) return;
+    
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const targetIndex = MOCK_DB_DATA.findIndex(s => s.slotIndex === slotIndex);
-      if (targetIndex !== -1) {
-        MOCK_DB_DATA.splice(targetIndex, 1);
+      const res = await fetch(`/api/slots/${slotIndex}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('削除に失敗しました');
       }
+
+      // 削除成功後にリストを再取得
       await fetchSlots();
     } catch (error) {
-      console.error("削除エラー", error);
+      console.error("削除エラー:", error);
+      alert("削除中にエラーが発生しました。");
       setIsLoading(false);
     }
   };
@@ -119,7 +112,7 @@ export default function SlotManager() {
         </button>
       </div>
 
-      {/* スロットグリッド (h-full等を削除し、内容に合わせて伸縮) */}
+      {/* スロットグリッド */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {[1, 2, 3].map((index) => {
           const slot = slots[index];
@@ -149,7 +142,8 @@ export default function SlotManager() {
                   Slot {index}
                 </span>
                 <span className="text-[9px] text-zinc-300 font-mono">
-                  {new Date(slot.createdAt).toLocaleDateString('ja-JP')}
+                  {/* APIから取得した日付を表示 */}
+                  {slot.createdAt ? new Date(slot.createdAt).toLocaleDateString('ja-JP') : '-'}
                 </span>
               </div>
 
