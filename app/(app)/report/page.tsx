@@ -73,13 +73,12 @@ export default function ReportPage() {
     setLoading(true);
     setError(null);
     try {
-      // Mock save functionality (Backend/DB is not ready for frontend testing)
-      // const body = {
-      //   selfVector,
-      //   resonanceVector,
-      //   personaIcon: "🧩", 
-      //   personaSummary: summary,
-      // };
+      const body = {
+        selfVector,
+        resonanceVector,
+        personaIcon: "🧩", 
+        personaSummary: summary,
+      };
 
       if (isFull && selectedSlotIndex === null) {
           setError("上書きするスロットを選択してください");
@@ -87,22 +86,32 @@ export default function ReportPage() {
           return;
       }
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      let res;
+      if (isFull && selectedSlotIndex !== null) {
+        // Overwrite existing slot
+        res = await fetch(`/api/slots/${selectedSlotIndex}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      } else {
+        // Create new slot
+        res = await fetch("/api/slots", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      }
 
-      // if (isFull) {
-      //   // Overwrite existing slot
-      //   const res = await fetch(`/api/slots/${selectedSlotIndex}`, { ... });
-      // } else {
-      //   // Create new slot
-      //   const res = await fetch("/api/slots", { ... });
-      // }
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "保存に失敗しました。");
+      }
       
-      alert("保存しました（モック）");
       router.push("/profile");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("保存に失敗しました。");
+      setError(err.message || "保存に失敗しました。");
     } finally {
       setLoading(false);
     }

@@ -61,11 +61,18 @@ export async function PUT(
       );
     }
 
+    // Convert Big5Vector object to array string for pgvector: '[o, c, e, a, n]'
+    const toVectorString = (v: any) => {
+      // Order: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism
+      const arr = [v.o, v.c, v.e, v.a, v.n];
+      return JSON.stringify(arr);
+    };
+
     const { error: updateError } = await supabase
       .from("slots")
       .update({
-        self_vector: parsed.selfVector,
-        resonance_vector: parsed.resonanceVector,
+        self_vector: toVectorString(parsed.selfVector),
+        resonance_vector: toVectorString(parsed.resonanceVector),
         persona_icon: parsed.personaIcon,
         persona_summary: parsed.personaSummary,
       })
