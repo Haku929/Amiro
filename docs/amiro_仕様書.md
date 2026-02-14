@@ -184,6 +184,19 @@
 | --- | --- | --- | --- | --- |
 | POST | `/api/matching/explain` | 二人の関係性をAIが解説 | `{ otherUserId: "uuid" }` | `{ explanation: "string" }` |
 
+**共鳴詳細画面で表示するユーザー情報（DetailUser）**  
+フロントは `profiles`（display_name, bio）と `slots`（該当スロット）から次の形で組み立て、自分・相手の2件を渡す。
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| id | UserId | ユーザーID |
+| name | string | 表示名（profiles.display_name） |
+| bio | string \| null | 自己紹介（profiles.bio） |
+| personaSummary | string | そのスロットの分人要約（slots.persona_summary） |
+| slotTitle? | string | 例: 分人1 |
+| selfVector | Big5Vector | 自己ベクトル |
+| resonanceVector? | Big5Vector | 共鳴ベクトル |
+
 **AI への入力**: 共鳴スコアを実現したスロットの組み合わせについて、**自分側**と**相手側**のそれぞれのスロット情報を取得し、次の 6 項目をプロンプトに含める。自分側：`selfVector`（自己ベクトル）、`resonanceVector`（共鳴ベクトル）、`personaSummary`（分人要約）。相手側：同様に `selfVector`、`resonanceVector`、`personaSummary`。どのスロットの組み合わせを使うかは、リクエストで `matchedSlotIndexSelf` / `matchedSlotIndexOther` を渡すか、API 内でマッチング結果を再取得して決める。AI はこれらを踏まえ「なぜこの二人だと好きな自分でいられるか」を解説文（`explanation`）で返す。
 
 ### 5.6 シチュエーション（リストから選択）
