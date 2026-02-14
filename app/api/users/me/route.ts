@@ -82,8 +82,36 @@ async function fetchUserProfile(
     .eq("user_id", userId)
     .single();
 
+  // プロフィールが見つからない場合、Auth情報から作成を試みる
+  let currentProfile = profile;
   if (profileError || !profile) {
-    return { error: 404 };
+    // Authユーザー情報を取得してプロフィールを作成
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+        const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || "User";
+        const avatarUrl = user.user_metadata?.avatar_url || null;
+
+        const { data: newProfile, error: createError } = await supabase
+            .from("profiles")
+            .upsert({
+                user_id: userId,
+                display_name: displayName,
+                avatar_url: avatarUrl,
+                updated_at: new Date().toISOString(),
+            })
+            .select("user_id, display_name, avatar_url, bio")
+            .single();
+        
+        if (!createError && newProfile) {
+            currentProfile = newProfile;
+        } else {
+            console.error("Failed to auto-create profile:", createError);
+            return { error: 404 };
+        }
+    } else {
+        return { error: 404 };
+    }
   }
 
   const { data: slotRows, error: slotsError } = await supabase
@@ -97,7 +125,7 @@ async function fetchUserProfile(
   }
 
   const slots: Slot[] = (slotRows ?? []).map(mapSlot);
-  return { profile, slots };
+  return { profile: currentProfile!, slots };
 }
 
 /**
