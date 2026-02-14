@@ -57,6 +57,7 @@ const TRAIT_MAPPING = [
 export interface DetailUser {
   id: string;
   name: string;
+  bio?: string | null;
   personaSummary: string;
   slotTitle?: string;
   selfVector: Big5Vector;
@@ -161,7 +162,13 @@ ${target.personaSummary}
               {me.name}
               <span className="text-sm font-normal text-zinc-500 ml-2">(あなた)</span>
             </h2>
-            <p className="text-xs text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full mb-5 font-medium">{me.slotTitle}</p>
+            <p className="text-xs text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full mb-3 font-medium">{me.slotTitle}</p>
+            {me.bio != null && me.bio !== '' && (
+              <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mb-3">
+                <p className="text-xs font-medium text-zinc-500 mb-1">自己紹介</p>
+                <p className="text-sm text-zinc-700 leading-relaxed line-clamp-3">{me.bio}</p>
+              </div>
+            )}
             <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mt-auto">
               <p className="text-sm text-zinc-700 leading-relaxed line-clamp-4">{me.personaSummary}</p>
             </div>
@@ -174,7 +181,9 @@ ${target.personaSummary}
                <div className="relative z-10 flex flex-col items-center">
                   <Zap className="text-rose-500" size={32} fill="currentColor" />
                   <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">共鳴スコア</span>
-                  <span className="text-6xl md:text-7xl font-black text-rose-500 tracking-tighter leading-none mt-1">{resonanceScore}</span>
+                  <span className="text-6xl md:text-7xl font-black text-rose-500 tracking-tighter leading-none mt-1">
+                  {resonanceScore <= 1 ? Math.round(resonanceScore * 100) : Math.round(resonanceScore)}
+                </span>
                </div>
             </div>
           </div>
@@ -186,7 +195,13 @@ ${target.personaSummary}
                <User className="text-rose-400" size={40} />
              </div>
              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 truncate w-full">{target.name}</h2>
-             <p className="text-xs text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-full mb-5 font-medium">共鳴マッチング対象</p>
+             <p className="text-xs text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-full mb-3 font-medium">共鳴マッチング対象</p>
+             {target.bio != null && target.bio !== '' && (
+               <div className="w-full bg-rose-50/30 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30 text-left mb-3">
+                 <p className="text-xs font-medium text-rose-600 dark:text-rose-400 mb-1">自己紹介</p>
+                 <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-3">{target.bio}</p>
+               </div>
+             )}
              <div className="w-full bg-rose-50/30 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30 text-left mt-auto">
                <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-4">{target.personaSummary}</p>
              </div>
@@ -215,9 +230,8 @@ ${target.personaSummary}
             </h3>
             
             <div className="flex flex-wrap items-center justify-center gap-6 bg-zinc-50 dark:bg-zinc-800 py-3 px-6 rounded-xl inline-flex border border-zinc-100 dark:border-zinc-700">
-               {/* 濃い点 (自分) */}
                <div className="flex items-center gap-2">
-                 <div className="w-4 h-4 rounded-full border bg-zinc-600 dark:bg-zinc-400 border-zinc-800 dark:border-zinc-200"></div>
+                 <div className="w-4 h-4 rounded-full border-2 bg-blue-500 border-blue-600 dark:border-blue-400 shadow-sm" aria-hidden />
                  <span className="text-sm text-zinc-800 dark:text-zinc-200 font-bold">
                    {isTargetView ? 'あなたの現実 (自己ベクトル)' : 'あなたの理想 (共鳴ベクトル)'}
                  </span>
@@ -225,9 +239,8 @@ ${target.personaSummary}
 
                <span className="text-zinc-300 dark:text-zinc-600">|</span>
 
-               {/* 薄い点 (相手) */}
                <div className="flex items-center gap-2">
-                 <div className="w-4 h-4 rounded-full border bg-zinc-200 dark:bg-zinc-600 border-zinc-400 dark:border-zinc-500"></div>
+                 <div className="w-4 h-4 rounded-full border-2 bg-blue-200 dark:bg-blue-900/40 border-blue-500 dark:border-blue-400 shadow-sm" aria-hidden />
                  <span className="text-sm text-zinc-600 dark:text-zinc-400 font-medium">
                    {isTargetView ? '相手の理想 (共鳴ベクトル)' : '相手の現実 (自己ベクトル)'}
                  </span>
@@ -297,19 +310,21 @@ ${target.personaSummary}
         </div>
 
         {/* 3. AI解説 */}
-        <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-purple-950/30 rounded-2xl p-8 border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
+        <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-purple-950/30 rounded-2xl p-8 border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
           <div className="flex items-center gap-2 mb-6">
             <Sparkles size={20} className="text-indigo-600 dark:text-indigo-400" />
             <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-200">AI Relationship Analysis</h3>
           </div>
 
+          {isAiLoading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl">
+              <Loader2 className="animate-spin text-indigo-400 mb-2" size={32} />
+              <p className="text-sm text-indigo-400 font-bold">AIが分析中...</p>
+            </div>
+          )}
+
           <div className="prose prose-zinc prose-base max-w-none">
-            {isAiLoading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm rounded-2xl">
-                <Loader2 className="animate-spin text-indigo-400 mb-2" size={32} />
-                <p className="text-sm text-indigo-400 font-bold">AIが分析中...</p>
-              </div>
-            ) : aiError ? (
+            {aiError ? (
               <p className="text-red-400 text-sm p-4 bg-red-50 rounded-lg">{aiError}</p>
             ) : (
               aiExplanation.split('\n').map((line, i) => {
@@ -320,7 +335,7 @@ ${target.personaSummary}
                 return <p key={i} className="text-zinc-700 leading-relaxed mb-3 text-justify">{line}</p>;
               })
             )}
-            {!isAiLoading && !aiError && !aiExplanation && (
+            {!aiError && !aiExplanation && !isAiLoading && (
               <p className="text-zinc-400 text-sm">データがありません</p>
             )}
           </div>
