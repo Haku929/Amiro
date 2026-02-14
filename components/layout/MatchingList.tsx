@@ -28,13 +28,28 @@ function MatchingCard({ candidate }: { candidate: MatchingResult }) {
 
                     <h3 className="text-sm font-bold text-zinc-900 text-center leading-tight line-clamp-2 w-full">{candidate.displayName}</h3>
 
-                    <div className="flex flex-col items-center bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100 w-full">
-                        <div className="flex items-center gap-1">
-                            <Zap size={14} className="text-rose-500 fill-rose-500" />
-                            <span className="text-xs font-bold text-rose-400">共鳴スコア</span>
-                        </div>
-                        <span className="text-xl font-black text-rose-500 leading-none">{(candidate.resonanceScore * 100).toFixed(1)}</span>
-                    </div>
+                    {(() => {
+                        const scoreVal = candidate.resonanceScore <= 1 ? candidate.resonanceScore * 100 : candidate.resonanceScore;
+                        const hue = Math.max(0, Math.min(240, 240 - (scoreVal * 2.4)));
+                        const mainColor = `hsl(${hue}, 90%, 55%)`;
+                        const bgColor = `hsla(${hue}, 90%, 55%, 0.1)`;
+                        const borderColor = `hsla(${hue}, 90%, 55%, 0.2)`;
+
+                        return (
+                            <div
+                                className="flex flex-col items-center px-3 py-1.5 rounded-xl border w-full transition-colors"
+                                style={{ backgroundColor: bgColor, borderColor: borderColor }}
+                            >
+                                <div className="flex items-center gap-1">
+                                    <Zap size={14} fill="currentColor" style={{ color: mainColor }} />
+                                    <span className="text-xs font-bold" style={{ color: mainColor, opacity: 0.8 }}>共鳴スコア</span>
+                                </div>
+                                <span className="text-xl font-black leading-none" style={{ color: mainColor }}>
+                                    {scoreVal.toFixed(1)}
+                                </span>
+                            </div>
+                        );
+                    })()}
                 </div>
 
                 {/* Right: Info */}
