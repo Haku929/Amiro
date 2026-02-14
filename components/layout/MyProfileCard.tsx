@@ -7,23 +7,23 @@ import { Slot } from '@/lib/types';
 const TRAIT_MAPPING = [
   { 
     key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
-    color: 'bg-orange-500 border-orange-600', barColor: 'bg-orange-50/50' 
+    color: 'bg-orange-500 border-orange-600 dark:border-orange-400', barColor: 'bg-orange-100/50 dark:bg-orange-900/30' 
   },
   { 
     key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
-    color: 'bg-emerald-500 border-emerald-600', barColor: 'bg-emerald-50/50' 
+    color: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400', barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30' 
   },
   { 
     key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
-    color: 'bg-blue-500 border-blue-600', barColor: 'bg-blue-50/50' 
+    color: 'bg-blue-500 border-blue-600 dark:border-blue-400', barColor: 'bg-blue-100/50 dark:bg-blue-900/30' 
   },
   { 
     key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
-    color: 'bg-rose-500 border-rose-600', barColor: 'bg-rose-50/50' 
+    color: 'bg-rose-500 border-rose-600 dark:border-rose-400', barColor: 'bg-rose-100/50 dark:bg-rose-900/30' 
   },
   { 
     key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
-    color: 'bg-purple-500 border-purple-600', barColor: 'bg-purple-50/50' 
+    color: 'bg-purple-500 border-purple-600 dark:border-purple-400', barColor: 'bg-purple-100/50 dark:bg-purple-900/30' 
   },
 ] as const;
 
@@ -35,19 +35,19 @@ interface MyProfileCardProps {
 
 export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyProfileCardProps) {
   return (
-    <div className="w-full bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm">
+    <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
       <div className="flex flex-col xl:flex-row items-stretch gap-6">
         
         {/* 1. 左ブロック：基本情報 & スイッチ (w-64でリストと統一) */}
         <div className="flex flex-col items-center justify-center gap-4 xl:w-64 shrink-0 xl:border-r xl:border-zinc-100 xl:pr-6">
           <div className="relative">
-            <div className="w-16 h-16 bg-zinc-50 border-2 border-zinc-100 rounded-full flex items-center justify-center text-zinc-400 shadow-sm">
+            <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-400 dark:text-zinc-500 shadow-sm">
               <User strokeWidth={1.5} size={32} />
             </div>
           </div>
           
           <div className="text-center w-full">
-            <h2 className="text-xl font-bold text-zinc-900">あなた</h2>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">あなた</h2>
             <div className="flex gap-2 mt-3 flex-wrap justify-center">
               {slots.map((slot) => (
                 <button
@@ -55,8 +55,8 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
                   onClick={() => onSlotChange(slot.slotIndex)}
                   className={`px-3 py-1 text-xs font-bold rounded-full transition-all border ${
                     currentSlot.slotIndex === slot.slotIndex
-                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-md transform scale-105'
-                      : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50'
+                      ? 'bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-800 dark:border-zinc-100 shadow-md transform scale-105'
+                      : 'bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                   }`}
                 >
                   分人{slot.slotIndex}
@@ -72,8 +72,8 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
           {/* 上段: ベクトル2カラム */}
           <div className="flex flex-col sm:flex-row gap-4">
             {/* 自己ベクトル */}
-            <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
-              <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
+            <div className="flex-1 bg-zinc-50/50 dark:bg-zinc-800/50 rounded-xl p-3 border border-zinc-200 dark:border-zinc-700">
+              <p className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-700 pb-2 mb-2 text-center tracking-wider">
                 自己ベクトル (現実)
               </p>
               <div className="space-y-3">
@@ -82,19 +82,19 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
                   return (
                     <div key={`my-self-${trait.key}`} className="relative h-4">
                       <div className="relative flex justify-between items-end mb-1 px-1 h-3">
-                        <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
-                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
+                        <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-medium">{trait.leftLabel}</span>
+                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600 dark:text-zinc-300">
                           {trait.label}
                         </span>
                         <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
                       </div>
 
                       <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
-                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
-                         {/* ドットを小さく w-2.5 h-2.5 */}
+                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40 dark:bg-zinc-600/40"></div>
+                         {/* ドット強調 */}
                          <div 
-                           className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
-                           style={{ left: `calc(${val}% - 5px)` }}
+                           className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border shadow-md ring-2 ring-white dark:ring-zinc-800 ${trait.color}`}
+                           style={{ left: `calc(${val}% - 6px)` }}
                          ></div>
                       </div>
                     </div>
@@ -104,8 +104,8 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
             </div>
 
             {/* 共鳴ベクトル */}
-            <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
-              <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
+            <div className="flex-1 bg-zinc-50/50 dark:bg-zinc-800/50 rounded-xl p-3 border border-zinc-200 dark:border-zinc-700">
+              <p className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-700 pb-2 mb-2 text-center tracking-wider">
                 共鳴ベクトル (理想)
               </p>
               <div className="space-y-3">
@@ -114,19 +114,19 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
                   return (
                     <div key={`my-res-${trait.key}`} className="relative h-4">
                       <div className="relative flex justify-between items-end mb-1 px-1 h-3">
-                        <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
-                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
+                        <span className="text-[9px] text-zinc-400 dark:text-zinc-500 font-medium">{trait.leftLabel}</span>
+                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600 dark:text-zinc-300">
                           {trait.label}
                         </span>
                         <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
                       </div>
 
                       <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
-                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
-                         {/* ドットを小さく w-2.5 h-2.5 */}
+                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40 dark:bg-zinc-600/40"></div>
+                         {/* ドット強調 */}
                          <div 
-                           className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
-                           style={{ left: `calc(${val}% - 5px)` }}
+                           className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border shadow-md ring-2 ring-white dark:ring-zinc-800 ${trait.color}`}
+                           style={{ left: `calc(${val}% - 6px)` }}
                          ></div>
                       </div>
                     </div>
@@ -137,9 +137,9 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
           </div>
 
           {/* 下段: 要約文 */}
-          <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
-            <p className="text-[10px] font-semibold text-zinc-400 mb-0.5">分人要約文</p>
-            <p className="text-xs text-zinc-700 leading-relaxed line-clamp-2">
+          <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-3 border border-zinc-100 dark:border-zinc-800">
+            <p className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 mb-0.5">分人要約文</p>
+            <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-2">
               {currentSlot.personaSummary}
             </p>
           </div>

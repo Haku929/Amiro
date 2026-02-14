@@ -84,19 +84,19 @@ const CARD_TEMPLATES = [
     name: "鏡の分人 A",
     description: "あなたの隠れた一面を映し出す鏡。深層心理に問いかけます。",
     icon: "🔮",
-    colorClass: "bg-purple-50 text-purple-600 border-purple-200",
+    colorClass: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800",
   },
   {
     name: "鏡の分人 B",
     description: "あなたの感情に寄り添う鏡。日々の機微をすくい上げます。",
     icon: "🌸",
-    colorClass: "bg-pink-50 text-pink-600 border-pink-200",
+    colorClass: "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-800",
   },
   {
     name: "鏡の分人 C",
     description: "あなたの理性を磨く鏡。思考の枠組みを広げます。",
     icon: "💎",
-    colorClass: "bg-cyan-50 text-cyan-600 border-cyan-200",
+    colorClass: "bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
   },
 ];
 
@@ -193,8 +193,8 @@ export default function HomePage() {
       
       {/* ページヘッダー部分 */}
       <div className="text-center space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900">今日の「鏡」を選ぶ</h1>
-        <p className="text-zinc-600 text-sm md:text-base max-w-xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100">今日の「鏡」を選ぶ</h1>
+        <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base max-w-xl mx-auto">
           話してみたいAIを選択してください。<br />対話を通じて、相手の性格に響き合うあなたの新しい「分人」を引き出します。
         </p>
       </div>
@@ -215,7 +215,7 @@ export default function HomePage() {
           return (
           <div 
             key={ai.id} 
-            className="group relative h-full border border-zinc-200 rounded-2xl p-6 bg-white shadow-sm hover:shadow-md hover:border-zinc-300 transition-all flex flex-col items-center text-center space-y-5"
+            className="h-full border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col items-center text-center space-y-5"
           >
             {/* アイコン部分 */}
             <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border ${ai.colorClass} transition-transform duration-300 group-hover:scale-110`}>
@@ -224,11 +224,11 @@ export default function HomePage() {
             
             {/* テキスト部分 */}
             <div className="flex-grow space-y-2">
-              <h2 className="text-lg font-bold text-zinc-900">{ai.name}</h2>
+              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{ai.name}</h2>
               <div className="text-xs font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded inline-block text-zinc-500 mb-2">
                  Situation: {ai.situation}
               </div>
-              <p className="text-sm text-zinc-600 leading-relaxed">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 {ai.description}
               </p>
             </div>
@@ -237,7 +237,7 @@ export default function HomePage() {
             <div className="w-full pt-2 mt-auto relative">
               <Link 
                 href={`/chat?${query.toString()}`}
-                className="group/btn relative block w-full py-3 px-4 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors shadow-sm"
+                className="inline-block w-full py-3 px-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-sm"
               >
                 このAIと話す
 

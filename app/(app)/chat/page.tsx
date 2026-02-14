@@ -220,15 +220,15 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] max-w-2xl mx-auto w-full p-4">
       {/* ヘッダー情報 */}
-      <Card className="mb-4 shadow-sm shrink-0">
+      <Card className="mb-4 shadow-sm shrink-0 dark:bg-zinc-900 dark:border-zinc-800">
         <CardHeader className="py-4 px-6 flex flex-row items-center justify-between space-y-0">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 border-2 border-primary/20">
-              <AvatarFallback><Sparkles className="h-5 w-5 text-primary" /></AvatarFallback>
+              <AvatarFallback className="dark:bg-zinc-800"><Sparkles className="h-5 w-5 text-primary" /></AvatarFallback>
             </Avatar>
             <div>
               <h2 className="text-sm font-medium text-muted-foreground">Mirror Situation</h2>
-              <p className="font-bold text-base">{situation}</p>
+              <p className="font-bold text-base dark:text-zinc-100">{situation}</p>
             </div>
           </div>
           
@@ -243,7 +243,7 @@ export default function ChatPage() {
             {/* Mobile用 Turn Count (Right aligned when button is hidden or just on right) */}
             <div className="md:hidden flex flex-col items-end gap-0.5">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Turn</span>
-              <p className={`font-mono text-lg font-bold leading-none ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
+              <p className={`font-mono text-lg font-bold leading-none dark:text-zinc-100 ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
                 {turnCount} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TURNS}</span>
               </p>
             </div>
@@ -254,7 +254,7 @@ export default function ChatPage() {
               size="sm" 
               onClick={handleFinish}
               disabled={analyzing || messages.length === 0}
-              className="hidden sm:flex border-primary/20 hover:bg-primary/5"
+              className="hidden sm:flex border-primary/20 hover:bg-primary/5 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-700"
             >
               {analyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
               終了して分析
@@ -264,7 +264,7 @@ export default function ChatPage() {
       </Card>
 
       {/* チャットエリア */}
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-sm">
+      <Card className="flex-1 flex flex-col overflow-hidden shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
         <CardContent className="flex-1 p-0 relative">
           <div 
             ref={scrollRef} 
@@ -288,18 +288,18 @@ export default function ChatPage() {
                   {msg.role === "user" ? (
                     <>
                       <AvatarImage src="" /> {/* ユーザーアイコンがあれば */}
-                      <AvatarFallback className="bg-slate-200"><User className="h-4 w-4 text-slate-600" /></AvatarFallback>
+                      <AvatarFallback className="bg-slate-200 dark:bg-slate-700"><User className="h-4 w-4 text-slate-600 dark:text-slate-300" /></AvatarFallback>
                     </>
                   ) : (
-                    <AvatarFallback className="bg-primary/10"><Sparkles className="h-4 w-4 text-primary" /></AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 dark:bg-zinc-800"><Sparkles className="h-4 w-4 text-primary" /></AvatarFallback>
                   )}
                 </Avatar>
                 
                 <div
                   className={`max-w-[80%] rounded-lg p-3 text-sm leading-relaxed whitespace-pre-wrap ${
                     msg.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
+                      ? "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground"
+                      : "bg-muted text-foreground dark:bg-zinc-800 dark:text-zinc-100"
                   }`}
                 >
                   {msg.content}
@@ -310,9 +310,9 @@ export default function ChatPage() {
             {loading && (
               <div className="flex gap-3">
                 <Avatar className="h-8 w-8 mt-1">
-                  <AvatarFallback className="bg-primary/10"><Sparkles className="h-4 w-4 text-primary" /></AvatarFallback>
+                  <AvatarFallback className="bg-primary/10 dark:bg-zinc-800"><Sparkles className="h-4 w-4 text-primary" /></AvatarFallback>
                 </Avatar>
-                <div className="bg-muted text-foreground rounded-lg p-3 flex items-center">
+                <div className="bg-muted text-foreground dark:bg-zinc-800 dark:text-zinc-100 rounded-lg p-3 flex items-center">
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   <span className="text-xs text-muted-foreground">思考中...</span>
                 </div>
@@ -330,7 +330,7 @@ export default function ChatPage() {
         </CardContent>
 
         {/* 入力エリア */}
-        <CardFooter className="p-3 bg-card border-t">
+        <CardFooter className="p-3 bg-card border-t dark:bg-zinc-900 dark:border-zinc-800">
           <form 
             className="flex w-full gap-2"
             onSubmit={(e) => {
@@ -342,8 +342,8 @@ export default function ChatPage() {
               placeholder={turnCount >= MAX_TURNS ? "会話終了" : "メッセージを入力..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              disabled={analyzing || turnCount >= MAX_TURNS}
-              className="flex-1"
+              disabled={loading || analyzing || turnCount >= MAX_TURNS}
+              className="flex-1 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder-zinc-400"
               ref={inputRef}
               autoFocus
             />
