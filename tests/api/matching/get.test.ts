@@ -14,7 +14,7 @@ function logResponseJson(status: number, json: unknown) {
   console.log("----------------\n");
 }
 
-function buildRequest(url = "http://localhost/api/matching") {
+function buildRequest(url = "http://localhost/api/matching?slot=1") {
   return new Request(url);
 }
 
@@ -106,6 +106,20 @@ describe("GET /api/matching", () => {
     expect(json.error).toBe("Unauthorized");
   });
 
+  it("returns 400 when slot is missing", async () => {
+    const res = await GET(buildRequest("http://localhost/api/matching"));
+    const json = await res.json();
+    expect(res.status).toBe(400);
+    expect(json.error).toBe("slot is required (1, 2, or 3)");
+  });
+
+  it("returns 400 when slot is invalid", async () => {
+    const res = await GET(buildRequest("http://localhost/api/matching?slot=0"));
+    const json = await res.json();
+    expect(res.status).toBe(400);
+    expect(json.error).toBe("slot is required (1, 2, or 3)");
+  });
+
   it("returns 503 when RPC errors", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     vi.mocked(createClient).mockResolvedValueOnce({
@@ -150,7 +164,7 @@ describe("GET /api/matching", () => {
   });
 
   it("returns 200 with MatchingResult[] when RPC returns rows and profiles exist", async () => {
-    const res = await GET(buildRequest());
+    const res = await GET(buildRequest("http://localhost/api/matching?slot=2"));
     const json = await res.json();
     logResponseJson(res.status, json);
     expect(res.status).toBe(200);
@@ -166,7 +180,7 @@ describe("GET /api/matching", () => {
     expect(json[0].personaSummary).toBe("相手の分人要約文");
   });
 
-  it("passes limit and offset from query to RPC", async () => {
+  it("passes slot, limit and offset from query to RPC", async () => {
     const { createClient } = await import("@/lib/supabase/server");
     const rpcMock = vi.fn().mockResolvedValue({ data: [], error: null });
     vi.mocked(createClient).mockResolvedValueOnce({
@@ -180,11 +194,39 @@ describe("GET /api/matching", () => {
       from: vi.fn(),
     } as never);
 
-    await GET(buildRequest("http://localhost/api/matching?limit=5&offset=10"));
+    await GET(buildRequest("http://localhost/api/matching?slot=2&limit=5&offset=10"));
     expect(rpcMock).toHaveBeenCalledWith("get_matching_scores", {
       my_user_id: "self-uuid-1",
-      limit_n: 5,
-      offset_n: 10,
+      limit_n: 100,
+      offset_n: 0,
     });
+  });
+
+  it("filters by slot when slot=2 and returns only matched_slot_index_self 2", async () => {
+    const res = await GET(buildRequest("http://localhost/api/matching?slot=2"));
+    const json = await res.json();
+    logResponseJson(res.status, json);
+    expect(res.status).toBe(200);
+    expect(json).toHaveLength(1);
+    expect(json[0].matchedSlotIndexSelf).toBe(2);
+  });
+
+  it("returns empty when slot=1 and RPC returns no rows for that slot", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+    vi.mocked(createClient).mockResolvedValueOnce({
+      auth: {
+        getUser: vi.fn(async () => ({
+          data: { user: { id: "self-uuid-1" } },
+          error: null,
+        })),
+      },
+      rpc: vi.fn().mockResolvedValue({ data: [], error: null }),
+      from: vi.fn(),
+    } as never);
+
+    const res = await GET(buildRequest("http://localhost/api/matching?slot=1"));
+    const json = await res.json();
+    expect(res.status).toBe(200);
+    expect(json).toEqual([]);
   });
 });

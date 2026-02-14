@@ -19,6 +19,13 @@ function parseOffset(value: string | null): number {
   return n;
 }
 
+function parseSlot(value: string | null): 1 | 2 | 3 | null {
+  if (value == null) return null;
+  const n = parseInt(value, 10);
+  if (n === 1 || n === 2 || n === 3) return n;
+  return null;
+}
+
 type RpcRow = {
   other_user_id: string;
   resonance_score: number;
@@ -28,8 +35,8 @@ type RpcRow = {
 
 /**
  * 認証ユーザーと共鳴スコアの高い他ユーザーを取得する。RPC get_matching_scores の結果にプロフィールを結合して返す。
- * @param request - URL query: `limit` (optional, default 20, max 100), `offset` (optional, default 0). Auth required.
- * @returns 200: `MatchingResult[]` (userId, displayName, avatarUrl, bio, resonanceScore, matchedSlotIndexSelf, matchedSlotIndexOther, personaSummary). 401: `{ error: "Unauthorized" }`. 503: `{ error: "Matching scores unavailable" }`. 500: `{ error: "Profiles fetch failed" }`, `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
+ * @param request - URL query: `slot` (required, 1|2|3), `limit` (optional, default 20, max 100), `offset` (optional, default 0). Auth required.
+ * @returns 200: `MatchingResult[]`. 400: `slot` なしまたは無効. 401: `{ error: "Unauthorized" }`. 503: `{ error: "Matching scores unavailable" }`. 500: 同上.
  */
 export async function GET(request: NextRequest) {
   try {
@@ -44,13 +51,14 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
+
     const limit = parseLimit(searchParams.get("limit"));
     const offset = parseOffset(searchParams.get("offset"));
 
     const { data: rows, error: rpcError } = await supabase.rpc("get_matching_scores", {
       my_user_id: user.id,
-      limit_n: limit,
-      offset_n: offset,
+      limit_n: MAX_LIMIT,
+      offset_n: 0,
     }) as { data: RpcRow[] | null; error: unknown };
 
     if (rpcError) {
@@ -60,7 +68,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const list = Array.isArray(rows) ? rows : [];
+    const list = (Array.isArray(rows) ? rows : []).slice(offset, offset + limit);
     if (list.length === 0) {
       return NextResponse.json([]);
     }
