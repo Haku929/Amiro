@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Slot } from '@/lib/types';
-import { User, Trash2, RefreshCw, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { Slot, Big5Vector } from '@/lib/types';
+import { User, RefreshCw, Plus, Loader2 } from 'lucide-react';
 
 const MAX_SLOTS = 3;
 
@@ -92,31 +93,6 @@ export default function SlotManager() {
     fetchSlots();
   }, []);
 
-  const handleDeleteSlot = async (slotIndex: number) => {
-    alert("削除機能は現在未実装です。");
-    // Original implementation disabled as per request
-    /*
-    if (!confirm(`スロット${slotIndex}のデータを削除してもよろしいですか？`)) return;
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/slots', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slotIndex }),
-      });
-      
-      if (!res.ok) {
-        throw new Error('Failed to delete slot');
-      }
-
-      await fetchSlots();
-    } catch (error) {
-      console.error("削除エラー", error);
-      setIsLoading(false);
-    }
-    */
-  };
-
   const activeSlotCount = Object.values(slots).filter(slot => slot !== null).length;
 
   return (
@@ -145,8 +121,16 @@ export default function SlotManager() {
         {[1, 2, 3].map((index) => {
           const slot = slots[index];
 
-          // --- ケースA: データなし ---
           if (!slot) {
+            if (isLoading) {
+              return (
+                <div key={index} className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/30 min-h-[320px]">
+                  <Loader2 className="h-10 w-10 animate-spin text-zinc-400 dark:text-zinc-500 mb-3" />
+                  <p className="text-sm font-bold text-zinc-500 dark:text-zinc-500">Slot {index}</p>
+                  <p className="text-xs mt-1 text-zinc-400 dark:text-zinc-600">読み込み中…</p>
+                </div>
+              );
+            }
             return (
               <div key={index} className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/30 text-zinc-400 dark:text-zinc-600 transition-colors hover:bg-zinc-50/60 dark:hover:bg-zinc-800/20 min-h-[400px]">
                 <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
@@ -220,19 +204,13 @@ export default function SlotManager() {
                   </p>
                 </div>
               </div>
-              
-              {/* フッター */}
-              <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-auto flex justify-end">
-                <button 
-                  onClick={() => handleDeleteSlot(index)}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors disabled:opacity-50"
-                  title="削除"
-                >
-                  <Trash2 size={16} />
-                  削除
-                </button>
-              </div>
+
+              <Link
+                href={`/profile/slot/${slot.slotIndex}`}
+                className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 underline"
+              >
+                会話履歴を見る
+              </Link>
 
               {isLoading && (
                 <div className="absolute inset-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl">

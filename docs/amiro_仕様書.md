@@ -81,6 +81,8 @@
 
 1 スロットにつき会話 1 本を紐づける。`slots` テーブルに `conversation`（JSONB、任意）を追加する。保存は POST /api/slots または PUT /api/slots/:slotIndex のリクエスト body に任意で `conversation: { messages: { role, content }[] }` を含める。GET /api/users/me や GET /api/slots でスロット取得時に `conversation` も返す。
 
+**フロントの流れ**: チャットで「会話を終了して分析結果を見る」により分析 API を呼んだあと、レポートページへ遷移する直前に、会話履歴（messages）を `sessionStorage`（キー: `amiro_report_conversation`）に保存する。レポート画面でスロット保存時にその値を読み取り、`body.conversation` に含めて POST/PUT する。保存成功後に `sessionStorage` を削除する。
+
 ---
 
 ## 4. ページ構成とユーザー体験（UX）
@@ -92,9 +94,14 @@
 | **ホーム（AIガチャ）** | 今日向き合う「鏡」の選択 | 毎日 3 体の「鏡」を提示。各鏡は「バックエンドのリストから選んだシチュエーション」と「フロントが生成したランダムな Big5」（日付 UTC シードで同一日は同じ値）の組み合わせで決まる。占い感覚で選ばせる。 |
 | **AI Mirror チャット** | 自分を引き出す対話 | 選んだ鏡のシチュエーション＋Big5 を渡し、**会話のやり取りそのものも AI が行う**（ユーザーが送信するたびに AI が鏡のキャラで返答。例: 10 往復）。終了後、AI がユーザーの Big5 推定と要約を返す。 |
 | **分人レポート** | 分析結果の提示と保存 | 5角形グラフを表示。「この自分を愛する」なら保存ボタン。満杯なら上書きするスロットを選択したうえで保存。 |
-| **プロフィール管理** | 3つの分人の管理 | 保存済みの自分を一覧表示する。スロットの追加・上書き選択はレポート保存時のみ行う。 |
+| **プロフィール管理** | 3つの分人の管理 | 保存済みの自分を一覧表示する。各スロットに「会話履歴を見る」リンクがあり、そのスロットに紐づく会話を閲覧できる。スロットの追加・上書き選択はレポート保存時のみ行う。表示名・アバターは GET /api/users/me から取得。 |
+| **会話履歴（自分）** | 自分の分人会話の閲覧 | `/profile/slot/[slotIndex]`。指定スロットに保存された会話を、チャット画面と同じレイアウトで表示。 |
+| **会話履歴（相手）** | 相手の分人会話の閲覧 | `/profile/[userId]/slot/[slotIndex]`。共鳴詳細から「相手の会話履歴を見る」で遷移。相手のそのスロットの会話を表示。 |
+| **他人プロフィール** | 他ユーザーの公開プロフィール閲覧 | `/profile/[userId]`。表示名・アバター・bio・スロット数。`userId=me` のときは /profile へリダイレクト。 |
 | **共鳴マッチング** | 響き合う他者との遭遇 | 「あなたが好きな自分」に惹かれるユーザーをリスト化。 |
-| **共鳴詳細** | 二人の関係性の可視化 | なぜこの二人だと「好きな自分」でいられるかをAIが解説。 |
+| **共鳴詳細** | 二人の関係性の可視化 | なぜこの二人だと「好きな自分」でいられるかをAIが解説。自分カードに「自分の会話履歴を見る」、相手カードに「相手の会話履歴を見る」リンクを表示。相手カードに「チャット相手に追加」ボタンと「チャットする」リンク。 |
+| **チャット一覧** | 1対1チャットの相手一覧 | `/dm`。登録した相手およびメッセージのやり取りがある相手を一覧表示。最後のメッセージを表示。クリックでその相手とのチャットルームへ。 |
+| **1対1チャットルーム** | マッチング相手とのテキストチャット | `/dm/[userId]`。相手とのメッセージ一覧を表示・送信。ポーリングで新着取得。 |
 
 ---
 
@@ -116,6 +123,7 @@
 | メソッド | パス | 説明 | リクエストボディ | レスポンス |
 | --- | --- | --- | --- | --- |
 | GET | `/api/users/me` | 自分のメタデータと分人スロット一覧取得 | なし | `UserProfile` |
+| GET | `/api/users/[userId]` | 指定ユーザーのプロフィールとスロット一覧（表示用）。`userId=me` のときは自分。**他ユーザー取得時は RLS を通過するためサーバー側で service role（createAdminClient）を使用。** 認証必須。 | なし | `UserProfile`。404: プロフィールなし。 |
 | PATCH | `/api/users/me` | 表示名・アバターURL・自己紹介更新 | `{ displayName?: string, avatarUrl?: string | null, bio?: string | null }` | `UserProfile` |
 | DELETE | `/api/users/me` | 自分のアカウント削除（slots → profiles → Auth ユーザーを削除しセッション破棄） | なし | `{ ok: true }`（200）。401: 未認証。500: 削除失敗。 |
 
@@ -157,7 +165,9 @@
 
 | メソッド | パス | 説明 | クエリ | レスポンス |
 | --- | --- | --- | --- | --- |
-| GET | `/api/matching` | 共鳴スコアの高いユーザー一覧取得 | `?limit=20&offset=0`（任意） | `MatchingResult[]` |
+| GET | `/api/matching` | 共鳴スコアの高いユーザー一覧取得（スロットごとに個別取得） | `slot=N`（必須、1|2|3）。`limit=20`・`offset=0` は任意。 | `MatchingResult[]` |
+
+`slot` なしまたは 1, 2, 3 以外のときは 400。RPC `get_matching_scores` には `slot_index_self`（1|2|3）を渡し、指定スロットでマッチした結果のみを DB から取得する。
 
 **MatchingResult**
 
@@ -176,15 +186,50 @@
 
 `resonanceScore` は 0〜1。相互共鳴スコア（自分→相手の類似度と相手→自分の類似度の両方を考慮した値。例: 両方向の最大類似度の積や最小値）。`matchedSlotIndexSelf` / `matchedSlotIndexOther` はそのスコアを実現したスロット番号。`bio` は相手の自己紹介文（profiles）、`personaSummary` は相手のそのスロットの分人要約文。
 
-### 5.5 共鳴詳細（AI解説）
+### 5.5 チャット相手の登録（contacts）
+
+| メソッド | パス | 説明 | リクエストボディ | レスポンス |
+| --- | --- | --- | --- | --- |
+| GET | `/api/contacts` | 自分が登録したチャット相手一覧 | なし | `Contact[]` |
+| POST | `/api/contacts` | 相手をチャット相手に登録 | `{ otherUserId: string }` | `Contact`。重複時は upsert で既存扱い。 |
+| DELETE | `/api/contacts/[otherUserId]` | 登録解除 | なし | `{ ok: true }` |
+
+**Contact**: `{ userId: string; displayName: string; avatarUrl: string | null }`
+
+片方だけ登録すれば、その二人間でメッセージ送信が可能（双方向）。相手が自分を登録していなくても、相手から届いたメッセージがあるスレッドは一覧に表示され返信できる。
+
+### 5.6 1対1チャット（DM）
+
+| メソッド | パス | 説明 | リクエストボディ / クエリ | レスポンス |
+| --- | --- | --- | --- | --- |
+| GET | `/api/dm/conversations` | チャット一覧用。登録相手＋メッセージやり取りがある相手の一覧（最後のメッセージ付き）。 | なし | `{ userId, displayName, avatarUrl, lastMessage?: { content, createdAt } }[]` |
+| GET | `/api/dm/[otherUserId]` | その相手とのメッセージ一覧。 | クエリ: `limit=50`, `before=id`（ページネーション） | `DmMessage[]` |
+| POST | `/api/dm` | メッセージ送信。送信権: (自分,相手) または (相手,自分) が contacts に存在する、または既にメッセージが存在する。 | `{ otherUserId: string, content: string }` | `DmMessage` |
+
+**DmMessage**: `{ id: string; senderId: string; receiverId: string; content: string; createdAt: string }`
+
+### 5.7 共鳴詳細（AI解説）
 
 | メソッド | パス | 説明 | リクエストボディ | レスポンス |
 | --- | --- | --- | --- | --- |
 | POST | `/api/matching/explain` | 二人の関係性をAIが解説 | `{ otherUserId: "uuid" }` | `{ explanation: "string" }` |
 
+**共鳴詳細画面で表示するユーザー情報（DetailUser）**  
+フロントは `profiles`（display_name, bio）と `slots`（該当スロット）から次の形で組み立て、自分・相手の2件を渡す。
+
+| フィールド | 型 | 説明 |
+| --- | --- | --- |
+| id | UserId | ユーザーID |
+| name | string | 表示名（profiles.display_name） |
+| bio | string \| null | 自己紹介（profiles.bio） |
+| personaSummary | string | そのスロットの分人要約（slots.persona_summary） |
+| slotTitle? | string | 例: 分人1 |
+| selfVector | Big5Vector | 自己ベクトル |
+| resonanceVector? | Big5Vector | 共鳴ベクトル |
+
 **AI への入力**: 共鳴スコアを実現したスロットの組み合わせについて、**自分側**と**相手側**のそれぞれのスロット情報を取得し、次の 6 項目をプロンプトに含める。自分側：`selfVector`（自己ベクトル）、`resonanceVector`（共鳴ベクトル）、`personaSummary`（分人要約）。相手側：同様に `selfVector`、`resonanceVector`、`personaSummary`。どのスロットの組み合わせを使うかは、リクエストで `matchedSlotIndexSelf` / `matchedSlotIndexOther` を渡すか、API 内でマッチング結果を再取得して決める。AI はこれらを踏まえ「なぜこの二人だと好きな自分でいられるか」を解説文（`explanation`）で返す。
 
-### 5.6 シチュエーション（リストから選択）
+### 5.8 シチュエーション（リストから選択）
 
 | メソッド | パス | 説明 | クエリ | レスポンス |
 | --- | --- | --- | --- | --- |
@@ -192,7 +237,7 @@
 
 **シチュエーションのリストはバックエンドに保存する**（DB や設定ファイルなど）。日付をシードにリストから 3 件を選択し、同一日は同じ 3 件が返る。フロントはホーム表示時に本 API を 1 回呼び、返った 3 件とフロントが生成した 3 本のランダム Big5 を組み合わせて 3 体の鏡を提示する。
 
-### 5.7 AI チャット（会話のやり取り）
+### 5.9 AI チャット（会話のやり取り）
 
 | メソッド | パス | 説明 | リクエストボディ | レスポンス |
 | --- | --- | --- | --- | --- |
@@ -200,7 +245,7 @@
 
 **会話そのものを AI が行う**。フロントはユーザーが送信するたびに本 API を呼び出し、これまでの `messages` とシチュエーション・鏡の Big5 を渡す。AI はそれらをシステムプロンプトに組み込み、鏡のキャラで 1 発言を返す。往復を重ねたのち、会話終了時に 5.8 の analyze を呼ぶ。
 
-### 5.8 AI 分析（内部/サーバー側）
+### 5.10 AI 分析（内部/サーバー側）
 
 | メソッド | パス | 説明 | リクエストボディ | レスポンス |
 | --- | --- | --- | --- | --- |

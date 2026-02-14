@@ -147,14 +147,14 @@ type Big5SliderChartProps = {
 export function Big5SliderChart({ selfVector, resonanceVector, className }: Big5SliderChartProps) {
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Legend */}
-      <div className="flex justify-center items-center gap-6 text-xs text-muted-foreground bg-muted/30 py-2 rounded-lg">
+      {/* Legend - same style as plot: solid = self, light+border = mirror */}
+      <div className="flex justify-center items-center gap-6 text-xs text-foreground bg-muted/30 py-2 rounded-lg">
         <div className="flex items-center gap-2">
-          <span className="block w-3 h-3 rounded-full bg-slate-500"></span>
+          <span className="block size-3 shrink-0 rounded-full bg-blue-500" aria-hidden />
           <span>あなた (Self)</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="block w-3 h-3 rounded-full bg-slate-200 border border-slate-400"></span>
+          <span className="block size-3 shrink-0 rounded-full border-2 border-blue-500 bg-blue-200 box-border" aria-hidden />
           <span>鏡 (Mirror)</span>
         </div>
       </div>

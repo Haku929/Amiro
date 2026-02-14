@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Moon, Sun, Monitor, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { logout } from '@/app/(auth)/login/actions';
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -15,10 +16,7 @@ export default function SettingsPage() {
   }, []);
 
   const handleLogout = async () => {
-    // Implement logout logic here
-    // For now, redirect to login page or home
-    console.log('Logging out...');
-    router.push('/login'); // Assuming a login route exists
+    await logout();
   };
 
   if (!mounted) {
@@ -44,7 +42,7 @@ export default function SettingsPage() {
           <div className="space-y-6">
             
             {/* テーマ設定 */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-semibold text-zinc-700 dark:text-zinc-200">外観テーマ</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">アプリの配色は端末の設定に従わせることも可能です</p>
@@ -75,18 +73,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-zinc-700 dark:text-zinc-200">ログアウト</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">アカウントからログアウトします</p>
-              </div>
-              <button 
-                className="px-4 py-2 text-sm font-bold text-rose-500 border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-900/10 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-colors"
-                onClick={() => alert('ログアウト機能は実装中です')}
-              >
-                ログアウト
-              </button>
-            </div>
+
           </div>
         </section>
 
@@ -112,13 +99,15 @@ export default function SettingsPage() {
         </section>
         
         <div className="flex justify-center mt-8">
-            <button 
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-6 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all font-medium"
-            >
-                <LogOut className="w-5 h-5" />
-                ログアウト
-            </button>
+            <form action={handleLogout}>
+                <button 
+                    type="submit"
+                    className="flex items-center gap-2 px-6 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all font-medium"
+                >
+                    <LogOut className="w-5 h-5" />
+                    ログアウト
+                </button>
+            </form>
         </div>
       </div>
     </div>

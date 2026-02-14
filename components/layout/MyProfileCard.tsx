@@ -1,152 +1,76 @@
-// components/layout/MyProfileCard.tsx
-'use client';
-
 import { User } from 'lucide-react';
-import { Slot } from '@/lib/types';
-
-const TRAIT_MAPPING = [
-  { 
-    key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
-    color: 'bg-orange-500 border-orange-600 dark:border-orange-400', barColor: 'bg-orange-100/50 dark:bg-orange-900/30' 
-  },
-  { 
-    key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
-    color: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400', barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30' 
-  },
-  { 
-    key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
-    color: 'bg-blue-500 border-blue-600 dark:border-blue-400', barColor: 'bg-blue-100/50 dark:bg-blue-900/30' 
-  },
-  { 
-    key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
-    color: 'bg-rose-500 border-rose-600 dark:border-rose-400', barColor: 'bg-rose-100/50 dark:bg-rose-900/30' 
-  },
-  { 
-    key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
-    color: 'bg-purple-500 border-purple-600 dark:border-purple-400', barColor: 'bg-purple-100/50 dark:bg-purple-900/30' 
-  },
-] as const;
+import type { UserProfile } from '@/lib/types';
 
 interface MyProfileCardProps {
-  slots: Slot[];
-  currentSlot: Slot;
-  onSlotChange: (index: number) => void;
+    profile: UserProfile;
+    currentSlotIndex: number;
+    onSlotChange: (index: number) => void;
 }
 
-export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyProfileCardProps) {
-  return (
-    <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
-      <div className="flex flex-col xl:flex-row items-stretch gap-6">
-        
-        {/* 1. 左ブロック：基本情報 & スイッチ (w-64でリストと統一) */}
-        <div className="flex flex-col items-center justify-center gap-5 xl:w-72 shrink-0 xl:border-r xl:border-zinc-100 xl:pr-8">
-          <div className="relative">
-            <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-400 dark:text-zinc-500 shadow-sm">
-              <User strokeWidth={1.5} size={40} />
-            </div>
-          </div>
-          
-          <div className="text-center w-full">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">あなた</h2>
-            <div className="flex gap-2.5 mt-4 flex-wrap justify-center">
-              {slots.map((slot) => (
-                <button
-                  key={slot.slotIndex}
-                  onClick={() => onSlotChange(slot.slotIndex)}
-                  className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all border ${
-                    currentSlot.slotIndex === slot.slotIndex
-                      ? 'bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-800 dark:border-zinc-100 shadow-md transform scale-105'
-                      : 'bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700'
-                  }`}
-                >
-                  分人{slot.slotIndex}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+export default function MyProfileCard({ profile, currentSlotIndex, onSlotChange }: MyProfileCardProps) {
+    // Find the current slot (bunjin)
+    const currentSlot = profile.slots.find(s => s.slotIndex === currentSlotIndex);
 
-        {/* 2. 右ブロック：ベクトル表示 & 要約 */}
-        <div className="flex-1 flex flex-col gap-6">
-          
-          {/* 上段: ベクトル2カラム */}
-          <div className="flex flex-col sm:flex-row gap-6">
-            {/* 自己ベクトル */}
-            <div className="flex-1 bg-zinc-50/50 dark:bg-zinc-800/50 rounded-xl p-5 border border-zinc-200 dark:border-zinc-700">
-              <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-700 pb-2.5 mb-3.5 text-center tracking-wider">
-                自己ベクトル (現実)
-              </p>
-              <div className="space-y-4">
-                {TRAIT_MAPPING.map((trait) => {
-                  const val = (currentSlot.selfVector[trait.key] ?? 0.5) * 100;
-                  return (
-                    <div key={`my-self-${trait.key}`} className="relative h-6">
-                      <div className="relative flex justify-between items-end mb-1 px-1 h-4">
-                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">{trait.leftLabel}</span>
-                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-xs font-bold text-zinc-600 dark:text-zinc-300">
-                          {trait.label}
-                        </span>
-                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">{trait.rightLabel}</span>
-                      </div>
+    return (
+        <div className="flex flex-col items-center bg-white rounded-3xl p-6 shadow-sm border border-zinc-200 h-full overflow-hidden">
+            <div className="w-full flex-1 flex flex-col items-center text-center overflow-y-auto pr-2 custom-scrollbar">
 
-                      <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
-                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40 dark:bg-zinc-600/40"></div>
-                         {/* ドットを少し大きく w-3.5 h-3.5 */}
-                         <div 
-                           className={`absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border shadow-sm ${trait.color}`}
-                           style={{ left: `calc(${val}% - 7px)` }}
-                         ></div>
-                      </div>
+                {/* Avatar */}
+                <div className="relative mb-4">
+                    <div className="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 overflow-hidden">
+                        {profile.avatarUrl ? (
+                            <img src={profile.avatarUrl} alt={profile.displayName} className="w-full h-full object-cover" />
+                        ) : (
+                            <User className="text-zinc-400" size={40} />
+                        )}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                </div>
 
-            {/* 共鳴ベクトル */}
-            <div className="flex-1 bg-zinc-50/50 rounded-xl p-5 border border-zinc-200">
-              <p className="text-xs font-bold text-zinc-600 border-b border-zinc-200 pb-2.5 mb-3.5 text-center tracking-wider">
-                共鳴ベクトル (理想)
-              </p>
-              <div className="space-y-4">
-                {TRAIT_MAPPING.map((trait) => {
-                  const val = (currentSlot.resonanceVector[trait.key] ?? 0.5) * 100;
-                  return (
-                    <div key={`my-res-${trait.key}`} className="relative h-6">
-                      <div className="relative flex justify-between items-end mb-1 px-1 h-4">
-                        <span className="text-[10px] text-zinc-400 font-medium">{trait.leftLabel}</span>
-                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-xs font-bold text-zinc-600">
-                          {trait.label}
-                        </span>
-                        <span className="text-[10px] text-zinc-400 font-medium">{trait.rightLabel}</span>
-                      </div>
+                {/* Name */}
+                <h2 className="text-lg font-bold text-zinc-900 truncate w-full mb-4 px-2">
+                    {profile.displayName}
+                </h2>
 
-                      <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
-                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
-                         {/* ドットを少し大きく w-3.5 h-3.5 */}
-                         <div 
-                           className={`absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border shadow-sm ${trait.color}`}
-                           style={{ left: `calc(${val}% - 7px)` }}
-                         ></div>
-                      </div>
+                {/* Slot Switcher (Tabs) */}
+                <div className="flex items-center gap-2 mb-6 bg-zinc-100 p-1 rounded-full">
+                    {[1, 2, 3].map((num) => (
+                        <button
+                            key={num}
+                            onClick={() => onSlotChange(num)}
+                            className={`px-3 py-1 text-xs font-bold rounded-full transition-all ${currentSlotIndex === num
+                                ? 'bg-white text-zinc-900 shadow-sm'
+                                : 'text-zinc-500 hover:text-zinc-700'
+                                }`}
+                        >
+                            分人{num}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Bio */}
+                <div className="w-full text-left space-y-4">
+                    <div>
+                        <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">自己紹介</h3>
+                        <div className="bg-zinc-50 p-3 rounded-xl border border-zinc-100">
+                            <p className="text-xs text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                {profile.bio || "自己紹介はまだありません"}
+                            </p>
+                        </div>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Persona Summary */}
+                    {currentSlot && (
+                        <div>
+                            <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">分人要約</h3>
+                            <div className="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                                <p className="text-xs text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                    {currentSlot.personaSummary || "要約はまだ生成されていません"}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-          </div>
-
-          {/* 下段: 要約文 */}
-          <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-5 border border-zinc-100 dark:border-zinc-800">
-            <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 mb-1.5">分人要約文</p>
-            <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-3">
-              {currentSlot.personaSummary}
-            </p>
-          </div>
-
         </div>
-
-      </div>
-    </div>
-  );
+    );
 }

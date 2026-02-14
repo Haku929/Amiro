@@ -22,7 +22,9 @@ import { cn } from "@/lib/utils";
 // メインコンポーネント
 // -----------------------------------------------------------------------------
 
-export default function ReportPage() {
+import { Suspense } from 'react';
+
+function ReportContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -69,15 +71,29 @@ export default function ReportPage() {
     fetchSlots();
   }, []);
 
+  const getStoredConversation = (): { messages: { role: string; content: string }[] } | null => {
+    try {
+      const raw = sessionStorage.getItem("amiro_report_conversation");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { messages?: { role: string; content: string }[] };
+      if (!parsed?.messages || !Array.isArray(parsed.messages)) return null;
+      return { messages: parsed.messages };
+    } catch {
+      return null;
+    }
+  };
+
   const handleSave = async () => {
     setLoading(true);
     setError(null);
     try {
+      const conversation = getStoredConversation();
       const body = {
         selfVector,
         resonanceVector,
-        personaIcon: "🧩", 
+        personaIcon: "🧩",
         personaSummary: summary,
+        ...(conversation && conversation.messages.length > 0 && { conversation }),
       };
 
       if (isFull && selectedSlotIndex === null) {
@@ -88,14 +104,12 @@ export default function ReportPage() {
 
       let res;
       if (isFull && selectedSlotIndex !== null) {
-        // Overwrite existing slot
         res = await fetch(`/api/slots/${selectedSlotIndex}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
       } else {
-        // Create new slot
         res = await fetch("/api/slots", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -107,7 +121,13 @@ export default function ReportPage() {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "保存に失敗しました。");
       }
-      
+
+      try {
+        sessionStorage.removeItem("amiro_report_conversation");
+      } catch {
+        // ignore
+      }
+
       router.push("/profile");
     } catch (err: any) {
       console.error(err);
@@ -185,36 +205,54 @@ export default function ReportPage() {
               onValueChange={(val) => setSelectedSlotIndex(parseInt(val))}
               className="grid gap-3"
             >
-              {existingSlots.map((slot) => (
-                <div key={slot.slotIndex}>
-                  <RadioGroupItem
-                    value={slot.slotIndex.toString()}
-                    id={`slot-${slot.slotIndex}`}
-                    className="peer sr-only"
-                  />
-                  <Label
-                    htmlFor={`slot-${slot.slotIndex}`}
-                    className="flex items-center justify-between rounded-md border border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
-                  >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <Avatar className="h-10 w-10 border shrink-0">
+              {existingSlots.map((slot) => {
+                const isSelected = selectedSlotIndex === slot.slotIndex;
+                return (
+                  <div key={slot.slotIndex}>
+                    <RadioGroupItem
+                      value={slot.slotIndex.toString()}
+                      id={`slot-${slot.slotIndex}`}
+                      className="peer sr-only"
+                    />
+                    <Label
+                      htmlFor={`slot-${slot.slotIndex}`}
+                      className={cn(
+                        "relative flex items-center gap-3 border py-3 pl-3 pr-4 cursor-pointer overflow-hidden transition-colors duration-200",
+                        isSelected
+                          ? "rounded-none border-muted/30 bg-muted/70 hover:bg-muted/80"
+                          : "rounded-xl border-muted/20 bg-transparent hover:bg-muted/25 hover:border-muted/35"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "absolute left-0 top-0 bottom-0 w-1 bg-foreground/80 transition-transform duration-200 ease-out origin-left",
+                          isSelected ? "scale-x-100" : "scale-x-0"
+                        )}
+                        aria-hidden
+                      />
+                      <Avatar
+                        className={cn(
+                          "h-10 w-10 shrink-0 border transition-colors relative z-10",
+                          !isSelected && "border-muted/30",
+                          isSelected && "border-foreground/25 bg-background"
+                        )}
+                      >
                         <AvatarImage src={slot.personaIcon} />
-                        <AvatarFallback>{slot.slotIndex}</AvatarFallback>
+                        <AvatarFallback className={isSelected ? "!bg-background" : undefined}>
+                          {slot.slotIndex}
+                        </AvatarFallback>
                       </Avatar>
-                      <div className="space-y-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                           <span className="text-[10px] font-mono bg-muted px-1.5 rounded text-muted-foreground">Slot {slot.slotIndex}</span>
-                           <span className="text-xs text-muted-foreground">
-                             {new Date(slot.createdAt).toLocaleDateString()}
-                           </span>
-                        </div>
-                        <div className="font-medium text-sm truncate">{slot.personaSummary}</div>
+                      <div className="space-y-1 min-w-0 flex-1 relative z-10">
+                        <span className="text-xs text-muted-foreground shrink-0 block">
+                          {new Date(slot.createdAt).toLocaleDateString()}
+                        </span>
+                        <p className={cn("font-medium text-sm break-words", isSelected ? "text-foreground" : "text-foreground/85")}>{slot.personaSummary}</p>
                       </div>
-                    </div>
-                    <RefreshCcw className="h-4 w-4 text-muted-foreground/50 peer-data-[state=checked]:text-primary shrink-0 ml-2" />
-                  </Label>
-                </div>
-              ))}
+                      <RefreshCcw className={cn("h-4 w-4 shrink-0 transition-colors relative z-10", isSelected ? "text-foreground/70" : "text-muted-foreground/35")} />
+                    </Label>
+                  </div>
+                );
+              })}
             </RadioGroup>
           )}
 
@@ -241,5 +279,13 @@ export default function ReportPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+      <ReportContent />
+    </Suspense>
   );
 }
