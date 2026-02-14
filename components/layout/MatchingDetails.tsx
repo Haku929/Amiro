@@ -5,52 +5,53 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User, Sparkles, Zap, ArrowLeftRight, Loader2 } from 'lucide-react';
 import { Big5Vector } from '@/lib/types';
+import { Big5Explanation } from '@/components/Big5Explanation';
 
 const TRAIT_MAPPING = [
+  {
+    key: 'o',
+    label: '開放性',
+    leftLabel: '保守的',
+    rightLabel: '開放的',
+    darkColor: 'bg-purple-500 border-purple-600 dark:border-purple-400',
+    lightColor: 'bg-purple-200 border-purple-300 dark:bg-purple-900/40 dark:border-purple-700',
+    barColor: 'bg-purple-100/50 dark:bg-purple-900/30',
+  },
+  {
+    key: 'c',
+    label: '誠実性',
+    leftLabel: '衝動的',
+    rightLabel: '計画的',
+    darkColor: 'bg-blue-500 border-blue-600 dark:border-blue-400',
+    lightColor: 'bg-blue-200 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700',
+    barColor: 'bg-blue-100/50 dark:bg-blue-900/30',
+  },
   {
     key: 'e',
     label: '外向性',
     leftLabel: '内向的',
     rightLabel: '外向的',
-    darkColor: 'bg-orange-500 border-orange-600 dark:border-orange-400', 
-    lightColor: 'bg-orange-200 border-orange-300 dark:bg-orange-900/40 dark:border-orange-700', 
-    barColor: 'bg-orange-100/50 dark:bg-orange-900/30' 
+    darkColor: 'bg-orange-500 border-orange-600 dark:border-orange-400',
+    lightColor: 'bg-orange-200 border-orange-300 dark:bg-orange-900/40 dark:border-orange-700',
+    barColor: 'bg-orange-100/50 dark:bg-orange-900/30',
   },
   {
     key: 'a',
     label: '協調性',
     leftLabel: '独立的',
     rightLabel: '協調的',
-    darkColor: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400', 
-    lightColor: 'bg-emerald-200 border-emerald-300 dark:bg-emerald-900/40 dark:border-emerald-700', 
-    barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30' 
-  },
-  {
-    key: 'c',
-    label: '勤勉性',
-    leftLabel: '衝動的',
-    rightLabel: '計画的',
-    darkColor: 'bg-blue-500 border-blue-600 dark:border-blue-400', 
-    lightColor: 'bg-blue-200 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700', 
-    barColor: 'bg-blue-100/50 dark:bg-blue-900/30' 
+    darkColor: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400',
+    lightColor: 'bg-emerald-200 border-emerald-300 dark:bg-emerald-900/40 dark:border-emerald-700',
+    barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30',
   },
   {
     key: 'n',
-    label: '情動性',
+    label: '神経症傾向',
     leftLabel: '安定',
     rightLabel: '敏感',
-    darkColor: 'bg-rose-500 border-rose-600 dark:border-rose-400', 
-    lightColor: 'bg-rose-200 border-rose-300 dark:bg-rose-900/40 dark:border-rose-700', 
-    barColor: 'bg-rose-100/50 dark:bg-rose-900/30' 
-  },
-  {
-    key: 'o',
-    label: '創造性',
-    leftLabel: '保守的',
-    rightLabel: '革新的',
-    darkColor: 'bg-purple-500 border-purple-600 dark:border-purple-400', 
-    lightColor: 'bg-purple-200 border-purple-300 dark:bg-purple-900/40 dark:border-purple-700', 
-    barColor: 'bg-purple-100/50 dark:bg-purple-900/30' 
+    darkColor: 'bg-rose-500 border-rose-600 dark:border-rose-400',
+    lightColor: 'bg-rose-200 border-rose-300 dark:bg-rose-900/40 dark:border-rose-700',
+    barColor: 'bg-rose-100/50 dark:bg-rose-900/30',
   },
 ] as const;
 
@@ -303,6 +304,9 @@ ${target.personaSummary}
                    {isTargetView ? '相手の理想 (共鳴ベクトル)' : '相手の現実 (自己ベクトル)'}
                  </span>
                </div>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <Big5Explanation variant="compact" />
             </div>
           </div>
 
