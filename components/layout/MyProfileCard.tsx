@@ -7,23 +7,23 @@ import { Slot } from '@/lib/types';
 const TRAIT_MAPPING = [
   { 
     key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
-    color: 'bg-orange-500 border-orange-600', barColor: 'bg-orange-50/50' 
+    color: 'bg-orange-500 border-orange-600 dark:border-orange-400', barColor: 'bg-orange-100/50 dark:bg-orange-900/30' 
   },
   { 
     key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
-    color: 'bg-emerald-500 border-emerald-600', barColor: 'bg-emerald-50/50' 
+    color: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400', barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30' 
   },
   { 
     key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
-    color: 'bg-blue-500 border-blue-600', barColor: 'bg-blue-50/50' 
+    color: 'bg-blue-500 border-blue-600 dark:border-blue-400', barColor: 'bg-blue-100/50 dark:bg-blue-900/30' 
   },
   { 
     key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
-    color: 'bg-rose-500 border-rose-600', barColor: 'bg-rose-50/50' 
+    color: 'bg-rose-500 border-rose-600 dark:border-rose-400', barColor: 'bg-rose-100/50 dark:bg-rose-900/30' 
   },
   { 
     key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
-    color: 'bg-purple-500 border-purple-600', barColor: 'bg-purple-50/50' 
+    color: 'bg-purple-500 border-purple-600 dark:border-purple-400', barColor: 'bg-purple-100/50 dark:bg-purple-900/30' 
   },
 ] as const;
 
@@ -35,7 +35,7 @@ interface MyProfileCardProps {
 
 export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyProfileCardProps) {
   return (
-    <div className="w-full bg-white border border-zinc-200 rounded-2xl p-5 shadow-sm">
+    <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
       <div className="flex flex-col xl:flex-row items-stretch gap-6">
         
         {/* 1. 左ブロック：基本情報 & スイッチ (w-64でリストと統一) */}
@@ -55,8 +55,8 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
                   onClick={() => onSlotChange(slot.slotIndex)}
                   className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all border ${
                     currentSlot.slotIndex === slot.slotIndex
-                      ? 'bg-zinc-800 text-white border-zinc-800 shadow-md transform scale-105'
-                      : 'bg-white text-zinc-500 border-zinc-200 hover:bg-zinc-50'
+                      ? 'bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 border-zinc-800 dark:border-zinc-100 shadow-md transform scale-105'
+                      : 'bg-white dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700'
                   }`}
                 >
                   分人{slot.slotIndex}

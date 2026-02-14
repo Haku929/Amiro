@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Slot, Big5Vector } from '@/lib/types';
+import { Slot } from '@/lib/types';
 import { User, Trash2, RefreshCw, Plus } from 'lucide-react';
 
 const MAX_SLOTS = 3;
@@ -10,23 +10,23 @@ const MAX_SLOTS = 3;
 const TRAIT_MAPPING = [
   { 
     key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
-    color: 'bg-orange-500 border-orange-600', barColor: 'bg-orange-50/50' 
+    color: 'bg-orange-500 border-orange-600 dark:border-orange-400', barColor: 'bg-orange-100/50 dark:bg-orange-900/30' 
   },
   { 
     key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
-    color: 'bg-emerald-500 border-emerald-600', barColor: 'bg-emerald-50/50' 
+    color: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400', barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30' 
   },
   { 
     key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
-    color: 'bg-blue-500 border-blue-600', barColor: 'bg-blue-50/50' 
+    color: 'bg-blue-500 border-blue-600 dark:border-blue-400', barColor: 'bg-blue-100/50 dark:bg-blue-900/30' 
   },
   { 
     key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
-    color: 'bg-rose-500 border-rose-600', barColor: 'bg-rose-50/50' 
+    color: 'bg-rose-500 border-rose-600 dark:border-rose-400', barColor: 'bg-rose-100/50 dark:bg-rose-900/30' 
   },
   { 
     key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
-    color: 'bg-purple-500 border-purple-600', barColor: 'bg-purple-50/50' 
+    color: 'bg-purple-500 border-purple-600 dark:border-purple-400', barColor: 'bg-purple-100/50 dark:bg-purple-900/30' 
   },
 ] as const;
 
@@ -124,16 +124,16 @@ export default function SlotManager() {
       
       {/* ヘッダーエリア */}
       <div className="flex justify-between items-center px-1 shrink-0">
-        <h3 className="text-base font-bold text-zinc-700 flex items-center gap-2">
+        <h3 className="text-base font-bold text-zinc-700 dark:text-zinc-200 flex items-center gap-2">
           マッチングスロット設定
-          <span className="text-xs font-normal text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">
+          <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-700">
             {activeSlotCount} / {MAX_SLOTS}
           </span>
         </h3>
         <button 
           onClick={fetchSlots} 
           disabled={isLoading}
-          className="text-zinc-400 hover:text-zinc-700 transition-colors p-1.5 rounded-full hover:bg-zinc-100"
+          className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors p-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
           title="データを再取得"
         >
           <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
@@ -235,7 +235,7 @@ export default function SlotManager() {
               </div>
 
               {isLoading && (
-                <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl">
+                <div className="absolute inset-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl">
                   <div className="animate-spin text-zinc-400">
                     <RefreshCw size={28} />
                   </div>

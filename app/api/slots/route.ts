@@ -35,15 +35,20 @@ export async function GET() {
       );
     }
 
-    // DBのカラム名(snake_case)からフロントエンドの型(camelCase)へ変換
-    const result = (slots || []).map((s: any) => ({
-      slotIndex: s.slot_index,
-      selfVector: s.self_vector,
-      resonanceVector: s.resonance_vector,
-      personaIcon: s.persona_icon,
-      personaSummary: s.persona_summary,
-      createdAt: s.created_at,
-    }));
+    const result = (slots || []).map((s: Record<string, unknown>) => {
+      const conv = s.conversation as { messages: unknown[] } | null | undefined;
+      const conversation =
+        conv && Array.isArray(conv.messages) ? { messages: conv.messages } : undefined;
+      return {
+        slotIndex: s.slot_index,
+        selfVector: s.self_vector,
+        resonanceVector: s.resonance_vector,
+        personaIcon: s.persona_icon,
+        personaSummary: s.persona_summary,
+        createdAt: s.created_at,
+        ...(conversation && { conversation }),
+      };
+    });
 
     return NextResponse.json(result);
   } catch (err) {
@@ -113,14 +118,19 @@ export async function POST(request: Request) {
     };
 
     const createdAt = new Date().toISOString();
+    const conversationPayload =
+      parsed.conversation && parsed.conversation.messages.length > 0
+        ? { messages: parsed.conversation.messages }
+        : null;
     const { error: insertError } = await supabase.from("slots").insert({
       user_id: user.id,
       slot_index: slotIndex,
-      self_vector: toVectorString(parsed.selfVector), 
+      self_vector: toVectorString(parsed.selfVector),
       resonance_vector: toVectorString(parsed.resonanceVector),
       persona_icon: parsed.personaIcon,
       persona_summary: parsed.personaSummary,
       created_at: createdAt,
+      ...(conversationPayload && { conversation: conversationPayload }),
     });
 
     if (insertError) {
@@ -131,7 +141,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const slot = buildSlot(slotIndex, parsed, createdAt);
+    const slotConversation =
+      parsed.conversation && parsed.conversation.messages.length > 0
+        ? { messages: parsed.conversation.messages }
+        : undefined;
+    const slot = buildSlot(slotIndex, parsed, createdAt, slotConversation);
     return NextResponse.json(slot, { status: 201 });
   } catch (err) {
     console.error("POST /api/slots: Internal server error", err);

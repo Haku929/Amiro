@@ -139,19 +139,19 @@ export default function MatchingContainer() {
   }, [baseMatches, activeFilter, currentSlot]);
 
   return (
-    <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col h-screen bg-zinc-50/30 overflow-hidden">
+    <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col h-screen bg-zinc-50/30 dark:bg-zinc-950 overflow-hidden">
       
       {/* 1. 上部固定エリア (タイトル + 自分カード) */}
-      <div className="shrink-0 bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-sm z-30 relative">
+      <div className="shrink-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 shadow-sm z-30 relative">
         <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
           
           {/* タイトル (独立した行) */}
           <div>
-             <h1 className="text-2xl font-bold text-zinc-800 tracking-tight flex items-center gap-2.5">
+             <h1 className="text-2xl font-bold text-zinc-800 dark:text-zinc-100 tracking-tight flex items-center gap-2.5">
                <span className="w-3 h-3 bg-rose-500 rounded-full animate-pulse"></span>
                共鳴マッチング
              </h1>
-             <p className="text-xs text-zinc-500 ml-6 mt-1">あなたの「分人」と共鳴する相手を見つけます</p>
+             <p className="text-xs text-zinc-500 dark:text-zinc-400 ml-6 mt-1">あなたの「分人」と共鳴する相手を見つけます</p>
           </div>
 
           {/* 自分カード */}
@@ -171,7 +171,7 @@ export default function MatchingContainer() {
       </div>
 
       {/* 2. 下部スクロールエリア (相手リスト) */}
-      <div className="flex-1 overflow-y-auto scroll-smooth overscroll-contain bg-zinc-50/50">
+      <div className="flex-1 overflow-y-auto scroll-smooth overscroll-contain bg-zinc-50/50 dark:bg-zinc-950">
           <div className="w-full max-w-7xl mx-auto px-4 lg:px-8 py-6">
              {/* 相手リスト (スペーサーなし、幅一杯でMyCardと揃う) */}
              <MatchingList matches={filteredMatches} currentSlotIndex={currentSlotIndex} />
@@ -191,9 +191,9 @@ export default function MatchingContainer() {
         )}
 
         {isFilterPanelOpen && (
-          <div className="bg-white p-5 rounded-3xl shadow-xl border border-zinc-200 w-80 lg:w-96 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-white dark:bg-zinc-900 p-5 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800 w-80 lg:w-96 animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2 text-zinc-800 font-bold">
+              <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-100 font-bold">
                 <Filter size={18} className="text-rose-500" />
                 再検索設定
               </div>
@@ -207,11 +207,11 @@ export default function MatchingContainer() {
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 ml-1">基準にするベクトル</label>
+                <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 ml-1">基準にするベクトル</label>
                 <select 
                   value={filterInput.type} 
                   onChange={(e) => setFilterInput({ ...filterInput, type: e.target.value as FilterType })}
-                  className="w-full bg-zinc-50 border border-zinc-200 text-sm font-medium text-zinc-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 transition-shadow"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-medium text-zinc-700 dark:text-zinc-100 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 transition-shadow"
                 >
                   <option value="none">指定なし (スコア順)</option>
                   <option value="self">自己ベクトルが近い人</option>
@@ -220,12 +220,12 @@ export default function MatchingContainer() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-500 ml-1">重視する項目</label>
+                <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 ml-1">重視する項目</label>
                 <select 
                   value={filterInput.vectorKey} 
                   onChange={(e) => setFilterInput({ ...filterInput, vectorKey: e.target.value as VectorKey })}
                   disabled={filterInput.type === 'none'}
-                  className="w-full bg-zinc-50 border border-zinc-200 text-sm font-medium text-zinc-700 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50 disabled:bg-zinc-100 transition-shadow"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-sm font-medium text-zinc-700 dark:text-zinc-100 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:opacity-50 disabled:bg-zinc-100 dark:disabled:bg-zinc-900 transition-shadow"
                 >
                   {VECTOR_KEYS.map((key, idx) => (
                     <option key={key} value={key}>{VECTOR_TRAITS[idx]}</option>
