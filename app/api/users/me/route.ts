@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { UserProfile, Slot, Big5Vector } from "@/lib/types";
 
 function mapSlot(row: {
@@ -9,7 +10,13 @@ function mapSlot(row: {
   persona_icon: string;
   persona_summary: string;
   created_at: string;
+  conversation?: { messages: { role: string; content: string }[] } | null;
 }): Slot {
+  const conv = row.conversation;
+  const conversation =
+    conv && Array.isArray(conv.messages)
+      ? { messages: conv.messages as { role: "user" | "model"; content: string }[] }
+      : undefined;
   return {
     slotIndex: row.slot_index as 1 | 2 | 3,
     selfVector: row.self_vector,
@@ -17,6 +24,7 @@ function mapSlot(row: {
     personaIcon: row.persona_icon,
     personaSummary: row.persona_summary,
     createdAt: row.created_at,
+    ...(conversation && { conversation }),
   };
 }
 
@@ -80,7 +88,7 @@ async function fetchUserProfile(
 
   const { data: slotRows, error: slotsError } = await supabase
     .from("slots")
-    .select("slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at")
+    .select("slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at, conversation")
     .eq("user_id", userId)
     .order("slot_index", { ascending: true });
 
@@ -164,6 +172,79 @@ export async function PATCH(request: NextRequest) {
     };
 
     return NextResponse.json(result);
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * 認証ユーザーのアカウントを削除する。slots → profiles → auth.users の順で削除し、セッションを破棄する。
+ * @returns 200: `{ ok: true }`. 401: `{ error: "Unauthorized" }`. 500: `{ error: "..." }`.
+ */
+export async function DELETE() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const userId = user.id;
+
+    const { error: slotsError } = await supabase
+      .from("slots")
+      .delete()
+      .eq("user_id", userId);
+
+    if (slotsError) {
+      return NextResponse.json(
+        { error: "Account deletion failed" },
+        { status: 500 }
+      );
+    }
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("user_id", userId);
+
+    if (profileError) {
+      return NextResponse.json(
+        { error: "Account deletion failed" },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json(
+        { error: "Account deletion is not configured (missing SUPABASE_SERVICE_ROLE_KEY)" },
+        { status: 503 }
+      );
+    }
+
+    const admin = createAdminClient();
+    const { error: deleteUserError } = await admin.auth.admin.deleteUser(userId);
+
+    if (deleteUserError) {
+      return NextResponse.json(
+        { error: "Account deletion failed" },
+        { status: 500 }
+      );
+    }
+
+    await supabase.auth.signOut();
+
+    return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },
