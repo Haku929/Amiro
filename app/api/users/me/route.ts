@@ -22,7 +22,7 @@ function mapSlot(row: {
 
 /**
  * 認証ユーザーのプロフィールとスロット一覧を取得する。
- * @returns 200: `UserProfile` (userId, displayName, avatarUrl, slots). 401: `{ error: "Unauthorized" }`. 404: `{ error: "Profile not found" }`. 500: `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
+ * @returns 200: `UserProfile` (userId, displayName, avatarUrl, bio, slots). 401: `{ error: "Unauthorized" }`. 404: `{ error: "Profile not found" }`. 500: `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
  */
 export async function GET() {
   try {
@@ -51,6 +51,7 @@ export async function GET() {
       userId: fetched.profile.user_id,
       displayName: fetched.profile.display_name ?? "",
       avatarUrl: fetched.profile.avatar_url ?? null,
+      bio: fetched.profile.bio ?? null,
       slots: fetched.slots,
     };
 
@@ -66,10 +67,10 @@ export async function GET() {
 async function fetchUserProfile(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string
-): Promise<{ profile: { user_id: string; display_name: string | null; avatar_url: string | null }; slots: Slot[] } | { error: number }> {
+): Promise<{ profile: { user_id: string; display_name: string | null; avatar_url: string | null; bio: string | null }; slots: Slot[] } | { error: number }> {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("user_id, display_name, avatar_url")
+    .select("user_id, display_name, avatar_url, bio")
     .eq("user_id", userId)
     .single();
 
@@ -93,7 +94,7 @@ async function fetchUserProfile(
 
 /**
  * 認証ユーザーのプロフィール（表示名・アバターURL）を部分的に更新する。body にない項目は変更しない。
- * @param request - JSON body: `{ displayName?: string; avatarUrl?: string | null }` のいずれかまたは両方。Auth required.
+ * @param request - JSON body: `{ displayName?: string; avatarUrl?: string | null; bio?: string | null }` のいずれかまたは複数。Auth required.
  * @returns 200: 更新後の `UserProfile`. 401: `{ error: "Unauthorized" }`. 400: `{ error: "Invalid JSON" }`. 404: `{ error: "Profile not found" }`. 500: `{ error: "Profile update failed" }`, `{ error: "Slots fetch failed" }` or `{ error: "Internal server error" }`.
  */
 export async function PATCH(request: NextRequest) {
@@ -111,7 +112,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    let body: { displayName?: string; avatarUrl?: string | null };
+    let body: { displayName?: string; avatarUrl?: string | null; bio?: string | null };
     try {
       body = await request.json();
     } catch {
@@ -121,12 +122,15 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updates: { display_name?: string; avatar_url?: string | null } = {};
+    const updates: { display_name?: string; avatar_url?: string | null; bio?: string | null } = {};
     if (body.displayName !== undefined) {
       updates.display_name = typeof body.displayName === "string" ? body.displayName : "";
     }
     if (body.avatarUrl !== undefined) {
       updates.avatar_url = body.avatarUrl === null || typeof body.avatarUrl === "string" ? body.avatarUrl : null;
+    }
+    if (body.bio !== undefined) {
+      updates.bio = body.bio === null || typeof body.bio === "string" ? body.bio : null;
     }
 
     if (Object.keys(updates).length > 0) {
@@ -155,6 +159,7 @@ export async function PATCH(request: NextRequest) {
       userId: fetched.profile.user_id,
       displayName: fetched.profile.display_name ?? "",
       avatarUrl: fetched.profile.avatar_url ?? null,
+      bio: fetched.profile.bio ?? null,
       slots: fetched.slots,
     };
 
