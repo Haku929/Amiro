@@ -25,6 +25,16 @@ class SeededRandom {
   range(min: number, max: number): number {
     return min + this.next() * (max - min);
   }
+
+  // 正規分布 (Box-Muller Transform)
+  // mean: 平均, stdDev: 標準偏差
+  normal(mean: number, stdDev: number): number {
+    let u = 0, v = 0;
+    while(u === 0) u = this.next(); // 0を回避 (log(0)を防ぐ)
+    while(v === 0) v = this.next();
+    const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    return mean + z * stdDev;
+  }
 }
 
 // 日付文字列 (YYYY-MM-DD) からシードを生成
@@ -55,6 +65,14 @@ type AiCard = {
 // -----------------------------------------------------------------------------
 // Constants / Fallback Data
 // -----------------------------------------------------------------------------
+const TRAIT_LABELS = [
+  { key: 'o', label: '創造性', color: 'bg-purple-500' },
+  { key: 'c', label: '勤勉性', color: 'bg-blue-500' },
+  { key: 'e', label: '外向性', color: 'bg-orange-500' },
+  { key: 'a', label: '協調性', color: 'bg-emerald-500' },
+  { key: 'n', label: '情動性', color: 'bg-rose-500' },
+] as const;
+
 const FALLBACK_SITUATIONS = [
   "新たな挑戦への第一歩",
   "心安らぐ対話の時間",
@@ -123,13 +141,21 @@ export default function HomePage() {
         // 3. 3枚のカードを生成
         const newCards: AiCard[] = situations.map((situation, i) => {
           const template = CARD_TEMPLATES[i % CARD_TEMPLATES.length];
-          // ランダムなBig5を生成 (0.1 ~ 0.9)
+          
+          // 正規分布でBig5を生成 (mean=0.5, stdDev=0.18, clamp 0.1~0.9)
+          const generateTrait = () => {
+            // 生成
+            const val = rng.normal(0.5, 0.18);
+            // クリップ (0.1 ~ 0.9)
+            return Math.max(0.1, Math.min(0.9, val));
+          };
+
           const big5: Big5 = {
-            o: parseFloat(rng.range(0.1, 0.9).toFixed(2)),
-            c: parseFloat(rng.range(0.1, 0.9).toFixed(2)),
-            e: parseFloat(rng.range(0.1, 0.9).toFixed(2)),
-            a: parseFloat(rng.range(0.1, 0.9).toFixed(2)),
-            n: parseFloat(rng.range(0.1, 0.9).toFixed(2)),
+            o: parseFloat(generateTrait().toFixed(2)),
+            c: parseFloat(generateTrait().toFixed(2)),
+            e: parseFloat(generateTrait().toFixed(2)),
+            a: parseFloat(generateTrait().toFixed(2)),
+            n: parseFloat(generateTrait().toFixed(2)),
           };
 
           return {
@@ -178,11 +204,7 @@ export default function HomePage() {
         {cards.map((ai) => {
           const query = new URLSearchParams({
              situation: ai.situation,
-             s_o: ai.big5.o.toString(), // パラメータ名を仕様書に合わせて s_ (self?) いや、これは鏡の性格なので、r_ (resonance) ではなく、AIのパラメータとして渡す？
-             // 前の実装では o, c, e, a, n だったが、Chatページでどう受け取っているか確認が必要。
-             // 前の実装: page.tsx l.51-55: o, c, e, a, n
-             // Chatページ l.38-42: searchParams.get("o") ...
-             // なので o, c, e, a, n でOK。
+             s_o: ai.big5.o.toString(), 
              o: ai.big5.o.toString(),
              c: ai.big5.c.toString(),
              e: ai.big5.e.toString(),
@@ -193,10 +215,10 @@ export default function HomePage() {
           return (
           <div 
             key={ai.id} 
-            className="h-full border border-zinc-200 rounded-2xl p-6 bg-white shadow-sm hover:shadow-md hover:border-zinc-300 transition-all flex flex-col items-center text-center space-y-5"
+            className="group relative h-full border border-zinc-200 rounded-2xl p-6 bg-white shadow-sm hover:shadow-md hover:border-zinc-300 transition-all flex flex-col items-center text-center space-y-5"
           >
             {/* アイコン部分 */}
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border ${ai.colorClass} transition-transform duration-300 hover:scale-110`}>
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border ${ai.colorClass} transition-transform duration-300 group-hover:scale-110`}>
               {ai.icon}
             </div>
             
@@ -211,16 +233,47 @@ export default function HomePage() {
               </p>
             </div>
             
-            {/* アクションボタン */}
-            <div className="w-full pt-2">
+            {/* アクションボタン (ホバーでBig5表示) */}
+            <div className="w-full pt-2 mt-auto relative">
               <Link 
                 href={`/chat?${query.toString()}`}
-                className="inline-block w-full py-3 px-4 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors shadow-sm"
+                className="group/btn relative block w-full py-3 px-4 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors shadow-sm"
               >
                 このAIと話す
+
+                {/* Big5 Tooltip (ボタンの下に表示) */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-64 bg-white p-4 rounded-xl shadow-xl border border-zinc-100 opacity-0 invisible translate-y-2 group-hover/btn:opacity-100 group-hover/btn:visible group-hover/btn:translate-y-0 transition-all duration-300 z-50 pointer-events-none text-left">
+                  {/* 装飾: 吹き出しの三角 */}
+                  <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-white border-t border-l border-zinc-100 transform rotate-45"></div>
+                  
+                  <p className="text-xs font-bold text-zinc-400 text-center mb-2 border-b border-zinc-50 pb-2">性格特性 (Big5)</p>
+                  <div className="space-y-2.5">
+                  {TRAIT_LABELS.map((trait) => {
+                    // @ts-ignore
+                    const val = ai.big5[trait.key] * 100;
+                    return (
+                      <div key={trait.key} className="flex items-center gap-2 text-xs">
+                        <span className="w-8 text-right text-zinc-500 font-mono scale-90">{trait.key.toUpperCase()}</span>
+                        
+                        {/* バーではなく点で表示 */}
+                        <div className="flex-1 relative h-4 flex items-center">
+                          {/* 背景線 */}
+                          <div className="absolute w-full h-0.5 bg-zinc-100 rounded-full"></div>
+                          {/* ドット */}
+                          <div 
+                            className={`absolute w-3 h-3 rounded-full border border-white shadow-sm ${trait.color}`}
+                            style={{ left: `calc(${val}% - 6px)` }}
+                          ></div>
+                        </div>
+
+                        <span className="w-6 text-right text-zinc-400 font-mono scale-90">{Math.round(val)}</span>
+                      </div>
+                    );
+                  })}
+                  </div>
+                </div>
               </Link>
             </div>
-            
           </div>
         )})}
       </div>
