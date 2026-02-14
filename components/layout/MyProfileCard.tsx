@@ -69,7 +69,7 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
         {/* 2. 右ブロック：ベクトル表示 & 要約 */}
         <div className="flex-1 flex flex-col gap-4">
           
-          {/* 上段: ベクトル (自己ベクトルのみ) */}
+          {/* 上段: ベクトル2カラム */}
           <div className="flex flex-col sm:flex-row gap-4">
             {/* 自己ベクトル */}
             <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
@@ -81,6 +81,38 @@ export default function MyProfileCard({ slots, currentSlot, onSlotChange }: MyPr
                   const val = (currentSlot.selfVector[trait.key] ?? 0.5) * 100;
                   return (
                     <div key={`my-self-${trait.key}`} className="relative h-4">
+                      <div className="relative flex justify-between items-end mb-1 px-1 h-3">
+                        <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
+                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
+                          {trait.label}
+                        </span>
+                        <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
+                      </div>
+
+                      <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
+                         <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
+                         {/* ドットを小さく w-2.5 h-2.5 */}
+                         <div 
+                           className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
+                           style={{ left: `calc(${val}% - 5px)` }}
+                         ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 共鳴ベクトル */}
+            <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
+              <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
+                共鳴ベクトル (理想)
+              </p>
+              <div className="space-y-3">
+                {TRAIT_MAPPING.map((trait) => {
+                  const val = (currentSlot.resonanceVector[trait.key] ?? 0.5) * 100;
+                  return (
+                    <div key={`my-res-${trait.key}`} className="relative h-4">
                       <div className="relative flex justify-between items-end mb-1 px-1 h-3">
                         <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
                         <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
