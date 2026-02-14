@@ -1,6 +1,8 @@
-import MatchingDetail, { DetailUser } from '@/components/layout/MatchingDetails';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Big5Vector } from '@/lib/types';
+import MatchingDetail, { DetailUser } from '@/components/layout/MatchingDetails';
 
 // Helper to parse vector string '[o, c, e, a, n]' from DB or JSON object
 function parseVector(v: string | object | null): Big5Vector {
@@ -20,15 +22,6 @@ function parseVector(v: string | object | null): Big5Vector {
 }
 
 // Calculate resonance (similarity) roughly for display if needed
-// 1 - (Euclidean / MaxDistance)? Or Cosine Similarity?
-// range of values is 0-1.
-// Let's just assume we want to show vectors mainly. The score is displayed in the UI.
-// I'll calculate a simple similarity: 1 / (1 + distance) or similar.
-// Or just omit exact score if not critical, or fetch from RPC.
-// To fetch from RPC for specific user is hard if RPC doesn't support it.
-// I'll try to find the score in the "Explanation" or just use a placeholder "88%".
-// Actually, I can replicate the score logic if I knew it.
-// Let's implement a simple Euclidean-based score: 100 - (distance * k).
 function calcScore(v1: Big5Vector, v2: Big5Vector): number {
   const d = Math.sqrt(
     Math.pow(v1.o - v2.o, 2) +
@@ -39,7 +32,6 @@ function calcScore(v1: Big5Vector, v2: Big5Vector): number {
   );
   // Max distance in 5D unit hypercube is sqrt(5) approx 2.23
   // Normalize to 0-100.
-  // If d=0 -> 100. If d=2.23 -> 0?
   const score = Math.max(0, 100 - (d * 40)); // Approx tuning
   return score;
 }
@@ -49,7 +41,15 @@ type Props = {
   searchParams: Promise<{ slot?: string; targetSlot?: string; score?: string }>;
 };
 
-export default async function MatchingDetailPage({ params, searchParams }: Props) {
+function Loading() {
+  return (
+    <div className="h-screen flex items-center justify-center bg-zinc-50">
+      <Loader2 className="animate-spin text-zinc-400" size={32} />
+    </div>
+  );
+}
+
+async function MatchingDetailContent({ params, searchParams }: Props) {
   const { userId: targetUserId } = await params;
   const { slot, targetSlot } = await searchParams;
   const supabase = await createClient();
@@ -147,5 +147,13 @@ export default async function MatchingDetailPage({ params, searchParams }: Props
       target={targetDetail}
       resonanceScore={score}
     />
+  );
+}
+
+export default function MatchingDetailPage(props: Props) {
+  return (
+    <Suspense fallback={<Loading />}>
+      <MatchingDetailContent {...props} />
+    </Suspense>
   );
 }
