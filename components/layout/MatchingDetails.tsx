@@ -157,7 +157,10 @@ ${target.personaSummary}
             <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 mb-4">
               <User className="text-zinc-400" size={40} />
             </div>
-            <h2 className="text-xl font-bold text-zinc-900 truncate w-full">{me.name}</h2>
+            <h2 className="text-xl font-bold text-zinc-900 truncate w-full">
+              {me.name}
+              <span className="text-sm font-normal text-zinc-500 ml-2">(あなた)</span>
+            </h2>
             <p className="text-xs text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full mb-5 font-medium">{me.slotTitle}</p>
             <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mt-auto">
               <p className="text-sm text-zinc-700 leading-relaxed line-clamp-4">{me.personaSummary}</p>

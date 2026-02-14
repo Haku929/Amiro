@@ -14,7 +14,7 @@ export default function MatchingContainer() {
 
   const [currentSlotIndex, setCurrentSlotIndex] = useState(initialSlot);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [candidates, setCandidates] = useState<MatchingResult[]>([]);
+  const [allCandidates, setAllCandidates] = useState<MatchingResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,10 +24,10 @@ export default function MatchingContainer() {
         setIsLoading(true);
 
         // Parallel fetch
-        // Pass currentSlotIndex to the matching API
+        // Fetch all matches (API now returns list for all slots)
         const [profileRes, matchingRes] = await Promise.all([
           fetch('/api/users/me'),
-          fetch(`/api/matching?limit=50&slot=${currentSlotIndex}`)
+          fetch('/api/matching?limit=100') // Fetch more to cover all slots
         ]);
 
         if (!profileRes.ok) throw new Error('Failed to load profile');
@@ -37,7 +37,7 @@ export default function MatchingContainer() {
         const matchingData = await matchingRes.json();
 
         setProfile(profileData);
-        setCandidates(matchingData);
+        setAllCandidates(matchingData);
       } catch (err) {
         console.error(err);
         setError('データの読み込みに失敗しました');
@@ -47,7 +47,10 @@ export default function MatchingContainer() {
     };
 
     fetchData();
-  }, [currentSlotIndex]);
+  }, []);
+
+  // Filter candidates based on selected slot
+  const candidates = allCandidates.filter(c => c.matchedSlotIndexSelf === currentSlotIndex);
 
   if (isLoading) {
     return (
@@ -66,7 +69,7 @@ export default function MatchingContainer() {
   }
 
   return (
-    <div className="flex h-[95vh] w-full max-w-[1600px] mx-auto overflow-hidden bg-zinc-50 rounded-3xl border border-zinc-200 shadow-2xl">
+    <div className="flex h-[calc(100vh-120px)] w-full max-w-[1600px] mx-auto overflow-hidden bg-zinc-50 rounded-3xl border border-zinc-200 shadow-2xl">
 
       {/* Left Panel: My Profile (Fixed) */}
       <div className="hidden md:flex w-80 flex-col border-r border-zinc-200 bg-white/50 p-6 z-10 shrink-0">

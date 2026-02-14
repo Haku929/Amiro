@@ -51,13 +51,6 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const slot = parseSlot(searchParams.get("slot"));
-    if (slot == null) {
-      return NextResponse.json(
-        { error: "slot is required (1, 2, or 3)" },
-        { status: 400 }
-      );
-    }
 
     const limit = parseLimit(searchParams.get("limit"));
     const offset = parseOffset(searchParams.get("offset"));
@@ -75,10 +68,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const filtered = (Array.isArray(rows) ? rows : []).filter(
-      (r) => r.matched_slot_index_self === slot
-    );
-    const list = filtered.slice(offset, offset + limit);
+    const list = (Array.isArray(rows) ? rows : []).slice(offset, offset + limit);
     if (list.length === 0) {
       return NextResponse.json([]);
     }

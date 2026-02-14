@@ -42,7 +42,7 @@ function MatchingCard({ candidate }: { candidate: MatchingResult }) {
                     <div className="flex items-start justify-between mb-2">
                         <div>
                             <p className="text-xs text-zinc-500 bg-zinc-100 inline-block px-2 py-1 rounded-md mb-2">
-                                分人 {candidate.matchedSlotIndexOther} とのマッチング
+                                分人 {candidate.matchedSlotIndexSelf} と共鳴
                             </p>
                         </div>
 
