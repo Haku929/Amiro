@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Slot } from '@/lib/types';
-import { User, Trash2, RefreshCw, Plus } from 'lucide-react';
+import { Slot, Big5Vector } from '@/lib/types';
+import { User, RefreshCw, Plus } from 'lucide-react';
 
 const MAX_SLOTS = 3;
 
@@ -91,31 +91,6 @@ export default function SlotManager() {
   useEffect(() => {
     fetchSlots();
   }, []);
-
-  const handleDeleteSlot = async (slotIndex: number) => {
-    alert("削除機能は現在未実装です。");
-    // Original implementation disabled as per request
-    /*
-    if (!confirm(`スロット${slotIndex}のデータを削除してもよろしいですか？`)) return;
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/slots', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slotIndex }),
-      });
-      
-      if (!res.ok) {
-        throw new Error('Failed to delete slot');
-      }
-
-      await fetchSlots();
-    } catch (error) {
-      console.error("削除エラー", error);
-      setIsLoading(false);
-    }
-    */
-  };
 
   const activeSlotCount = Object.values(slots).filter(slot => slot !== null).length;
 
@@ -222,18 +197,7 @@ export default function SlotManager() {
                 </div>
               </div>
               
-              {/* フッター */}
-              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 mt-auto flex justify-end">
-                <button 
-                  onClick={() => handleDeleteSlot(index)}
-                  disabled={isLoading}
-                  className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors disabled:opacity-50"
-                  title="削除"
-                >
-                  <Trash2 size={12} />
-                  削除
-                </button>
-              </div>
+              {/* フッターなし */}
 
               {isLoading && (
                 <div className="absolute inset-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl">
