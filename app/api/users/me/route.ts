@@ -9,7 +9,13 @@ function mapSlot(row: {
   persona_icon: string;
   persona_summary: string;
   created_at: string;
+  conversation?: { messages: { role: string; content: string }[] } | null;
 }): Slot {
+  const conv = row.conversation;
+  const conversation =
+    conv && Array.isArray(conv.messages)
+      ? { messages: conv.messages as { role: "user" | "model"; content: string }[] }
+      : undefined;
   return {
     slotIndex: row.slot_index as 1 | 2 | 3,
     selfVector: row.self_vector,
@@ -17,6 +23,7 @@ function mapSlot(row: {
     personaIcon: row.persona_icon,
     personaSummary: row.persona_summary,
     createdAt: row.created_at,
+    ...(conversation && { conversation }),
   };
 }
 
@@ -79,7 +86,7 @@ async function fetchUserProfile(
 
   const { data: slotRows, error: slotsError } = await supabase
     .from("slots")
-    .select("slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at")
+    .select("slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at, conversation")
     .eq("user_id", userId)
     .order("slot_index", { ascending: true });
 

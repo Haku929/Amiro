@@ -63,19 +63,25 @@ export async function PUT(
 
     // Convert Big5Vector object to array string for pgvector: '[o, c, e, a, n]'
     const toVectorString = (v: any) => {
-      // Order: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism
       const arr = [v.o, v.c, v.e, v.a, v.n];
       return JSON.stringify(arr);
     };
 
+    const conversationPayload =
+      parsed.conversation && parsed.conversation.messages.length > 0
+        ? { messages: parsed.conversation.messages }
+        : null;
+    const updatePayload: Record<string, unknown> = {
+      self_vector: toVectorString(parsed.selfVector),
+      resonance_vector: toVectorString(parsed.resonanceVector),
+      persona_icon: parsed.personaIcon,
+      persona_summary: parsed.personaSummary,
+    };
+    if (conversationPayload) updatePayload.conversation = conversationPayload;
+
     const { error: updateError } = await supabase
       .from("slots")
-      .update({
-        self_vector: toVectorString(parsed.selfVector),
-        resonance_vector: toVectorString(parsed.resonanceVector),
-        persona_icon: parsed.personaIcon,
-        persona_summary: parsed.personaSummary,
-      })
+      .update(updatePayload)
       .eq("user_id", user.id)
       .eq("slot_index", slotIndex);
 
@@ -86,7 +92,11 @@ export async function PUT(
       );
     }
 
-    const slot = buildSlot(slotIndex, parsed, existing.created_at);
+    const slotConversation =
+      parsed.conversation && parsed.conversation.messages.length > 0
+        ? { messages: parsed.conversation.messages }
+        : undefined;
+    const slot = buildSlot(slotIndex, parsed, existing.created_at, slotConversation);
     return NextResponse.json(slot, { status: 200 });
   } catch {
     return NextResponse.json(

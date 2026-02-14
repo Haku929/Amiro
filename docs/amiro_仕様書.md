@@ -76,6 +76,10 @@
 4. **対話**: ユーザーがメッセージを送るたびに、フロントは AI（例: Gemini）を呼び出し、AI が鏡のキャラで返答を返す。**会話のやり取りそのものを AI が行う**（チャット API で 1 往復ごとに AI を呼び出す想定。例: 10 往復まで）。
 5. **会話終了後**: AI が**ユーザーの Big5 推定**（selfVector）と**要約**（personaSummary）を返す。理想ベクトル（resonanceVector）は会話開始時にフロントが生成したランダムな Big5 をそのまま使う（選択した鏡の状態として保持）。フロントは `/api/ai/analyze` で selfVector と personaSummary を受け取り、resonanceVector と合わせて分人レポート画面に渡す。
 
+### 3.5 会話履歴の保存
+
+1 スロットにつき会話 1 本を紐づける。`slots` テーブルに `conversation`（JSONB、任意）を追加する。保存は POST /api/slots または PUT /api/slots/:slotIndex のリクエスト body に任意で `conversation: { messages: { role, content }[] }` を含める。GET /api/users/me や GET /api/slots でスロット取得時に `conversation` も返す。
+
 ---
 
 ## 4. ページ構成とユーザー体験（UX）
@@ -141,18 +145,9 @@
 | POST | `/api/slots` | 新規スロット保存（会話レポートから） | `SaveSlotRequest` | `Slot` |
 | PUT | `/api/slots/:slotIndex` | 既存スロット上書き | `SaveSlotRequest` | `Slot` |
 
-**SaveSlotRequest**
+**SaveSlotRequest**: 上記に加え、任意で `conversation: { messages: { role: "user" | "model", content: string }[] }` を渡せる。スロット保存時にその会話を 1 本だけ紐づける。
 
-```json
-{
-  "selfVector": { "o": 0.8, "c": 0.5, "e": 0.6, "a": 0.7, "n": 0.3 },
-  "resonanceVector": { "o": 0.7, "c": 0.6, "e": 0.5, "a": 0.8, "n": 0.2 },
-  "personaIcon": "string（分人アイコン画像のURL）",
-  "personaSummary": "string"
-}
-```
-
-**Slot**: 上記 `UserProfile.slots[]` の1要素と同じ形。
+**Slot**: `slotIndex`, `selfVector`, `resonanceVector`, `personaIcon`, `personaSummary`, `createdAt` に加え、保存時に会話を渡していれば `conversation: { messages: { role, content }[] }` が含まれる（任意）。
 
 ### 5.4 マッチング
 
@@ -267,6 +262,7 @@ Next.js App Router を想定。詳細なディレクトリ構造は [README](../
 * **[P0]** Supabaseプロジェクト作成と接続情報の管理（環境変数）。
 * **[P0]** `profiles` テーブル作成（user_id, display_name, avatar_url）。Auth 登録時に自動作成する Trigger を用意。
 * **[P0]** `slots` テーブル作成（user_id, slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at）。slot_index は 1〜3 の UNIQUE 制約。
+* **[P2]** `slots` に `conversation`（JSONB、任意）を追加。1 スロットにつき会話 1 本を格納。
 * **[P0]** RLS（Row Level Security）ポリシー設定（自分の profiles / slots のみ読み書き可能、マッチングは他ユーザーのスロット読み取りのみ許可）。
 * **[P1]** pgvector 拡張の有効化と、self_vector 用のベクトルインデックス（IVFFlat 等）作成（マッチング検索用）。
 * **[P1]** 共鳴スコア計算用の RPC または SQL（相互共鳴：自分→相手・相手→自分の両方向の類似度を考慮）。
@@ -289,6 +285,7 @@ Next.js App Router を想定。詳細なディレクトリ構造は [README](../
 * **[P1]** `GET /api/matching` の実装（limit/offset 対応、共鳴スコア降順）。依存: 共鳴スコア RPC。
 * **[P1]** `PATCH /api/users/me` の実装（display_name, avatar_url 更新）。
 * **[P2]** `POST /api/matching/explain` の実装（他ユーザーIDを受け取り、AI解説文を返す）。
+* **[P2]** 会話の保存は POST/PUT /api/slots の body に optional で `conversation` を含める。GET でスロット取得時に `conversation` を返す。依存: DB（slots.conversation）。
 
 ### 🎨 フロントエンド・デザイン担当
 
