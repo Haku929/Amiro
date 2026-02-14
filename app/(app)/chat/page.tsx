@@ -232,21 +232,29 @@ export default function ChatPage() {
             </div>
           </div>
           
+          <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:flex flex-col items-center">
+             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Turn</span>
+             <p className={`font-mono text-xl font-bold leading-none ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
+               {turnCount} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TURNS}</span>
+             </p>
+          </div>
+
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <span className="text-xs text-muted-foreground">Turn</span>
-              <p className={`font-mono font-bold ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
-                {turnCount} / {MAX_TURNS}
+            {/* Mobile用 Turn Count (Right aligned when button is hidden or just on right) */}
+            <div className="md:hidden flex flex-col items-end gap-0.5">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Turn</span>
+              <p className={`font-mono text-lg font-bold leading-none ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
+                {turnCount} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TURNS}</span>
               </p>
             </div>
-            
+
             {/* 任意終了ボタン */}
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleFinish}
               disabled={analyzing || messages.length === 0}
-              className="hidden sm:flex"
+              className="hidden sm:flex border-primary/20 hover:bg-primary/5"
             >
               {analyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
               終了して分析
