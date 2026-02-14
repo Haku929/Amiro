@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Big5SliderChart } from "@/components/chart/Big5SliderChart";
+import { Big5Explanation } from "@/components/Big5Explanation";
 import { Big5Vector, Slot } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -146,10 +147,15 @@ export default function ReportPage() {
       {/* 2. Big5 上下分割比較エリア */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">性格特性</CardTitle>
-          <CardDescription>
-            あなたと会話相手の波長の比較
-          </CardDescription>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-lg">性格特性</CardTitle>
+              <CardDescription>
+                あなたと会話相手の波長の比較
+              </CardDescription>
+            </div>
+            <Big5Explanation variant="inline" />
+          </div>
         </CardHeader>
         <CardContent>
           {/* コンポーネント呼び出し */}
