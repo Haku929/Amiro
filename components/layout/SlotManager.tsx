@@ -141,19 +141,19 @@ export default function SlotManager() {
       </div>
 
       {/* スロットグリッド (h-full等を削除し、内容に合わせて伸縮) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3].map((index) => {
           const slot = slots[index];
 
           // --- ケースA: データなし ---
           if (!slot) {
             return (
-              <div key={index} className="border-2 border-dashed border-zinc-200 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 text-zinc-400 transition-colors hover:bg-zinc-50/60 min-h-[320px]">
-                <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center mb-3">
-                  <Plus size={20} className="text-zinc-300" />
+              <div key={index} className="border-2 border-dashed border-zinc-200 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 text-zinc-400 transition-colors hover:bg-zinc-50/60 min-h-[400px]">
+                <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
+                  <Plus size={28} className="text-zinc-300" />
                 </div>
-                <p className="text-sm font-bold text-zinc-500">Slot {index}</p>
-                <p className="text-xs mt-1 text-center text-zinc-400">
+                <p className="text-lg font-bold text-zinc-500">Slot {index}</p>
+                <p className="text-sm mt-1 text-center text-zinc-400">
                   未設定
                 </p>
               </div>
@@ -162,46 +162,46 @@ export default function SlotManager() {
           
           // --- ケースB: データあり ---
           return (
-            <div key={index} className="relative border border-zinc-200 rounded-2xl p-4 shadow-sm bg-white flex flex-col hover:shadow-md transition-shadow group">
+            <div key={index} className="relative border border-zinc-200 rounded-2xl p-6 shadow-sm bg-white flex flex-col hover:shadow-md transition-shadow group min-h-[400px]">
               
               {/* スロット番号 & 日付 */}
-              <div className="flex justify-between items-center mb-3">
-                <span className="bg-zinc-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+              <div className="flex justify-between items-center mb-5">
+                <span className="bg-zinc-900 text-white text-xs font-bold px-3 py-0.5 rounded-full">
                   Slot {index}
                 </span>
-                <span className="text-[9px] text-zinc-300 font-mono">
+                <span className="text-xs text-zinc-400 font-mono">
                   {new Date(slot.createdAt).toLocaleDateString('ja-JP')}
                 </span>
               </div>
 
               {/* アイコン */}
-              <div className="flex justify-center mb-3">
-                <div className="w-12 h-12 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center text-zinc-500 shadow-sm group-hover:scale-105 transition-transform">
-                  <User strokeWidth={1.5} size={24} />
+              <div className="flex justify-center mb-5">
+                <div className="w-16 h-16 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center text-zinc-500 shadow-sm group-hover:scale-105 transition-transform">
+                  <User strokeWidth={1.5} size={32} />
                 </div>
               </div>
 
               {/* ベクトル情報 (1カラム: 自己ベクトルのみ) */}
-              <div className="mb-4">
+              <div className="mb-6">
                 <div>
-                  <p className="text-[9px] font-bold text-zinc-500 text-center border-b border-zinc-100 pb-1 mb-2 tracking-wider">
+                  <p className="text-xs font-bold text-zinc-500 text-center border-b border-zinc-100 pb-2 mb-3 tracking-wider">
                     自己 (Real)
                   </p>
-                  <div className="space-y-2.5">
+                  <div className="space-y-3.5">
                     {TRAIT_MAPPING.map((trait) => {
                       const val = (slot.selfVector[trait.key] ?? 0.5) * 100;
                       return (
-                        <div key={`self-${trait.key}`} className="relative h-3">
-                          <div className="relative flex justify-between items-end mb-0.5 px-0.5 h-2.5">
-                            <span className="text-[8px] text-zinc-400 scale-90 origin-left">{trait.leftLabel}</span>
-                            <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[8px] font-bold text-zinc-600 scale-90">{trait.label}</span>
-                            <span className="text-[8px] text-zinc-400 scale-90 origin-right">{trait.rightLabel}</span>
+                        <div key={`self-${trait.key}`} className="relative h-5">
+                          <div className="relative flex justify-between items-end mb-0.5 px-0.5 h-3.5">
+                            <span className="text-[10px] text-zinc-400 scale-100 origin-left">{trait.leftLabel}</span>
+                            <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600 scale-100">{trait.label}</span>
+                            <span className="text-[10px] text-zinc-400 scale-100 origin-right">{trait.rightLabel}</span>
                           </div>
-                          <div className={`h-1 w-full rounded-full relative ${trait.barColor}`}>
+                          <div className={`h-2 w-full rounded-full relative ${trait.barColor}`}>
                              <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
                              <div 
-                               className={`absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border shadow-sm ${trait.color}`}
-                               style={{ left: `calc(${val}% - 4px)` }}
+                               className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border shadow-sm ${trait.color}`}
+                               style={{ left: `calc(${val}% - 6px)` }}
                              ></div>
                           </div>
                         </div>
@@ -212,24 +212,24 @@ export default function SlotManager() {
               </div>
 
               {/* 分人要約文 */}
-              <div className="mb-4 flex-grow">
-                <div className="bg-zinc-50 rounded-xl p-2.5 border border-zinc-100">
-                  <p className="text-[9px] font-bold text-zinc-400 mb-0.5">分人要約</p>
-                  <p className="text-[10px] text-zinc-700 leading-relaxed line-clamp-3">
+              <div className="mb-5 flex-grow">
+                <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 h-full">
+                  <p className="text-xs font-bold text-zinc-400 mb-1.5">分人要約</p>
+                  <p className="text-sm text-zinc-700 leading-relaxed line-clamp-5">
                     {slot.personaSummary}
                   </p>
                 </div>
               </div>
               
               {/* フッター */}
-              <div className="pt-2 border-t border-zinc-100 mt-auto flex justify-end">
+              <div className="pt-4 border-t border-zinc-100 mt-auto flex justify-end">
                 <button 
                   onClick={() => handleDeleteSlot(index)}
                   disabled={isLoading}
-                  className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
                   title="削除"
                 >
-                  <Trash2 size={12} />
+                  <Trash2 size={16} />
                   削除
                 </button>
               </div>
@@ -237,7 +237,7 @@ export default function SlotManager() {
               {isLoading && (
                 <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl">
                   <div className="animate-spin text-zinc-400">
-                    <RefreshCw size={20} />
+                    <RefreshCw size={28} />
                   </div>
                 </div>
               )}
