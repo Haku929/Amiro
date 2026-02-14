@@ -1,0 +1,15 @@
+## 目的
+分人の会話履歴を保存・表示する UI を実装する。API（POST/PUT /api/slots で conversation 送信、GET で取得）は実装済み。
+
+## やること
+- チャット終了〜スロット保存時に、その会話の `messages` をリクエスト body の `conversation` に含めて送信する
+- プロフィール（スロット一覧）や必要に応じた画面で、保存済み会話を表示する
+
+## 完了条件
+- レポート保存時に会話が API 経由で DB に保存される
+- 保存済みスロットの会話をユーザーが閲覧できる
+
+## 参照
+- 仕様書 3.5 会話履歴の保存、5.3 SaveSlotRequest / Slot
+- 親 Issue: #87 会話履歴の保存
+- DB 対応: slots に conversation カラム追加の Issue（別途作成）

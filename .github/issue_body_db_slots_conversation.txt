@@ -1,0 +1,13 @@
+## 目的
+1スロットにつき会話1本を紐づけるため、既存の `slots` テーブルに会話データ用カラムを追加する。
+
+## やること
+- `slots` テーブルに `conversation` カラムを追加（JSONB、NULL 可）
+- 保存形式: `{ "messages": [ { "role": "user" | "model", "content": "string" } ] }`
+
+## 完了条件
+- マイグレーション適用後、POST /api/slots および PUT /api/slots/:slotIndex で body の `conversation` を DB に保存でき、GET /api/users/me および GET /api/slots で `conversation` が返る
+
+## 参照
+- 仕様書 3.5 会話履歴の保存、5.3 分人スロット
+- 親 Issue: #87 会話履歴の保存（API は実装済み）
