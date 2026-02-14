@@ -30,7 +30,17 @@ export default function MatchingContainer() {
           fetch('/api/matching?limit=100') // Fetch more to cover all slots
         ]);
 
-        if (!profileRes.ok) throw new Error('Failed to load profile');
+        if (!profileRes.ok) {
+          if (profileRes.status === 401) {
+            setError('ログインが必要です');
+            return;
+          }
+          if (profileRes.status === 404) {
+            setError('プロフィールが見つかりません');
+            return;
+          }
+          throw new Error('Failed to load profile');
+        }
         if (!matchingRes.ok) throw new Error('Failed to load matches');
 
         const profileData = await profileRes.json();
