@@ -122,6 +122,7 @@ export default function MatchingContainer() {
   const baseMatches = MOCK_MATCHES[currentSlotIndex] || [];
 
   const filteredMatches = useMemo(() => {
+    if (!currentSlot) return []; // Guard against no slots
     if (activeFilter.type === 'none') return baseMatches;
     const vKey = activeFilter.vectorKey;
     const myVal = activeFilter.type === 'self' ? currentSlot.selfVector[vKey] : currentSlot.resonanceVector[vKey];
@@ -137,6 +138,17 @@ export default function MatchingContainer() {
         return Math.abs(myVal - aVal) - Math.abs(myVal - bVal);
       });
   }, [baseMatches, activeFilter, currentSlot]);
+
+  if (!currentSlot) {
+    return (
+      <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col items-center justify-center h-screen bg-zinc-50/30">
+        <div className="text-center p-8 bg-white/80 backdrop-blur rounded-3xl border border-zinc-200 shadow-sm max-w-md mx-4">
+           <h2 className="text-xl font-bold text-zinc-800 mb-2">分人データがありません</h2>
+           <p className="text-zinc-500 text-sm">マッチングを行うには、まず分人を作成してください。</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 lg:pl-20 z-0 flex flex-col h-screen bg-zinc-50/30 overflow-hidden">
