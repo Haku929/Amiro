@@ -161,7 +161,9 @@
 
 | メソッド | パス | 説明 | クエリ | レスポンス |
 | --- | --- | --- | --- | --- |
-| GET | `/api/matching` | 共鳴スコアの高いユーザー一覧取得 | `?limit=20&offset=0`（任意） | `MatchingResult[]` |
+| GET | `/api/matching` | 共鳴スコアの高いユーザー一覧取得（スロットごとに個別取得） | `slot=N`（必須、1|2|3）。`limit=20`・`offset=0` は任意。 | `MatchingResult[]` |
+
+`slot` なしまたは 1, 2, 3 以外のときは 400。RPC `get_matching_scores` には `slot_index_self`（1|2|3）を渡し、指定スロットでマッチした結果のみを DB から取得する。
 
 **MatchingResult**
 
