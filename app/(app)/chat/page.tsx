@@ -192,16 +192,22 @@ function ChatContent() {
         throw new Error(result.error);
       }
 
-      // 2. レポートページへ遷移 (クエリパラメータで結果を渡す)
+      try {
+        sessionStorage.setItem(
+          "amiro_report_conversation",
+          JSON.stringify({ messages })
+        );
+      } catch {
+        // ignore storage errors
+      }
+
       const query = new URLSearchParams({
-        // 分析結果 (Self)
         s_o: result.selfVector.o.toString(),
         s_c: result.selfVector.c.toString(),
         s_e: result.selfVector.e.toString(),
         s_a: result.selfVector.a.toString(),
         s_n: result.selfVector.n.toString(),
-        summary: result.personaSummary, // API returns personaSummary
-        // 鏡の設定 (Resonanceとして保存するため引き継ぐ)
+        summary: result.personaSummary,
         r_o: mirrorBig5.o.toString(),
         r_c: mirrorBig5.c.toString(),
         r_e: mirrorBig5.e.toString(),

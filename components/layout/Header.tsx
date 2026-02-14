@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // 現在のパスを取得するために追加
 // shadcn/ui 標準のアイコンライブラリからアイコンをインポート
-import { Home, Compass, Sparkles, User, Settings } from "lucide-react";
+import { Home, Compass, MessageCircle, User, Settings } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname(); // 現在のURLパスを取得
@@ -35,13 +35,24 @@ export default function Header() {
         <Link 
           href="/matching" 
           className={`p-3 rounded-xl transition-all ${
-            pathname.startsWith("/matching") // サブページ（詳細など）に入ってもアクティブにする
+            pathname.startsWith("/matching")
               ? "bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50"
               : "text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900"
           }`} 
           title="マッチング"
         >
           <Compass className="w-6 h-6" strokeWidth={2} />
+        </Link>
+        <Link 
+          href="/dm" 
+          className={`p-3 rounded-xl transition-all ${
+            pathname.startsWith("/dm")
+              ? "bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50"
+              : "text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-900"
+          }`} 
+          title="チャット"
+        >
+          <MessageCircle className="w-6 h-6" strokeWidth={2} />
         </Link>
 
       </nav>

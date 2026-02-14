@@ -52,3 +52,17 @@ export type MatchingResult = {
   personaSummary: string;
 };
 
+export type Contact = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
+
+export type DmMessage = {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt: string;
+};
+

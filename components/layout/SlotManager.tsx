@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Slot, Big5Vector } from '@/lib/types';
-import { User, RefreshCw, Plus } from 'lucide-react';
+import { User, RefreshCw, Plus, Loader2 } from 'lucide-react';
 
 const MAX_SLOTS = 3;
 
@@ -120,8 +121,16 @@ export default function SlotManager() {
         {[1, 2, 3].map((index) => {
           const slot = slots[index];
 
-          // --- ケースA: データなし ---
           if (!slot) {
+            if (isLoading) {
+              return (
+                <div key={index} className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/30 min-h-[320px]">
+                  <Loader2 className="h-10 w-10 animate-spin text-zinc-400 dark:text-zinc-500 mb-3" />
+                  <p className="text-sm font-bold text-zinc-500 dark:text-zinc-500">Slot {index}</p>
+                  <p className="text-xs mt-1 text-zinc-400 dark:text-zinc-600">読み込み中…</p>
+                </div>
+              );
+            }
             return (
               <div key={index} className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/30 text-zinc-400 dark:text-zinc-600 transition-colors hover:bg-zinc-50/60 dark:hover:bg-zinc-800/20 min-h-[320px]">
                 <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-3">
@@ -196,8 +205,13 @@ export default function SlotManager() {
                   </p>
                 </div>
               </div>
-              
-              {/* フッターなし */}
+
+              <Link
+                href={`/profile/slot/${slot.slotIndex}`}
+                className="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 underline"
+              >
+                会話履歴を見る
+              </Link>
 
               {isLoading && (
                 <div className="absolute inset-0 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-[1px] z-20 flex items-center justify-center rounded-2xl">
