@@ -101,6 +101,18 @@ export default function ChatPage() {
     }
   }, [situation]);
 
+  // Focus management
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 送信直後にフォーカスを維持する
+  useEffect(() => {
+    if (!loading && !analyzing && turnCount < MAX_TURNS) {
+       // 初回マウント時や、何らかの理由でフォーカスが外れた場合に戻す処理は
+       // ユーザーの意図しない挙動になる可能性があるため、
+       // ここでは「送信ボタン押下直後」のフォーカス維持・復帰を主に行う。
+    }
+  }, [loading]); 
+
   // 送信ハンドラ
   const handleSend = async () => {
     if (!input.trim() || loading || analyzing || turnCount >= MAX_TURNS) return;
@@ -110,6 +122,11 @@ export default function ChatPage() {
     const newMessages = [...messages, { role: "user" as const, content: userMsg }];
     setMessages(newMessages);
     setLoading(true);
+
+    // 送信直後にフォーカスを入力欄に戻す (ボタンクリックで送信した場合対策)
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
 
     try {
       // 1. AI応答の取得 (Real API)
@@ -124,7 +141,8 @@ export default function ChatPage() {
       });
 
       if (!res.ok) {
-        throw new Error(`Chat API error: ${res.status}`);
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || `Chat API error: ${res.status}`);
       }
 
       const data = await res.json();
@@ -141,6 +159,12 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, { role: "model", content: "すみません、エラーが発生しました。" }]);
     } finally {
       setLoading(false);
+      // AI応答完了後もフォーカスを確保（念のため）
+      setTimeout(() => {
+        if (!analyzing && turnCount < MAX_TURNS) {
+            inputRef.current?.focus();
+        }
+      }, 0);
     }
   };
 
@@ -310,8 +334,9 @@ export default function ChatPage() {
               placeholder={turnCount >= MAX_TURNS ? "会話終了" : "メッセージを入力..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              disabled={loading || analyzing || turnCount >= MAX_TURNS}
+              disabled={analyzing || turnCount >= MAX_TURNS}
               className="flex-1"
+              ref={inputRef}
               autoFocus
             />
             {turnCount >= MAX_TURNS ? (
