@@ -64,3 +64,20 @@ export async function signup(formData: FormData) {
   revalidatePath('/', 'layout');
   redirect('/');
 }
+
+export async function logout() {
+  const cookieStore = await cookies();
+
+  if (cookieStore.get('amiro-test-session')?.value === 'true') {
+    cookieStore.delete('amiro-test-session');
+    revalidatePath('/', 'layout');
+    redirect('/login');
+    return;
+  }
+
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+
+  revalidatePath('/', 'layout');
+  redirect('/login');
+}
