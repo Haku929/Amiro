@@ -138,7 +138,8 @@ amiro/
 1. リポジトリをクローンする。
 2. 依存関係を入れる: `npm install` または `pnpm install`。
 3. `.env.example` をコピーして `.env` を作成し、次を設定する:
-   * Supabase の URL と anon key
+   * Supabase の URL と anon key（必須）
+   * `SUPABASE_SERVICE_ROLE_KEY`（任意。アカウント削除 API `DELETE /api/users/me` を使う場合に必要。Supabase ダッシュボード → Project Settings → API → **service_role** の値をコピー。サーバー専用のためクライアントに露出しないこと）
    * Gemini API キー
 4. 開発サーバーを起動: `npm run dev` または `pnpm dev`。
 5. ブラウザで `http://localhost:3000` を開く。

@@ -113,6 +113,7 @@
 | --- | --- | --- | --- | --- |
 | GET | `/api/users/me` | 自分のメタデータと分人スロット一覧取得 | なし | `UserProfile` |
 | PATCH | `/api/users/me` | 表示名・アバターURL・自己紹介更新 | `{ displayName?: string, avatarUrl?: string | null, bio?: string | null }` | `UserProfile` |
+| DELETE | `/api/users/me` | 自分のアカウント削除（slots → profiles → Auth ユーザーを削除しセッション破棄） | なし | `{ ok: true }`（200）。401: 未認証。500: 削除失敗。 |
 
 **UserProfile**
 
