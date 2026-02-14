@@ -148,12 +148,12 @@ export default function SlotManager() {
           // --- ケースA: データなし ---
           if (!slot) {
             return (
-              <div key={index} className="border-2 border-dashed border-zinc-200 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 text-zinc-400 transition-colors hover:bg-zinc-50/60 min-h-[400px]">
+              <div key={index} className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/30 text-zinc-400 dark:text-zinc-600 transition-colors hover:bg-zinc-50/60 dark:hover:bg-zinc-800/20 min-h-[400px]">
                 <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-                  <Plus size={28} className="text-zinc-300" />
+                  <Plus size={28} className="text-zinc-300 dark:text-zinc-500" />
                 </div>
-                <p className="text-lg font-bold text-zinc-500">Slot {index}</p>
-                <p className="text-sm mt-1 text-center text-zinc-400">
+                <p className="text-lg font-bold text-zinc-500 dark:text-zinc-500">Slot {index}</p>
+                <p className="text-sm mt-1 text-center text-zinc-400 dark:text-zinc-600">
                   未設定
                 </p>
               </div>
@@ -162,21 +162,21 @@ export default function SlotManager() {
           
           // --- ケースB: データあり ---
           return (
-            <div key={index} className="relative border border-zinc-200 rounded-2xl p-6 shadow-sm bg-white flex flex-col hover:shadow-md transition-shadow group min-h-[400px]">
+            <div key={index} className="relative border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm bg-white dark:bg-zinc-900 flex flex-col hover:shadow-md transition-shadow group min-h-[400px]">
               
               {/* スロット番号 & 日付 */}
               <div className="flex justify-between items-center mb-5">
-                <span className="bg-zinc-900 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+                <span className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-bold px-3 py-0.5 rounded-full">
                   Slot {index}
                 </span>
-                <span className="text-xs text-zinc-400 font-mono">
+                <span className="text-xs text-zinc-400 dark:text-zinc-600 font-mono">
                   {new Date(slot.createdAt).toLocaleDateString('ja-JP')}
                 </span>
               </div>
 
               {/* アイコン */}
               <div className="flex justify-center mb-5">
-                <div className="w-16 h-16 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center text-zinc-500 shadow-sm group-hover:scale-105 transition-transform">
+                <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 shadow-sm group-hover:scale-105 transition-transform">
                   <User strokeWidth={1.5} size={32} />
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function SlotManager() {
               {/* ベクトル情報 (1カラム: 自己ベクトルのみ) */}
               <div className="mb-6">
                 <div>
-                  <p className="text-xs font-bold text-zinc-500 text-center border-b border-zinc-100 pb-2 mb-3 tracking-wider">
+                  <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 text-center border-b border-zinc-100 dark:border-zinc-800 pb-2 mb-3 tracking-wider">
                     自己 (Real)
                   </p>
                   <div className="space-y-3.5">
@@ -193,12 +193,12 @@ export default function SlotManager() {
                       return (
                         <div key={`self-${trait.key}`} className="relative h-5">
                           <div className="relative flex justify-between items-end mb-0.5 px-0.5 h-3.5">
-                            <span className="text-[10px] text-zinc-400 scale-100 origin-left">{trait.leftLabel}</span>
-                            <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600 scale-100">{trait.label}</span>
-                            <span className="text-[10px] text-zinc-400 scale-100 origin-right">{trait.rightLabel}</span>
+                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 scale-100 origin-left">{trait.leftLabel}</span>
+                            <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 scale-100">{trait.label}</span>
+                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 scale-100 origin-right">{trait.rightLabel}</span>
                           </div>
                           <div className={`h-2 w-full rounded-full relative ${trait.barColor}`}>
-                             <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
+                             <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40 dark:bg-zinc-600/40"></div>
                              <div 
                                className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border shadow-sm ${trait.color}`}
                                style={{ left: `calc(${val}% - 6px)` }}
@@ -213,20 +213,20 @@ export default function SlotManager() {
 
               {/* 分人要約文 */}
               <div className="mb-5 flex-grow">
-                <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 h-full">
-                  <p className="text-xs font-bold text-zinc-400 mb-1.5">分人要約</p>
-                  <p className="text-sm text-zinc-700 leading-relaxed line-clamp-5">
+                <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-zinc-100 dark:border-zinc-800 h-full">
+                  <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 mb-1.5">分人要約</p>
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-5">
                     {slot.personaSummary}
                   </p>
                 </div>
               </div>
               
               {/* フッター */}
-              <div className="pt-4 border-t border-zinc-100 mt-auto flex justify-end">
+              <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-auto flex justify-end">
                 <button 
                   onClick={() => handleDeleteSlot(index)}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors disabled:opacity-50"
                   title="削除"
                 >
                   <Trash2 size={16} />

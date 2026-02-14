@@ -15,7 +15,7 @@ const MOCK_USER = {
 export default function ProfilePage() {
   return (
     // 画面全体の高さを固定し、中央寄せ
-    <div className="h-[calc(100vh-1rem)] flex flex-col p-4 lg:p-8 overflow-hidden w-full max-w-7xl mx-auto">
+    <div className="h-[calc(100vh-4rem)] flex flex-col p-4 lg:p-8 overflow-hidden w-full max-w-7xl mx-auto">
       
       {/* 1. ページヘッダー & ユーザー情報 (固定エリア) */}
       <div className="shrink-0 mb-4 flex items-end justify-between border-b border-zinc-200 dark:border-zinc-800 pb-4">
