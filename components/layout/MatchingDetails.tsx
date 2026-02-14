@@ -72,13 +72,21 @@ interface MatchingDetailProps {
 }
 
 export default function MatchingDetail({ me, target, resonanceScore }: MatchingDetailProps) {
-  // false: あなたの理想視点, true: 相手の理想視点
   const [isTargetView, setIsTargetView] = useState(false);
-
-  // AI Explanation State
   const [aiExplanation, setAiExplanation] = useState<string>('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [contactIds, setContactIds] = useState<Set<string>>(new Set());
+  const [addingContact, setAddingContact] = useState(false);
+
+  const isTargetContact = contactIds.has(target.id);
+
+  useEffect(() => {
+    fetch('/api/contacts')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((list: { userId: string }[]) => setContactIds(new Set(list.map((c) => c.userId))))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     // Generate AI explanation on mount
@@ -222,6 +230,39 @@ ${target.personaSummary}
                  相手の会話履歴を見る
                </Link>
              )}
+             <div className="mt-3 flex flex-col gap-2">
+               {isTargetContact ? (
+                 <Link
+                   href={`/dm/${encodeURIComponent(target.id)}`}
+                   className="inline-flex justify-center items-center px-4 py-2 rounded-lg text-sm font-medium bg-rose-500 text-white hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 transition-colors"
+                 >
+                   チャットする
+                 </Link>
+               ) : (
+                 <button
+                   type="button"
+                   disabled={addingContact}
+                   onClick={async () => {
+                     setAddingContact(true);
+                     try {
+                       const res = await fetch('/api/contacts', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ otherUserId: target.id }),
+                       });
+                       if (res.ok) {
+                         setContactIds((prev) => new Set(prev).add(target.id));
+                       }
+                     } finally {
+                       setAddingContact(false);
+                     }
+                   }}
+                   className="inline-flex justify-center items-center px-4 py-2 rounded-lg text-sm font-medium bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200 hover:bg-rose-200 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                 >
+                   {addingContact ? '追加中…' : 'チャット相手に追加'}
+                 </button>
+               )}
+             </div>
           </div>
 
         </div>
