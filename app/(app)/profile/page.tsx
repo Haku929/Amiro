@@ -19,7 +19,7 @@ export default function ProfilePage() {
   const avatarUrl = profile?.avatarUrl ?? null;
 
   return (
-    <div className="h-[calc(100vh-1rem)] flex flex-col p-4 lg:p-8 overflow-hidden w-full max-w-5xl mx-auto">
+    <div className="h-[calc(100vh-1rem)] flex flex-col p-4 lg:p-8 overflow-hidden w-full max-w-7xl mx-auto">
       <div className="shrink-0 mb-4 flex items-end justify-between border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
           <h1 className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">
