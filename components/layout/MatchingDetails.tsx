@@ -60,6 +60,7 @@ export interface DetailUser {
   bio?: string | null;
   personaSummary: string;
   slotTitle?: string;
+  slotIndex?: 1 | 2 | 3;
   selfVector: Big5Vector;
   resonanceVector?: Big5Vector;
 }
@@ -172,6 +173,14 @@ ${target.personaSummary}
             <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mt-auto">
               <p className="text-sm text-zinc-700 leading-relaxed line-clamp-4">{me.personaSummary}</p>
             </div>
+            {me.slotIndex != null && (
+              <Link
+                href={`/profile/slot/${me.slotIndex}`}
+                className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 underline"
+              >
+                自分の会話履歴を見る
+              </Link>
+            )}
           </div>
 
           {/* 中央：共鳴スコア */}
@@ -205,6 +214,14 @@ ${target.personaSummary}
              <div className="w-full bg-rose-50/30 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30 text-left mt-auto">
                <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-4">{target.personaSummary}</p>
              </div>
+             {target.slotIndex != null && (
+               <Link
+                 href={`/profile/${encodeURIComponent(target.id)}/slot/${target.slotIndex}`}
+                 className="mt-3 text-sm font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline"
+               >
+                 相手の会話履歴を見る
+               </Link>
+             )}
           </div>
 
         </div>
