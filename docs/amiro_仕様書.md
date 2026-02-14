@@ -167,13 +167,15 @@
   "userId": "uuid",
   "displayName": "string",
   "avatarUrl": "string | null",
+  "bio": "string | null",
   "resonanceScore": 0.92,
   "matchedSlotIndexSelf": 2,
-  "matchedSlotIndexOther": 1
+  "matchedSlotIndexOther": 1,
+  "personaSummary": "string"
 }
 ```
 
-`resonanceScore` は 0〜1。相互共鳴スコア（自分→相手の類似度と相手→自分の類似度の両方を考慮した値。例: 両方向の最大類似度の積や最小値）。`matchedSlotIndexSelf` / `matchedSlotIndexOther` はそのスコアを実現したスロット番号。
+`resonanceScore` は 0〜1。相互共鳴スコア（自分→相手の類似度と相手→自分の類似度の両方を考慮した値。例: 両方向の最大類似度の積や最小値）。`matchedSlotIndexSelf` / `matchedSlotIndexOther` はそのスコアを実現したスロット番号。`bio` は相手の自己紹介文（profiles）、`personaSummary` は相手のそのスロットの分人要約文。
 
 ### 5.5 共鳴詳細（AI解説）
 

@@ -56,6 +56,23 @@ vi.mock("@/lib/supabase/server", () => ({
                   user_id: "other-uuid-1",
                   display_name: "Other User",
                   avatar_url: "https://example.com/other.png",
+                  bio: "自己紹介文です",
+                },
+              ],
+              error: null,
+            }),
+          };
+        }
+        if (table === "slots") {
+          stepLog("5. slots 取得");
+          return {
+            select: vi.fn().mockReturnThis(),
+            in: vi.fn().mockResolvedValue({
+              data: [
+                {
+                  user_id: "other-uuid-1",
+                  slot_index: 1,
+                  persona_summary: "相手の分人要約文",
                 },
               ],
               error: null,
@@ -142,9 +159,11 @@ describe("GET /api/matching", () => {
     expect(json[0].userId).toBe("other-uuid-1");
     expect(json[0].displayName).toBe("Other User");
     expect(json[0].avatarUrl).toBe("https://example.com/other.png");
+    expect(json[0].bio).toBe("自己紹介文です");
     expect(json[0].resonanceScore).toBe(0.92);
     expect(json[0].matchedSlotIndexSelf).toBe(2);
     expect(json[0].matchedSlotIndexOther).toBe(1);
+    expect(json[0].personaSummary).toBe("相手の分人要約文");
   });
 
   it("passes limit and offset from query to RPC", async () => {
