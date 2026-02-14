@@ -22,7 +22,9 @@ import { cn } from "@/lib/utils";
 // メインコンポーネント
 // -----------------------------------------------------------------------------
 
-export default function ReportPage() {
+import { Suspense } from 'react';
+
+function ReportContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -259,5 +261,13 @@ export default function ReportPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+      <ReportContent />
+    </Suspense>
   );
 }
