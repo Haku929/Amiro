@@ -6,6 +6,15 @@ export type Big5Vector = {
   n: number;
 };
 
+export type ChatMessage = {
+  role: "user" | "model";
+  content: string;
+};
+
+export type SlotConversation = {
+  messages: ChatMessage[];
+};
+
 export type Slot = {
   slotIndex: 1 | 2 | 3;
   selfVector: Big5Vector;
@@ -13,6 +22,7 @@ export type Slot = {
   personaIcon: string;
   personaSummary: string;
   createdAt: string;
+  conversation?: SlotConversation;
 };
 
 export type SaveSlotRequest = {
@@ -20,6 +30,7 @@ export type SaveSlotRequest = {
   resonanceVector: Big5Vector;
   personaIcon: string;
   personaSummary: string;
+  conversation?: { messages: ChatMessage[] };
 };
 
 export type UserProfile = {
@@ -40,3 +51,4 @@ export type MatchingResult = {
   matchedSlotIndexOther: number;
   personaSummary: string;
 };
+
