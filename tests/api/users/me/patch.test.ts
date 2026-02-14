@@ -14,7 +14,7 @@ function logResponseJson(status: number, json: unknown) {
   console.log("----------------\n");
 }
 
-function buildRequest(body: { displayName?: string; avatarUrl?: string | null }) {
+function buildRequest(body: { displayName?: string; avatarUrl?: string | null; bio?: string | null }) {
   return new Request("http://localhost/api/users/me", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -26,6 +26,7 @@ const defaultProfile = {
   user_id: "user-uuid-1",
   display_name: "Test User",
   avatar_url: "https://example.com/avatar.png",
+  bio: null as string | null,
 };
 
 const defaultSlots = [
@@ -124,6 +125,7 @@ describe("PATCH /api/users/me", () => {
     expect(json.userId).toBe("user-uuid-1");
     expect(json.displayName).toBe("Test User");
     expect(json.avatarUrl).toBe("https://example.com/avatar.png");
+    expect(json.bio).toBe(null);
     expect(Array.isArray(json.slots)).toBe(true);
     expect(json.slots).toHaveLength(1);
   });
@@ -143,6 +145,48 @@ describe("PATCH /api/users/me", () => {
     logResponseJson(res.status, json);
     expect(res.status).toBe(200);
     expect(json).toHaveProperty("avatarUrl");
+    expect(json).toHaveProperty("bio");
     expect(json).toHaveProperty("slots");
+  });
+
+  it("returns 200 when sending bio in body", async () => {
+    const { createClient } = await import("@/lib/supabase/server");
+    vi.mocked(createClient).mockResolvedValueOnce({
+      auth: {
+        getUser: vi.fn(async () => ({
+          data: { user: { id: "user-uuid-1" } },
+          error: null,
+        })),
+      },
+      from: vi.fn((table: string) => {
+        if (table === "profiles") {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({
+              data: { ...defaultProfile, bio: "Hello, I am a test user." },
+              error: null,
+            }),
+            update: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ error: null }),
+            }),
+          };
+        }
+        if (table === "slots") {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            order: vi.fn().mockResolvedValue({ data: defaultSlots, error: null }),
+          };
+        }
+        return {};
+      }),
+    } as never);
+
+    const res = await PATCH(buildRequest({ bio: "Hello, I am a test user." }));
+    const json = await res.json();
+    logResponseJson(res.status, json);
+    expect(res.status).toBe(200);
+    expect(json.bio).toBe("Hello, I am a test user.");
   });
 });

@@ -101,6 +101,18 @@ export default function ChatPage() {
     }
   }, [situation]);
 
+  // Focus management
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 送信直後にフォーカスを維持する
+  useEffect(() => {
+    if (!loading && !analyzing && turnCount < MAX_TURNS) {
+       // 初回マウント時や、何らかの理由でフォーカスが外れた場合に戻す処理は
+       // ユーザーの意図しない挙動になる可能性があるため、
+       // ここでは「送信ボタン押下直後」のフォーカス維持・復帰を主に行う。
+    }
+  }, [loading]); 
+
   // 送信ハンドラ
   const handleSend = async () => {
     if (!input.trim() || loading || analyzing || turnCount >= MAX_TURNS) return;
@@ -110,6 +122,11 @@ export default function ChatPage() {
     const newMessages = [...messages, { role: "user" as const, content: userMsg }];
     setMessages(newMessages);
     setLoading(true);
+
+    // 送信直後にフォーカスを入力欄に戻す (ボタンクリックで送信した場合対策)
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
 
     try {
       // 1. AI応答の取得 (Real API)
@@ -124,7 +141,8 @@ export default function ChatPage() {
       });
 
       if (!res.ok) {
-        throw new Error(`Chat API error: ${res.status}`);
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || `Chat API error: ${res.status}`);
       }
 
       const data = await res.json();
@@ -141,6 +159,12 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, { role: "model", content: "すみません、エラーが発生しました。" }]);
     } finally {
       setLoading(false);
+      // AI応答完了後もフォーカスを確保（念のため）
+      setTimeout(() => {
+        if (!analyzing && turnCount < MAX_TURNS) {
+            inputRef.current?.focus();
+        }
+      }, 0);
     }
   };
 
@@ -208,14 +232,22 @@ export default function ChatPage() {
             </div>
           </div>
           
+          <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:flex flex-col items-center">
+             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Turn</span>
+             <p className={`font-mono text-xl font-bold leading-none ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
+               {turnCount} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TURNS}</span>
+             </p>
+          </div>
+
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <span className="text-xs text-muted-foreground">Turn</span>
-              <p className={`font-mono font-bold dark:text-zinc-100 ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
-                {turnCount} / {MAX_TURNS}
+            {/* Mobile用 Turn Count (Right aligned when button is hidden or just on right) */}
+            <div className="md:hidden flex flex-col items-end gap-0.5">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Turn</span>
+              <p className={`font-mono text-lg font-bold leading-none dark:text-zinc-100 ${turnCount >= MAX_TURNS ? "text-destructive" : ""}`}>
+                {turnCount} <span className="text-sm font-normal text-muted-foreground">/ {MAX_TURNS}</span>
               </p>
             </div>
-            
+
             {/* 任意終了ボタン */}
             <Button 
               variant="outline" 
@@ -223,6 +255,7 @@ export default function ChatPage() {
               onClick={handleFinish}
               disabled={analyzing || messages.length === 0}
               className="hidden sm:flex dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-700"
+              className="hidden sm:flex border-primary/20 hover:bg-primary/5"
             >
               {analyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
               終了して分析
@@ -312,6 +345,9 @@ export default function ChatPage() {
               onChange={(e) => setInput(e.target.value)}
               disabled={loading || analyzing || turnCount >= MAX_TURNS}
               className="flex-1 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder-zinc-400"
+              disabled={analyzing || turnCount >= MAX_TURNS}
+              className="flex-1"
+              ref={inputRef}
               autoFocus
             />
             {turnCount >= MAX_TURNS ? (

@@ -32,6 +32,7 @@
 * **User ID**: システム上の識別子
 * **Display Name**: アプリ内での名前
 * **Avatar URL**: アイコン画像
+* **Bio**: 自己紹介文（任意）
 
 アカウント登録時に Supabase Auth Trigger で `profiles` 行を自動作成する。
 
@@ -82,7 +83,8 @@
 
 | ページ名 | 主な役割 | ポイント |
 | --- | --- | --- |
-| **ログイン / 新規登録** | サービスへの入り口 | 面倒な性格テストは不要。登録後すぐにAIチャットへ誘導。 |
+| **ログイン / 新規登録** | サービスへの入り口 | 面倒な性格テストは不要。登録後は初回プロフィール設定へ。 |
+| **プロフィール設定** | 名前・アイコン・自己紹介の入力 | 新規登録直後の初回に表示。名前・アバター・自己紹介を設定したらホームへ。既存ユーザーはプロフィール管理からも編集可能。 |
 | **ホーム（AIガチャ）** | 今日向き合う「鏡」の選択 | 毎日 3 体の「鏡」を提示。各鏡は「バックエンドのリストから選んだシチュエーション」と「フロントが生成したランダムな Big5」（日付 UTC シードで同一日は同じ値）の組み合わせで決まる。占い感覚で選ばせる。 |
 | **AI Mirror チャット** | 自分を引き出す対話 | 選んだ鏡のシチュエーション＋Big5 を渡し、**会話のやり取りそのものも AI が行う**（ユーザーが送信するたびに AI が鏡のキャラで返答。例: 10 往復）。終了後、AI がユーザーの Big5 推定と要約を返す。 |
 | **分人レポート** | 分析結果の提示と保存 | 5角形グラフを表示。「この自分を愛する」なら保存ボタン。満杯なら上書きするスロットを選択したうえで保存。 |
@@ -110,7 +112,7 @@
 | メソッド | パス | 説明 | リクエストボディ | レスポンス |
 | --- | --- | --- | --- | --- |
 | GET | `/api/users/me` | 自分のメタデータと分人スロット一覧取得 | なし | `UserProfile` |
-| PATCH | `/api/users/me` | 表示名・アバターURL更新 | `{ displayName?: string, avatarUrl?: string }` | `UserProfile` |
+| PATCH | `/api/users/me` | 表示名・アバターURL・自己紹介更新 | `{ displayName?: string, avatarUrl?: string | null, bio?: string | null }` | `UserProfile` |
 
 **UserProfile**
 
@@ -119,6 +121,7 @@
   "userId": "uuid",
   "displayName": "string",
   "avatarUrl": "string | null",
+  "bio": "string | null",
   "slots": [
     {
       "slotIndex": 1,
@@ -265,7 +268,7 @@ Next.js App Router を想定。詳細なディレクトリ構造は [README](../
 #### DB
 
 * **[P0]** Supabaseプロジェクト作成と接続情報の管理（環境変数）。
-* **[P0]** `profiles` テーブル作成（user_id, display_name, avatar_url）。Auth 登録時に自動作成する Trigger を用意。
+* **[P0]** `profiles` テーブル作成（user_id, display_name, avatar_url, bio）。Auth 登録時に自動作成する Trigger を用意。bio は任意（NULL 可）。
 * **[P0]** `slots` テーブル作成（user_id, slot_index, self_vector, resonance_vector, persona_icon, persona_summary, created_at）。slot_index は 1〜3 の UNIQUE 制約。
 * **[P0]** RLS（Row Level Security）ポリシー設定（自分の profiles / slots のみ読み書き可能、マッチングは他ユーザーのスロット読み取りのみ許可）。
 * **[P1]** pgvector 拡張の有効化と、self_vector 用のベクトルインデックス（IVFFlat 等）作成（マッチング検索用）。
@@ -287,7 +290,7 @@ Next.js App Router を想定。詳細なディレクトリ構造は [README](../
 * **[P1]** `POST /api/slots` の実装（空きスロットがあれば保存、なければ 409）。依存: DB（slots）。
 * **[P1]** `PUT /api/slots/:slotIndex` の実装（既存スロット上書き）。
 * **[P1]** `GET /api/matching` の実装（limit/offset 対応、共鳴スコア降順）。依存: 共鳴スコア RPC。
-* **[P1]** `PATCH /api/users/me` の実装（display_name, avatar_url 更新）。
+* **[P1]** `PATCH /api/users/me` の実装（display_name, avatar_url, bio 更新）。
 * **[P2]** `POST /api/matching/explain` の実装（他ユーザーIDを受け取り、AI解説文を返す）。
 
 ### 🎨 フロントエンド・デザイン担当
@@ -301,10 +304,11 @@ Next.js App Router を想定。詳細なディレクトリ構造は [README](../
 #### ページ別 UI
 
 * **[P0]** ログイン / 新規登録ページのレイアウトと Supabase Auth 連携。
+* **[P1]** プロフィール設定ページ（初回）：名前・アバター・自己紹介の入力。PATCH /api/users/me で保存。完了後ホームへ。依存: PATCH /api/users/me。
 * **[P1]** ホーム（AIガチャ）ページ：3 体の鏡（シチュエーション＋ランダム Big5 の組み合わせ）のカード表示と選択遷移。依存: `GET /api/ai/situations`、フロントのランダム Big5、「今日の 3 体」ロジック。
 * **[P1]** AI Mirror チャットページ：メッセージリスト、入力欄、往復制限の表示。ユーザー送信のたびに `/api/ai/chat` を呼び、**AI が返した発言**を表示する。依存: `/api/ai/chat`、選んだ鏡のシチュエーション＋Big5。
 * **[P1]** 分人レポートページ：5角形グラフ表示エリア、保存ボタン、満杯時はスロットの上書き選択のUI。依存: `/api/ai/analyze`、チャート、`GET /api/users/me`、`POST /api/slots`、`PUT /api/slots/:slotIndex`。
-* **[P1]** プロフィール管理ページ：3スロットの一覧（表示のみ）。依存: `GET /api/users/me`。
+* **[P1]** プロフィール管理ページ：3スロットの一覧表示。表示名・アバター・自己紹介の編集も可能（同上 API）。依存: `GET /api/users/me`、PATCH /api/users/me。
 * **[P1]** 共鳴マッチングページ：マッチ一覧（アバター、名前、スコア）、クリックで詳細へ。依存: `GET /api/matching`。
 * **[P2]** 共鳴詳細ページ：二人の関係性解説テキストの表示。依存: `POST /api/matching/explain`。
 
@@ -315,7 +319,7 @@ Next.js App Router を想定。詳細なディレクトリ構造は [README](../
 
 #### フロー
 
-* **[P0]** ログイン〜ホームへの遷移フロー。
+* **[P0]** ログイン〜ホームへの遷移フロー（既存ユーザー）。新規登録〜プロフィール設定〜ホームの遷移フロー（初回のみ）。
 * **[P1]** ホーム〜AI選択〜チャット〜レポート〜保存の一連フロー（保存後はプロフィールまたはホームへ）。
 * **[P1]** レポート保存後（空きがあれば即時保存、満杯時は上書き選択）の再取得とプロフィール表示の更新。
 * **[P1]** 共鳴マッチング一覧〜詳細〜（必要なら戻る）の遷移。詳細は P2 なら簡易表示でよい。
