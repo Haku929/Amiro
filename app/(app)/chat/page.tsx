@@ -28,7 +28,9 @@ type Big5 = {
 // メインコンポーネント
 // -----------------------------------------------------------------------------
 
-export default function ChatPage() {
+import { Suspense } from 'react';
+
+function ChatContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -379,5 +381,13 @@ export default function ChatPage() {
         </Button>
       </div>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+      <ChatContent />
+    </Suspense>
   );
 }
