@@ -21,6 +21,33 @@ export default function SettingsPage() {
     router.push('/login'); // Assuming a login route exists
   };
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch('/api/users/me', {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        // 削除成功 -> ログイン画面へ (あるいはトップへ)
+        router.push('/login');
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(`削除に失敗しました: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Delete account error:', error);
+      alert('削除処理中にエラーが発生しました');
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   if (!mounted) {
     return null;
   }
@@ -81,12 +108,33 @@ export default function SettingsPage() {
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">アカウントからログアウトします</p>
               </div>
               <button 
-                className="px-4 py-2 text-sm font-bold text-rose-500 border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-900/10 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-colors"
-                onClick={() => alert('ログアウト機能は実装中です')}
+                className="px-4 py-2 text-sm font-bold text-zinc-500 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                onClick={handleLogout}
               >
                 ログアウト
               </button>
             </div>
+          </div>
+        </section>
+
+        {/* 危険な設定 (アカウント削除) */}
+        <section className="bg-red-50 dark:bg-red-900/10 rounded-2xl p-6 border border-red-100 dark:border-red-900/30">
+          <h2 className="text-xl font-bold text-red-700 dark:text-red-400 mb-4 flex items-center gap-2">
+            危険な設定
+          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-red-900 dark:text-red-200">アカウントの削除</h3>
+              <p className="text-sm text-red-600 dark:text-red-400/80">
+                アカウントと全てのデータを完全に削除します。<br/>この操作は取り消せません。
+              </p>
+            </div>
+            <button 
+              className="px-4 py-2 text-sm font-bold text-red-600 border border-red-200 dark:border-red-800 bg-white dark:bg-red-900/20 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/40 transition-colors"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              削除する
+            </button>
           </div>
         </section>
 
@@ -114,13 +162,42 @@ export default function SettingsPage() {
         <div className="flex justify-center mt-8">
             <button 
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-6 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all font-medium"
+                className="flex items-center gap-2 px-6 py-3 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all font-medium"
             >
                 <LogOut className="w-5 h-5" />
                 ログアウト
             </button>
         </div>
       </div>
+
+      {/* 削除確認モーダル */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-sm w-full shadow-xl border border-zinc-200 dark:border-zinc-800 space-y-4 animate-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">本当に削除しますか？</h3>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              アカウントを削除すると、これまでの対話履歴やプロフィールなど全てのデータが失われます。<br/>
+              <span className="font-bold text-red-500">この操作は元に戻せません。</span>
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 py-2.5 text-sm font-medium text-zinc-600 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-300 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                disabled={isDeleting}
+              >
+                キャンセル
+              </button>
+              <button 
+                onClick={handleDeleteAccount}
+                className="flex-1 py-2.5 text-sm font-bold text-white bg-red-500 rounded-xl hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isDeleting}
+              >
+                {isDeleting ? '削除中...' : '削除する'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
