@@ -237,36 +237,36 @@ export default function HomePage() {
             <div className="w-full pt-2 mt-auto relative">
               <Link 
                 href={`/chat?${query.toString()}`}
-                className="inline-block w-full py-3 px-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-sm"
+                className="group/btn relative block w-full py-3 px-4 bg-zinc-900 dark:bg-zinc-700 text-white dark:text-zinc-100 text-sm font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-600 transition-colors shadow-sm"
               >
                 このAIと話す
 
                 {/* Big5 Tooltip (ボタンの下に表示) */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-64 bg-white p-4 rounded-xl shadow-xl border border-zinc-100 opacity-0 invisible translate-y-2 group-hover/btn:opacity-100 group-hover/btn:visible group-hover/btn:translate-y-0 transition-all duration-300 z-50 pointer-events-none text-left">
+                <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-64 bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-700 opacity-0 invisible translate-y-2 group-hover/btn:opacity-100 group-hover/btn:visible group-hover/btn:translate-y-0 transition-all duration-300 z-50 pointer-events-none text-left">
                   {/* 装飾: 吹き出しの三角 */}
-                  <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-white border-t border-l border-zinc-100 transform rotate-45"></div>
+                  <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-white dark:bg-zinc-800 border-t border-l border-zinc-100 dark:border-zinc-700 transform rotate-45"></div>
                   
-                  <p className="text-xs font-bold text-zinc-400 text-center mb-2 border-b border-zinc-50 pb-2">性格特性 (Big5)</p>
+                  <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 text-center mb-2 border-b border-zinc-50 dark:border-zinc-700 pb-2">性格特性 (Big5)</p>
                   <div className="space-y-2.5">
                   {TRAIT_LABELS.map((trait) => {
                     // @ts-ignore
                     const val = ai.big5[trait.key] * 100;
                     return (
                       <div key={trait.key} className="flex items-center gap-2 text-xs">
-                        <span className="w-8 text-right text-zinc-500 font-mono scale-90">{trait.key.toUpperCase()}</span>
+                        <span className="w-8 text-right text-zinc-500 dark:text-zinc-400 font-mono scale-90">{trait.key.toUpperCase()}</span>
                         
                         {/* バーではなく点で表示 */}
                         <div className="flex-1 relative h-4 flex items-center">
                           {/* 背景線 */}
-                          <div className="absolute w-full h-0.5 bg-zinc-100 rounded-full"></div>
+                          <div className="absolute w-full h-0.5 bg-zinc-100 dark:bg-zinc-700 rounded-full"></div>
                           {/* ドット */}
                           <div 
-                            className={`absolute w-3 h-3 rounded-full border border-white shadow-sm ${trait.color}`}
+                            className={`absolute w-3 h-3 rounded-full border border-white dark:border-zinc-800 shadow-sm ${trait.color}`}
                             style={{ left: `calc(${val}% - 6px)` }}
                           ></div>
                         </div>
 
-                        <span className="w-6 text-right text-zinc-400 font-mono scale-90">{Math.round(val)}</span>
+                        <span className="w-6 text-right text-zinc-400 dark:text-zinc-500 font-mono scale-90">{Math.round(val)}</span>
                       </div>
                     );
                   })}
