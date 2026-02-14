@@ -22,7 +22,9 @@ import { cn } from "@/lib/utils";
 // メインコンポーネント
 // -----------------------------------------------------------------------------
 
-export default function ReportPage() {
+import { Suspense } from 'react';
+
+function ReportContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -69,15 +71,29 @@ export default function ReportPage() {
     fetchSlots();
   }, []);
 
+  const getStoredConversation = (): { messages: { role: string; content: string }[] } | null => {
+    try {
+      const raw = sessionStorage.getItem("amiro_report_conversation");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { messages?: { role: string; content: string }[] };
+      if (!parsed?.messages || !Array.isArray(parsed.messages)) return null;
+      return { messages: parsed.messages };
+    } catch {
+      return null;
+    }
+  };
+
   const handleSave = async () => {
     setLoading(true);
     setError(null);
     try {
+      const conversation = getStoredConversation();
       const body = {
         selfVector,
         resonanceVector,
-        personaIcon: "🧩", 
+        personaIcon: "🧩",
         personaSummary: summary,
+        ...(conversation && conversation.messages.length > 0 && { conversation }),
       };
 
       if (isFull && selectedSlotIndex === null) {
@@ -88,14 +104,12 @@ export default function ReportPage() {
 
       let res;
       if (isFull && selectedSlotIndex !== null) {
-        // Overwrite existing slot
         res = await fetch(`/api/slots/${selectedSlotIndex}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
       } else {
-        // Create new slot
         res = await fetch("/api/slots", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -107,7 +121,13 @@ export default function ReportPage() {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "保存に失敗しました。");
       }
-      
+
+      try {
+        sessionStorage.removeItem("amiro_report_conversation");
+      } catch {
+        // ignore
+      }
+
       router.push("/profile");
     } catch (err: any) {
       console.error(err);
@@ -259,5 +279,13 @@ export default function ReportPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+      <ReportContent />
+    </Suspense>
   );
 }

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Moon, Sun, Monitor, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { logout } from '@/app/(auth)/login/actions';
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -15,10 +16,7 @@ export default function SettingsPage() {
   }, []);
 
   const handleLogout = async () => {
-    // Implement logout logic here
-    // For now, redirect to login page or home
-    console.log('Logging out...');
-    router.push('/login'); // Assuming a login route exists
+    await logout();
   };
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -71,7 +69,7 @@ export default function SettingsPage() {
           <div className="space-y-6">
             
             {/* テーマ設定 */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-semibold text-zinc-700 dark:text-zinc-200">外観テーマ</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">アプリの配色は端末の設定に従わせることも可能です</p>
@@ -160,13 +158,15 @@ export default function SettingsPage() {
         </section>
         
         <div className="flex justify-center mt-8">
-            <button 
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-6 py-3 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all font-medium"
-            >
-                <LogOut className="w-5 h-5" />
-                ログアウト
-            </button>
+            <form action={handleLogout}>
+                <button 
+                    type="submit"
+                    className="flex items-center gap-2 px-6 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all font-medium"
+                >
+                    <LogOut className="w-5 h-5" />
+                    ログアウト
+                </button>
+            </form>
         </div>
       </div>
 

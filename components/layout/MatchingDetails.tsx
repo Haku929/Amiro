@@ -57,8 +57,10 @@ const TRAIT_MAPPING = [
 export interface DetailUser {
   id: string;
   name: string;
+  bio?: string | null;
   personaSummary: string;
   slotTitle?: string;
+  slotIndex?: 1 | 2 | 3;
   selfVector: Big5Vector;
   resonanceVector?: Big5Vector;
 }
@@ -70,13 +72,21 @@ interface MatchingDetailProps {
 }
 
 export default function MatchingDetail({ me, target, resonanceScore }: MatchingDetailProps) {
-  // false: あなたの理想視点, true: 相手の理想視点
   const [isTargetView, setIsTargetView] = useState(false);
-
-  // AI Explanation State
   const [aiExplanation, setAiExplanation] = useState<string>('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [contactIds, setContactIds] = useState<Set<string>>(new Set());
+  const [addingContact, setAddingContact] = useState(false);
+
+  const isTargetContact = contactIds.has(target.id);
+
+  useEffect(() => {
+    fetch('/api/contacts')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((list: { userId: string }[]) => setContactIds(new Set(list.map((c) => c.userId))))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     // Generate AI explanation on mount
@@ -161,10 +171,24 @@ ${target.personaSummary}
               {me.name}
               <span className="text-sm font-normal text-zinc-500 ml-2">(あなた)</span>
             </h2>
-            <p className="text-xs text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full mb-5 font-medium">{me.slotTitle}</p>
+            <p className="text-xs text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full mb-3 font-medium">{me.slotTitle}</p>
+            {me.bio != null && me.bio !== '' && (
+              <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mb-3">
+                <p className="text-xs font-medium text-zinc-500 mb-1">自己紹介</p>
+                <p className="text-sm text-zinc-700 leading-relaxed line-clamp-3">{me.bio}</p>
+              </div>
+            )}
             <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mt-auto">
               <p className="text-sm text-zinc-700 leading-relaxed line-clamp-4">{me.personaSummary}</p>
             </div>
+            {me.slotIndex != null && (
+              <Link
+                href={`/profile/slot/${me.slotIndex}`}
+                className="mt-3 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 underline"
+              >
+                自分の会話履歴を見る
+              </Link>
+            )}
           </div>
 
           {/* 中央：共鳴スコア */}
@@ -174,7 +198,9 @@ ${target.personaSummary}
                <div className="relative z-10 flex flex-col items-center">
                   <Zap className="text-rose-500" size={32} fill="currentColor" />
                   <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">共鳴スコア</span>
-                  <span className="text-6xl md:text-7xl font-black text-rose-500 tracking-tighter leading-none mt-1">{resonanceScore}</span>
+                  <span className="text-6xl md:text-7xl font-black text-rose-500 tracking-tighter leading-none mt-1">
+                  {resonanceScore <= 1 ? Math.round(resonanceScore * 100) : Math.round(resonanceScore)}
+                </span>
                </div>
             </div>
           </div>
@@ -186,9 +212,56 @@ ${target.personaSummary}
                <User className="text-rose-400" size={40} />
              </div>
              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 truncate w-full">{target.name}</h2>
-             <p className="text-xs text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-full mb-5 font-medium">共鳴マッチング対象</p>
+             <p className="text-xs text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-full mb-3 font-medium">共鳴マッチング対象</p>
+             {target.bio != null && target.bio !== '' && (
+               <div className="w-full bg-rose-50/30 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30 text-left mb-3">
+                 <p className="text-xs font-medium text-rose-600 dark:text-rose-400 mb-1">自己紹介</p>
+                 <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-3">{target.bio}</p>
+               </div>
+             )}
              <div className="w-full bg-rose-50/30 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30 text-left mt-auto">
                <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-4">{target.personaSummary}</p>
+             </div>
+             {target.slotIndex != null && (
+               <Link
+                 href={`/profile/${encodeURIComponent(target.id)}/slot/${target.slotIndex}`}
+                 className="mt-3 text-sm font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline"
+               >
+                 相手の会話履歴を見る
+               </Link>
+             )}
+             <div className="mt-3 flex flex-col gap-2">
+               {isTargetContact ? (
+                 <Link
+                   href={`/dm/${encodeURIComponent(target.id)}`}
+                   className="inline-flex justify-center items-center px-4 py-2 rounded-lg text-sm font-medium bg-rose-500 text-white hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-500 transition-colors"
+                 >
+                   チャットする
+                 </Link>
+               ) : (
+                 <button
+                   type="button"
+                   disabled={addingContact}
+                   onClick={async () => {
+                     setAddingContact(true);
+                     try {
+                       const res = await fetch('/api/contacts', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ otherUserId: target.id }),
+                       });
+                       if (res.ok) {
+                         setContactIds((prev) => new Set(prev).add(target.id));
+                       }
+                     } finally {
+                       setAddingContact(false);
+                     }
+                   }}
+                   className="inline-flex justify-center items-center px-4 py-2 rounded-lg text-sm font-medium bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200 hover:bg-rose-200 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                 >
+                   {addingContact ? '追加中…' : 'チャット相手に追加'}
+                 </button>
+               )}
              </div>
           </div>
 
@@ -215,9 +288,8 @@ ${target.personaSummary}
             </h3>
             
             <div className="flex flex-wrap items-center justify-center gap-6 bg-zinc-50 dark:bg-zinc-800 py-3 px-6 rounded-xl inline-flex border border-zinc-100 dark:border-zinc-700">
-               {/* 濃い点 (自分) */}
                <div className="flex items-center gap-2">
-                 <div className="w-4 h-4 rounded-full border bg-zinc-600 dark:bg-zinc-400 border-zinc-800 dark:border-zinc-200"></div>
+                 <div className="w-4 h-4 rounded-full border-2 bg-blue-500 border-blue-600 dark:border-blue-400 shadow-sm" aria-hidden />
                  <span className="text-sm text-zinc-800 dark:text-zinc-200 font-bold">
                    {isTargetView ? 'あなたの現実 (自己ベクトル)' : 'あなたの理想 (共鳴ベクトル)'}
                  </span>
@@ -225,9 +297,8 @@ ${target.personaSummary}
 
                <span className="text-zinc-300 dark:text-zinc-600">|</span>
 
-               {/* 薄い点 (相手) */}
                <div className="flex items-center gap-2">
-                 <div className="w-4 h-4 rounded-full border bg-zinc-200 dark:bg-zinc-600 border-zinc-400 dark:border-zinc-500"></div>
+                 <div className="w-4 h-4 rounded-full border-2 bg-blue-200 dark:bg-blue-900/40 border-blue-500 dark:border-blue-400 shadow-sm" aria-hidden />
                  <span className="text-sm text-zinc-600 dark:text-zinc-400 font-medium">
                    {isTargetView ? '相手の理想 (共鳴ベクトル)' : '相手の現実 (自己ベクトル)'}
                  </span>
@@ -297,19 +368,21 @@ ${target.personaSummary}
         </div>
 
         {/* 3. AI解説 */}
-        <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-purple-950/30 rounded-2xl p-8 border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
+        <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-purple-950/30 rounded-2xl p-8 border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
           <div className="flex items-center gap-2 mb-6">
             <Sparkles size={20} className="text-indigo-600 dark:text-indigo-400" />
             <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-200">AI Relationship Analysis</h3>
           </div>
 
+          {isAiLoading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl">
+              <Loader2 className="animate-spin text-indigo-400 mb-2" size={32} />
+              <p className="text-sm text-indigo-400 font-bold">AIが分析中...</p>
+            </div>
+          )}
+
           <div className="prose prose-zinc prose-base max-w-none">
-            {isAiLoading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm rounded-2xl">
-                <Loader2 className="animate-spin text-indigo-400 mb-2" size={32} />
-                <p className="text-sm text-indigo-400 font-bold">AIが分析中...</p>
-              </div>
-            ) : aiError ? (
+            {aiError ? (
               <p className="text-red-400 text-sm p-4 bg-red-50 rounded-lg">{aiError}</p>
             ) : (
               aiExplanation.split('\n').map((line, i) => {
@@ -320,7 +393,7 @@ ${target.personaSummary}
                 return <p key={i} className="text-zinc-700 leading-relaxed mb-3 text-justify">{line}</p>;
               })
             )}
-            {!isAiLoading && !aiError && !aiExplanation && (
+            {!aiError && !aiExplanation && !isAiLoading && (
               <p className="text-zinc-400 text-sm">データがありません</p>
             )}
           </div>

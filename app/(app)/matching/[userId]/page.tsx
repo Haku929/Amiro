@@ -1,7 +1,6 @@
-import { notFound } from 'next/navigation';
 import MatchingDetail, { DetailUser } from '@/components/layout/MatchingDetails';
 import { createClient } from '@/lib/supabase/server';
-import { Slot, Big5Vector } from '@/lib/types';
+import { Big5Vector } from '@/lib/types';
 
 // Helper to parse vector string '[o, c, e, a, n]' from DB or JSON object
 function parseVector(v: string | object | null): Big5Vector {
@@ -70,10 +69,9 @@ export default async function MatchingDetailPage({ params, searchParams }: Props
   const mySlotIndex = parseInt(slot || '1', 10);
   const targetSlotIndex = parseInt(targetSlot || '1', 10);
 
-  // Fetch Me
   const { data: myProfile } = await supabase
     .from('profiles')
-    .select('display_name')
+    .select('display_name, bio')
     .eq('user_id', user.id)
     .single();
 
@@ -124,8 +122,10 @@ export default async function MatchingDetailPage({ params, searchParams }: Props
   const meDetail: DetailUser = {
     id: user.id,
     name: myProfile?.display_name || 'あなた',
+    bio: myProfile?.bio ?? null,
     personaSummary: mySlotData?.persona_summary || 'データなし',
     slotTitle: `分人${mySlotIndex}`,
+    slotIndex: mySlotIndex as 1 | 2 | 3,
     selfVector: mySelfVector,
     resonanceVector: myResonanceVector,
   };
@@ -133,8 +133,10 @@ export default async function MatchingDetailPage({ params, searchParams }: Props
   const targetDetail: DetailUser = {
     id: targetUserId,
     name: targetProfile?.display_name || '不明なユーザー',
+    bio: targetProfile?.bio ?? null,
     personaSummary: targetSlotData?.persona_summary || 'データなし',
     slotTitle: `分人${targetSlotIndex}`,
+    slotIndex: targetSlotIndex as 1 | 2 | 3,
     selfVector: targetSelfVector,
     resonanceVector: targetResonanceVector,
   };
