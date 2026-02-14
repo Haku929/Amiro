@@ -254,8 +254,7 @@ export default function ChatPage() {
               size="sm" 
               onClick={handleFinish}
               disabled={analyzing || messages.length === 0}
-              className="hidden sm:flex dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-700"
-              className="hidden sm:flex border-primary/20 hover:bg-primary/5"
+              className="hidden sm:flex border-primary/20 hover:bg-primary/5 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-700"
             >
               {analyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
               終了して分析
@@ -345,8 +344,6 @@ export default function ChatPage() {
               onChange={(e) => setInput(e.target.value)}
               disabled={loading || analyzing || turnCount >= MAX_TURNS}
               className="flex-1 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder-zinc-400"
-              disabled={analyzing || turnCount >= MAX_TURNS}
-              className="flex-1"
               ref={inputRef}
               autoFocus
             />
