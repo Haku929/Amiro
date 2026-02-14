@@ -34,7 +34,9 @@ export type MatchingResult = {
   userId: string;
   displayName: string;
   avatarUrl: string | null;
+  bio: string | null;
   resonanceScore: number;
   matchedSlotIndexSelf: number;
   matchedSlotIndexOther: number;
+  personaSummary: string;
 };
