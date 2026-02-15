@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ConversationItem = {
   userId: string;
@@ -66,7 +67,8 @@ export async function GET() {
       return NextResponse.json([]);
     }
 
-    const { data: profiles, error: profilesError } = await supabase
+    const admin = createAdminClient();
+    const { data: profiles, error: profilesError } = await admin
       .from("profiles")
       .select("user_id, display_name, avatar_url")
       .in("user_id", Array.from(otherIds));

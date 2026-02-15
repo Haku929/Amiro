@@ -7,7 +7,7 @@ import { ArrowLeft, User, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { DmMessage } from "@/lib/types";
 
 const POLL_INTERVAL_MS = 10000;
@@ -43,6 +43,7 @@ export default function DmRoomPage() {
   const [messages, setMessages] = useState<DmMessage[]>([]);
   const [displayName, setDisplayName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [myAvatarUrl, setMyAvatarUrl] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState<"loading" | "ok" | "error">("loading");
@@ -58,6 +59,11 @@ export default function DmRoomPage() {
   };
 
   useEffect(() => {
+    fetch("/api/users/me")
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then((data: { avatarUrl?: string | null }) => setMyAvatarUrl(data.avatarUrl ?? null))
+      .catch(() => {});
+
     fetch(`/api/users/${encodeURIComponent(userId)}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then((data: { displayName?: string; avatarUrl?: string | null }) => {
@@ -139,13 +145,10 @@ export default function DmRoomPage() {
             <ArrowLeft className="text-zinc-600 dark:text-zinc-400" size={20} />
           </Link>
           <Avatar className="h-10 w-10 border-2 border-zinc-200 dark:border-zinc-700">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
-            ) : (
-              <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
-                <User className="h-5 w-5 text-zinc-500" />
-              </AvatarFallback>
-            )}
+            <AvatarImage src={avatarUrl ?? undefined} alt={displayName} className="object-cover" />
+            <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
+              <User className="h-5 w-5 text-zinc-500" />
+            </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <h2 className="font-bold text-base dark:text-zinc-100 truncate">
@@ -171,6 +174,11 @@ export default function DmRoomPage() {
                   className={`flex gap-3 ${isMe ? "flex-row-reverse" : "flex-row"}`}
                 >
                   <Avatar className="h-8 w-8 mt-1 shrink-0">
+                    <AvatarImage
+                      src={(isMe ? myAvatarUrl : avatarUrl) ?? undefined}
+                      alt={isMe ? "自分" : displayName}
+                      className="object-cover"
+                    />
                     <AvatarFallback
                       className={
                         isMe
