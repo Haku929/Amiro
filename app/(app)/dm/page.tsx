@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MessageCircle, User, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type ConversationItem = {
   userId: string;
@@ -12,6 +12,22 @@ type ConversationItem = {
   avatarUrl: string | null;
   lastMessage?: { content: string; createdAt: string };
 };
+
+function normalizeItem(raw: Record<string, unknown>): ConversationItem {
+  const lastMsg = raw.lastMessage ?? raw.last_message;
+  return {
+    userId: String(raw.userId ?? raw.user_id ?? ""),
+    displayName: String(raw.displayName ?? raw.display_name ?? ""),
+    avatarUrl: raw.avatarUrl != null ? String(raw.avatarUrl) : raw.avatar_url != null ? String(raw.avatar_url) : null,
+    lastMessage:
+      lastMsg && typeof lastMsg === "object" && lastMsg !== null && "content" in lastMsg
+        ? {
+            content: String((lastMsg as Record<string, unknown>).content ?? ""),
+            createdAt: String((lastMsg as Record<string, unknown>).createdAt ?? (lastMsg as Record<string, unknown>).created_at ?? ""),
+          }
+        : undefined,
+  };
+}
 
 const MOCK_CONVERSATIONS: ConversationItem[] = [
   {
@@ -36,8 +52,9 @@ export default function DmListPage() {
   useEffect(() => {
     fetch("/api/dm/conversations")
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: ConversationItem[]) => {
-        setList(data);
+      .then((data: unknown) => {
+        const items = Array.isArray(data) ? data.map((raw) => normalizeItem(typeof raw === "object" && raw !== null ? (raw as Record<string, unknown>) : {})) : [];
+        setList(items);
         setStatus("ok");
       })
       .catch(() => {
@@ -92,16 +109,11 @@ export default function DmListPage() {
                   >
                     <Avatar className="h-12 w-12 shrink-0">
                       {item.avatarUrl ? (
-                        <img
-                          src={item.avatarUrl}
-                          alt={item.displayName}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
-                          <User className="h-6 w-6 text-zinc-500" />
-                        </AvatarFallback>
-                      )}
+                        <AvatarImage src={item.avatarUrl} alt={item.displayName} className="object-cover" />
+                      ) : null}
+                      <AvatarFallback className="bg-zinc-200 dark:bg-zinc-700">
+                        <User className="h-6 w-6 text-zinc-500" />
+                      </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
