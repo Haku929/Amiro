@@ -64,6 +64,7 @@ export interface DetailUser {
   slotIndex?: 1 | 2 | 3;
   selfVector: Big5Vector;
   resonanceVector?: Big5Vector;
+  avatarUrl?: string | null;
 }
 
 interface MatchingDetailProps {
@@ -165,22 +166,28 @@ ${target.personaSummary}
           {/* 左：自分カード */}
           <div className="w-full md:flex-1 bg-white border border-zinc-200 rounded-3xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-2 bg-zinc-600"></div>
-            <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 mb-4">
-              <User className="text-zinc-400" size={40} />
+            <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center shrink-0 border border-zinc-200 mb-4 overflow-hidden">
+              {me.avatarUrl ? (
+                <img src={me.avatarUrl} alt={me.name} className="w-full h-full object-cover" />
+              ) : (
+                <User className="text-zinc-400" size={40} />
+              )}
             </div>
             <h2 className="text-xl font-bold text-zinc-900 truncate w-full">
               {me.name}
               <span className="text-sm font-normal text-zinc-500 ml-2">(あなた)</span>
             </h2>
             <p className="text-xs text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full mb-3 font-medium">{me.slotTitle}</p>
-            {me.bio != null && me.bio !== '' && (
-              <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mb-3">
-                <p className="text-xs font-medium text-zinc-500 mb-1">自己紹介</p>
-                <p className="text-sm text-zinc-700 leading-relaxed line-clamp-3">{me.bio}</p>
+            <div className="w-full flex flex-col gap-2">
+              {me.bio != null && me.bio !== '' && (
+                <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left">
+                  <p className="text-xs font-medium text-zinc-500 mb-1">自己紹介</p>
+                  <p className="text-sm text-zinc-700 leading-relaxed line-clamp-3">{me.bio}</p>
+                </div>
+              )}
+              <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left">
+                <p className="text-sm text-zinc-700 leading-relaxed line-clamp-4">{me.personaSummary}</p>
               </div>
-            )}
-            <div className="w-full bg-zinc-50 p-4 rounded-xl border border-zinc-100 text-left mt-auto">
-              <p className="text-sm text-zinc-700 leading-relaxed line-clamp-4">{me.personaSummary}</p>
             </div>
             {me.slotIndex != null && (
               <Link
@@ -231,8 +238,12 @@ ${target.personaSummary}
           {/* 右：相手カード */}
           <div className="w-full md:flex-1 bg-white dark:bg-zinc-900 border border-rose-200 dark:border-rose-900 rounded-3xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-2 bg-rose-500"></div>
-            <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center shrink-0 border border-rose-100 dark:border-rose-900/30 mb-4">
-              <User className="text-rose-400" size={40} />
+            <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center shrink-0 border border-rose-100 dark:border-rose-900/30 mb-4 overflow-hidden">
+              {target.avatarUrl ? (
+                <img src={target.avatarUrl} alt={target.name} className="w-full h-full object-cover" />
+              ) : (
+                <User className="text-rose-400" size={40} />
+              )}
             </div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 truncate w-full">{target.name}</h2>
             <p className="text-xs text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-full mb-3 font-medium">共鳴マッチング対象</p>

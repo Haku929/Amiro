@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Big5Vector } from '@/lib/types';
 import MatchingDetail, { DetailUser } from '@/components/layout/MatchingDetails';
 
@@ -71,7 +72,7 @@ async function MatchingDetailContent({ params, searchParams }: Props) {
 
   const { data: myProfile } = await supabase
     .from('profiles')
-    .select('display_name, bio')
+    .select('display_name, bio, avatar_url')
     .eq('user_id', user.id)
     .single();
 
@@ -82,19 +83,21 @@ async function MatchingDetailContent({ params, searchParams }: Props) {
     .eq('slot_index', mySlotIndex)
     .single();
 
-  // Fetch Target
-  const { data: targetProfile } = await supabase
+  // Fetch Target (Use Admin Client to bypass RLS)
+  const adminSupabase = createAdminClient();
+
+  const { data: targetProfile } = await adminSupabase
     .from('profiles')
-    .select('display_name, bio')
+    .select('display_name, bio, avatar_url')
     .eq('user_id', targetUserId)
     .maybeSingle();
 
-  const { data: targetSlotData } = await supabase
+  const { data: targetSlotData } = await adminSupabase
     .from('slots')
     .select('*')
     .eq('user_id', targetUserId)
     .eq('slot_index', targetSlotIndex)
-    .maybeSingle(); // Also use maybeSingle for slot just in case
+    .maybeSingle();
 
   // Parse Vectors
   const mySelfVector = parseVector(mySlotData?.self_vector);
@@ -128,6 +131,7 @@ async function MatchingDetailContent({ params, searchParams }: Props) {
     slotIndex: mySlotIndex as 1 | 2 | 3,
     selfVector: mySelfVector,
     resonanceVector: myResonanceVector,
+    avatarUrl: myProfile?.avatar_url,
   };
 
   const targetDetail: DetailUser = {
@@ -139,6 +143,7 @@ async function MatchingDetailContent({ params, searchParams }: Props) {
     slotIndex: targetSlotIndex as 1 | 2 | 3,
     selfVector: targetSelfVector,
     resonanceVector: targetResonanceVector,
+    avatarUrl: targetProfile?.avatar_url,
   };
 
   return (

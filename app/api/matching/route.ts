@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { MatchingResult } from "@/lib/types";
 
 const DEFAULT_LIMIT = 20;
@@ -74,7 +75,11 @@ export async function GET(request: NextRequest) {
     }
 
     const userIds = list.map((r) => r.other_user_id);
-    const { data: profiles, error: profilesError } = await supabase
+
+    // Admin client to bypass RLS for public profile data
+    const adminSupabase = createAdminClient();
+
+    const { data: profiles, error: profilesError } = await adminSupabase
       .from("profiles")
       .select("user_id, display_name, avatar_url, bio")
       .in("user_id", userIds);
@@ -86,7 +91,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data: slotRows, error: slotsError } = await supabase
+    const { data: slotRows, error: slotsError } = await adminSupabase
       .from("slots")
       .select("user_id, slot_index, persona_summary")
       .in("user_id", userIds);
