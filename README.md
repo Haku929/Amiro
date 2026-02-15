@@ -2,7 +2,7 @@
 
 **「理想の相手」ではなく、「好きな自分でいられる相手」と出会う**マッチングアプリ。
 
-AI との対話で引き出した「好きな自分（分人）」を保存し、相互共鳴する相手をベクトル検索で見つけます。
+AI との対話で引き出した「好きな自分（イロ）」を保存し、相互共鳴する相手をパレット検索で見つけます。
 
 ---
 
@@ -123,7 +123,7 @@ amiro/
 | **インフラ・DB** | Supabase ダッシュボード、必要なら `supabase/migrations/` | テーブル定義、Trigger、RLS、pgvector 設定、共鳴スコア用 RPC。接続情報は環境変数で共有。 |
 | **API** | `app/api/` 各ルート、`tests/api/`（同上のパス） | 各 `route.ts` で GET/POST/PUT/DELETE を実装。**API を追加・変更したら、対応する単体テストを `tests/api/` に追加し、同じ PR に含める。** Supabase クライアントは `lib/supabase/` を利用。 |
 | **AI・プロンプト** | `lib/gemini.ts`, `lib/prompts/`, `app/api/ai/analyze/route.ts` | Gemini クライアント、分析・日替わり・共鳴解説のプロンプト文、`/api/ai/analyze` のハンドラ。 |
-| **フロント A** | `app/(auth)/login/`, `app/(app)/layout.tsx`, `app/(app)/page.tsx`, `app/(app)/chat/`, `app/(app)/report/`, `components/layout/`, `components/chart/` | ログイン画面、共通レイアウト・認証ガード、ホーム、チャット、分人レポート、レーダーチャート。 |
+| **フロント A** | `app/(auth)/login/`, `app/(app)/layout.tsx`, `app/(app)/page.tsx`, `app/(app)/chat/`, `app/(app)/report/`, `components/layout/`, `components/chart/` | ログイン画面、共通レイアウト・認証ガード、ホーム、チャット、イロレポート、レーダーチャート。 |
 | **フロント B** | `app/(app)/profile/`, `app/(app)/matching/`, `app/(app)/matching/[userId]/` | プロフィール管理、マッチング一覧、共鳴詳細。 |
 | **共通** | `lib/supabase/`, `lib/types.ts`, `components/ui/` | Supabase クライアント、型定義、shadcn 等の UI 部品。初日に担当間で役割を決めるとよい。 |
 
