@@ -143,18 +143,18 @@ function ReportContent() {
       <div className="space-y-2 text-center sm:text-left">
         <h1 className="text-2xl font-bold tracking-tight">分析レポート</h1>
         <p className="text-muted-foreground">
-          「{situation}」での対話を通じて抽出された分人データです。
+          「{situation}」での対話を通じて抽出されたイロデータです。
         </p>
       </div>
 
-      {/* 1. 分人要約カード */}
+      {/* 1. イロ要約カード */}
       <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Avatar className="h-8 w-8 border border-primary/20">
               <AvatarFallback className="bg-primary/10 text-primary">AI</AvatarFallback>
             </Avatar>
-            今回の分人
+            今回のイロ
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -191,11 +191,11 @@ function ReportContent() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Save className="h-5 w-5" />
-            この分人を保存する
+            このイロを保存する
           </CardTitle>
           {isFull ? (
             <CardDescription className="text-destructive font-medium">
-              スロットが満杯です。上書きする分人を選択してください。
+              スロットが満杯です。上書きするイロを選択してください。
             </CardDescription>
           ) : (
             <CardDescription>

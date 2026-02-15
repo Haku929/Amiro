@@ -189,7 +189,7 @@ export default function SlotManager() {
               <div className="mb-6">
                 <div>
                   <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400 text-center border-b border-zinc-100 dark:border-zinc-800 pb-2 mb-3 tracking-wider">
-                    自己 (Real)
+                    自己パレット (Real)
                   </p>
                   <div className="space-y-3.5">
                     {TRAIT_MAPPING.map((trait) => {
@@ -215,10 +215,10 @@ export default function SlotManager() {
                 </div>
               </div>
 
-              {/* 分人要約文 */}
+              {/* イロ要約文 */}
               <div className="mb-5 flex-grow">
                 <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-zinc-100 dark:border-zinc-800 h-full">
-                  <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 mb-1.5">分人要約</p>
+                  <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 mb-1.5">イロ要約</p>
                   <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed line-clamp-5">
                     {slot.personaSummary}
                   </p>

@@ -101,14 +101,14 @@ export default function MatchingDetail({ me, target, resonanceScore }: MatchingD
 ユーザー「${me.name}」とユーザー「${target.name}」の共鳴マッチング結果についての分析をお願いします。
 共鳴スコア: ${resonanceScore}点
 
-【${me.name}の性格ベクトル】
+【${me.name}の性格パレット】
 ${JSON.stringify(me.selfVector)}
-【${me.name}の分人要約】
+【${me.name}のイロ要約】
 ${me.personaSummary}
 
-【${target.name}の性格ベクトル】
+【${target.name}の性格パレット】
 ${JSON.stringify(target.selfVector)}
-【${target.name}の分人要約】
+【${target.name}のイロ要約】
 ${target.personaSummary}
 
 あなたは「鏡」として、二人の相性や、お互いがどう作用しあうかについて、
@@ -150,7 +150,7 @@ ${target.personaSummary}
       {/* ヘッダー */}
       <div className="sticky top-0 z-30 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
-          <Link href={`/matching?slot=${me.slotTitle?.replace('分人', '') || '1'}`} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+          <Link href={`/matching?slot=${me.slotTitle?.replace('イロ', '') || '1'}`} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
             <ArrowLeft className="text-zinc-600 dark:text-zinc-400" size={24} />
           </Link>
           <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">共鳴詳細</h1>
@@ -314,7 +314,7 @@ ${target.personaSummary}
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full border-2 bg-blue-500 border-blue-600 dark:border-blue-400 shadow-sm" aria-hidden />
                 <span className="text-sm text-zinc-800 dark:text-zinc-200 font-bold">
-                  {isTargetView ? 'あなたの現実 (自己ベクトル)' : 'あなたの理想 (共鳴ベクトル)'}
+                  {isTargetView ? 'あなたの現実 (自己パレット)' : 'あなたの理想 (共鳴パレット)'}
                 </span>
               </div>
 
@@ -323,7 +323,7 @@ ${target.personaSummary}
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full border-2 bg-blue-200 dark:bg-blue-900/40 border-blue-500 dark:border-blue-400 shadow-sm" aria-hidden />
                 <span className="text-sm text-zinc-600 dark:text-zinc-400 font-medium">
-                  {isTargetView ? '相手の理想 (共鳴ベクトル)' : '相手の現実 (自己ベクトル)'}
+                  {isTargetView ? '相手の理想 (共鳴パレット)' : '相手の現実 (自己パレット)'}
                 </span>
               </div>
             </div>
