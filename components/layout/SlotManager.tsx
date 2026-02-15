@@ -9,25 +9,45 @@ import { User, RefreshCw, Plus, Loader2 } from 'lucide-react';
 const MAX_SLOTS = 3;
 
 const TRAIT_MAPPING = [
-  { 
-    key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
-    color: 'bg-orange-500 border-orange-600 dark:border-orange-400', barColor: 'bg-orange-100/50 dark:bg-orange-900/30' 
+  {
+    key: 'o',
+    label: '開放性',
+    leftLabel: '保守的',
+    rightLabel: '開放的',
+    color: 'bg-purple-500 border-purple-600 dark:border-purple-400',
+    barColor: 'bg-purple-100/50 dark:bg-purple-900/30',
   },
-  { 
-    key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
-    color: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400', barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30' 
+  {
+    key: 'c',
+    label: '誠実性',
+    leftLabel: '衝動的',
+    rightLabel: '計画的',
+    color: 'bg-blue-500 border-blue-600 dark:border-blue-400',
+    barColor: 'bg-blue-100/50 dark:bg-blue-900/30',
   },
-  { 
-    key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
-    color: 'bg-blue-500 border-blue-600 dark:border-blue-400', barColor: 'bg-blue-100/50 dark:bg-blue-900/30' 
+  {
+    key: 'e',
+    label: '外向性',
+    leftLabel: '内向的',
+    rightLabel: '外向的',
+    color: 'bg-orange-500 border-orange-600 dark:border-orange-400',
+    barColor: 'bg-orange-100/50 dark:bg-orange-900/30',
   },
-  { 
-    key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
-    color: 'bg-rose-500 border-rose-600 dark:border-rose-400', barColor: 'bg-rose-100/50 dark:bg-rose-900/30' 
+  {
+    key: 'a',
+    label: '協調性',
+    leftLabel: '独立的',
+    rightLabel: '協調的',
+    color: 'bg-emerald-500 border-emerald-600 dark:border-emerald-400',
+    barColor: 'bg-emerald-100/50 dark:bg-emerald-900/30',
   },
-  { 
-    key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
-    color: 'bg-purple-500 border-purple-600 dark:border-purple-400', barColor: 'bg-purple-100/50 dark:bg-purple-900/30' 
+  {
+    key: 'n',
+    label: '神経症傾向',
+    leftLabel: '安定',
+    rightLabel: '敏感',
+    color: 'bg-rose-500 border-rose-600 dark:border-rose-400',
+    barColor: 'bg-rose-100/50 dark:bg-rose-900/30',
   },
 ] as const;
 

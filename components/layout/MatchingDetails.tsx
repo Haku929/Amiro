@@ -5,8 +5,27 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User, Sparkles, Zap, ArrowLeftRight, Loader2 } from 'lucide-react';
 import { Big5Vector } from '@/lib/types';
+import { Big5Explanation } from '@/components/Big5Explanation';
 
 const TRAIT_MAPPING = [
+  {
+    key: 'o',
+    label: '開放性',
+    leftLabel: '保守的',
+    rightLabel: '開放的',
+    darkColor: 'bg-purple-500 border-purple-600 dark:border-purple-400',
+    lightColor: 'bg-purple-200 border-purple-300 dark:bg-purple-900/40 dark:border-purple-700',
+    barColor: 'bg-purple-100/50 dark:bg-purple-900/30',
+  },
+  {
+    key: 'c',
+    label: '誠実性',
+    leftLabel: '衝動的',
+    rightLabel: '計画的',
+    darkColor: 'bg-blue-500 border-blue-600 dark:border-blue-400',
+    lightColor: 'bg-blue-200 border-blue-300 dark:bg-blue-900/40 dark:border-blue-700',
+    barColor: 'bg-blue-100/50 dark:bg-blue-900/30',
+  },
   {
     key: 'e',
     label: '外向性',
@@ -36,7 +55,7 @@ const TRAIT_MAPPING = [
   },
   {
     key: 'n',
-    label: '情動性',
+    label: '神経症傾向',
     leftLabel: '安定',
     rightLabel: '敏感',
     darkColor: 'bg-rose-500 border-rose-600 dark:border-rose-400',
@@ -325,6 +344,9 @@ ${target.personaSummary}
                   {isTargetView ? '相手の理想 (共鳴ベクトル)' : '相手の現実 (自己ベクトル)'}
                 </span>
               </div>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <Big5Explanation variant="compact" />
             </div>
           </div>
 
