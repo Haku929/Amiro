@@ -100,18 +100,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-zinc-700 dark:text-zinc-200">ログアウト</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">アカウントからログアウトします</p>
-              </div>
-              <button 
-                className="px-4 py-2 text-sm font-bold text-zinc-500 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
-                onClick={handleLogout}
-              >
-                ログアウト
-              </button>
-            </div>
+
           </div>
         </section>
 
