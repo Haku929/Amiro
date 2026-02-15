@@ -28,16 +28,16 @@ export function buildExplainPrompt(
 ## 入力：共鳴している二人のスロット情報
 
 ### 自分側（ユーザー）
-- **自己ベクトル（今の自分）**: ${formatBig5(selfSlot.selfVector)}
-- **共鳴ベクトル（求める相手）**: ${formatBig5(selfSlot.resonanceVector)}
-- **分人要約**: ${selfSlot.personaSummary}
+- **自己パレット（今の自分）**: ${formatBig5(selfSlot.selfVector)}
+- **共鳴パレット（求める相手）**: ${formatBig5(selfSlot.resonanceVector)}
+- **イロ要約**: ${selfSlot.personaSummary}
 
 ### 相手側
-- **自己ベクトル**: ${formatBig5(otherSlot.selfVector)}
-- **共鳴ベクトル**: ${formatBig5(otherSlot.resonanceVector)}
-- **分人要約**: ${otherSlot.personaSummary}
+- **自己パレット**: ${formatBig5(otherSlot.selfVector)}
+- **共鳴パレット**: ${formatBig5(otherSlot.resonanceVector)}
+- **イロ要約**: ${otherSlot.personaSummary}
 
 ---
 
-上記の二人の「自己ベクトル」と「共鳴ベクトル」「分人要約」を踏まえ、**なぜこの二人だとお互い「好きな自分」でいられるか**を、ユーザー向けに **2〜3 文** でやさしく解説してください。専門用語は使わず、温かみのある文体にしてください。`;
+上記の二人の「自己パレット」と「共鳴パレット」「イロ要約」を踏まえ、**なぜこの二人だとお互い「好きな自分」でいられるか**を、ユーザー向けに **2〜3 文** でやさしく解説してください。専門用語は使わず、温かみのある文体にしてください。`;
 }

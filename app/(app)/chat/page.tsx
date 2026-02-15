@@ -350,7 +350,7 @@ function ChatContent() {
               placeholder={turnCount >= MAX_TURNS ? "会話終了" : "メッセージを入力..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              disabled={loading || analyzing || turnCount >= MAX_TURNS}
+              disabled={analyzing || turnCount >= MAX_TURNS}
               className="flex-1 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder-zinc-400"
               ref={inputRef}
               autoFocus

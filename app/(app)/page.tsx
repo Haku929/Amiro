@@ -81,19 +81,19 @@ const FALLBACK_SITUATIONS = [
 
 const CARD_TEMPLATES = [
   {
-    name: "鏡の分人 A",
+    name: "鏡のイロ A",
     description: "あなたの隠れた一面を映し出す鏡。深層心理に問いかけます。",
     icon: "🔮",
     colorClass: "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800",
   },
   {
-    name: "鏡の分人 B",
+    name: "鏡のイロ B",
     description: "あなたの感情に寄り添う鏡。日々の機微をすくい上げます。",
     icon: "🌸",
     colorClass: "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-800",
   },
   {
-    name: "鏡の分人 C",
+    name: "鏡のイロ C",
     description: "あなたの理性を磨く鏡。思考の枠組みを広げます。",
     icon: "💎",
     colorClass: "bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
@@ -198,7 +198,7 @@ export default function HomePage() {
         </Link>
         <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100">今日の「鏡」を選ぶ</h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-          話してみたいAIを選択してください。<br />対話を通じて、相手の性格に響き合うあなたの新しい「分人」を引き出します。
+          話してみたいAIを選択してください。<br />対話を通じて、相手の性格に響き合うあなたの新しい「イロ」を引き出します。
         </p>
       </div>
 

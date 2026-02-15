@@ -57,7 +57,7 @@ function MatchingCard({ candidate }: { candidate: MatchingResult }) {
                     <div className="flex items-start justify-between mb-2">
                         <div>
                             <p className="text-xs text-zinc-500 bg-zinc-100 inline-block px-2 py-1 rounded-md mb-2">
-                                分人 {candidate.matchedSlotIndexSelf} と共鳴
+                                イロ {candidate.matchedSlotIndexSelf} と共鳴
                             </p>
                         </div>
 
@@ -78,7 +78,7 @@ function MatchingCard({ candidate }: { candidate: MatchingResult }) {
 
                         {/* Persona Summary */}
                         <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
-                            <p className="text-xs text-indigo-400 font-bold mb-1">分人要約</p>
+                            <p className="text-xs text-indigo-400 font-bold mb-1">イロ要約</p>
                             <p className="text-sm text-zinc-700 line-clamp-2">{candidate.personaSummary || "要約なし"}</p>
                         </div>
                     </div>

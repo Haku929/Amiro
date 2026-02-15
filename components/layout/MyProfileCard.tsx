@@ -42,7 +42,7 @@ export default function MyProfileCard({ profile, currentSlotIndex, onSlotChange 
                                 : 'text-zinc-500 hover:text-zinc-700'
                                 }`}
                         >
-                            分人{num}
+                            イロ{num}
                         </button>
                     ))}
                 </div>
@@ -61,7 +61,7 @@ export default function MyProfileCard({ profile, currentSlotIndex, onSlotChange 
                     {/* Persona Summary */}
                     {currentSlot && (
                         <div>
-                            <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">分人要約</h3>
+                            <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">イロ要約</h3>
                             <div className="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
                                 <p className="text-xs text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                     {currentSlot.personaSummary || "要約はまだ生成されていません"}

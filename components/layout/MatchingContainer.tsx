@@ -98,7 +98,7 @@ export default function MatchingContainer() {
         <div className="p-6 border-b border-zinc-200 bg-white/80 backdrop-blur-sm z-10 sticky top-0 shrink-0 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">共鳴マッチング</h1>
-            <p className="text-zinc-500 text-sm">あなたの分人と共鳴するユーザー</p>
+            <p className="text-zinc-500 text-sm">あなたのイロと共鳴するユーザー</p>
           </div>
         </div>
 

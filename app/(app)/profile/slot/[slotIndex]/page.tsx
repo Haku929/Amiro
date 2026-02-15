@@ -42,7 +42,7 @@ export default function ProfileSlotConversationPage() {
             </Avatar>
             <div>
               <h2 className="text-sm font-medium text-muted-foreground">会話履歴</h2>
-              <p className="font-bold text-base dark:text-zinc-100">分人{slotIndex}</p>
+              <p className="font-bold text-base dark:text-zinc-100">イロ{slotIndex}</p>
             </div>
           </CardHeader>
         </Card>
@@ -95,7 +95,7 @@ export default function ProfileSlotConversationPage() {
             </Avatar>
             <div>
               <h2 className="text-sm font-medium text-muted-foreground">会話履歴</h2>
-              <p className="font-bold text-base dark:text-zinc-100">分人{slotIndex}</p>
+              <p className="font-bold text-base dark:text-zinc-100">イロ{slotIndex}</p>
             </div>
           </div>
         </CardHeader>
