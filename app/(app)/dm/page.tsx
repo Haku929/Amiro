@@ -49,9 +49,8 @@ export default function DmListPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex flex-col h-[calc(100vh-4rem)] max-w-2xl mx-auto w-full p-4 items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-zinc-400" />
-        <p className="mt-2 text-sm text-zinc-500">読み込み中…</p>
+      <div className="h-screen flex items-center justify-center bg-zinc-50">
+        <Loader2 className="animate-spin text-zinc-400" size={32} />
       </div>
     );
   }
