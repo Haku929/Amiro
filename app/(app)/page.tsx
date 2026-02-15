@@ -189,18 +189,21 @@ export default function HomePage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-10 mt-4">
+    <div className="w-full max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-10 space-y-12">
       
       {/* ページヘッダー部分 */}
-      <div className="text-center space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-100">今日の「鏡」を選ぶ</h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base max-w-xl mx-auto">
+      <div className="text-center space-y-4">
+        <Link href="/" className="inline-block mb-10">
+          <img src="/amiro_logo.svg" alt="Amiro" className="h-[5.25rem] md:h-24 w-auto mx-auto" />
+        </Link>
+        <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100">今日の「鏡」を選ぶ</h1>
+        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
           話してみたいAIを選択してください。<br />対話を通じて、相手の性格に響き合うあなたの新しい「分人」を引き出します。
         </p>
       </div>
 
       {/* AIカード一覧 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {cards.map((ai) => {
           const query = new URLSearchParams({
              situation: ai.situation,
@@ -215,29 +218,29 @@ export default function HomePage() {
           return (
           <div 
             key={ai.id} 
-            className="h-full border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col items-center text-center space-y-5"
+            className="h-full border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col items-center text-center space-y-6"
           >
             {/* アイコン部分 */}
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl border ${ai.colorClass} transition-transform duration-300 group-hover:scale-110`}>
+            <div className={`w-36 h-36 rounded-full flex items-center justify-center text-7xl border ${ai.colorClass} transition-transform duration-300 group-hover:scale-110`}>
               {ai.icon}
             </div>
             
             {/* テキスト部分 */}
-            <div className="flex-grow space-y-2">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{ai.name}</h2>
-              <div className="text-xs font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded inline-block text-zinc-500 mb-2">
-                 Situation: {ai.situation}
+            <div className="flex-grow space-y-3">
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{ai.name}</h2>
+              <div className="text-sm font-mono bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded inline-block text-zinc-500">
+                 {ai.situation}
               </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 {ai.description}
               </p>
             </div>
             
             {/* アクションボタン (ホバーでBig5表示) */}
-            <div className="w-full pt-2 mt-auto relative">
+            <div className="w-full pt-4 mt-auto relative">
               <Link 
                 href={`/chat?${query.toString()}`}
-                className="group/btn relative block w-full py-3 px-4 bg-zinc-900 dark:bg-zinc-700 text-white dark:text-zinc-100 text-sm font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-600 transition-colors shadow-sm"
+                className="group/btn relative block w-full py-4 px-5 bg-zinc-900 dark:bg-zinc-700 text-white dark:text-zinc-100 text-base font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-600 transition-colors shadow-sm"
               >
                 このAIと話す
 
