@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User, Sparkles, Zap, ArrowLeftRight, Loader2 } from 'lucide-react';
 import { Big5Vector } from '@/lib/types';
+import { Big5Explanation } from '@/components/Big5Explanation';
 
 const TRAIT_MAPPING = [
   {
@@ -325,6 +326,9 @@ ${target.personaSummary}
                   {isTargetView ? '相手の理想 (共鳴ベクトル)' : '相手の現実 (自己ベクトル)'}
                 </span>
               </div>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <Big5Explanation variant="compact" />
             </div>
           </div>
 
