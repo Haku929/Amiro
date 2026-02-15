@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { createClient } from "@/lib/supabase/client";
 
 // 型定義
 type Message = {
@@ -51,6 +52,29 @@ function ChatContent() {
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [turnCount, setTurnCount] = useState(0);
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // プロフィールからアバターURLを取得
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("user_id", user.id)
+          .single();
+        
+        if (profile?.avatar_url) {
+          setUserAvatarUrl(profile.avatar_url);
+        } else if (user.user_metadata?.avatar_url) {
+          setUserAvatarUrl(user.user_metadata.avatar_url);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
   const MAX_TURNS = 10;
 
@@ -295,7 +319,7 @@ function ChatContent() {
                 <Avatar className="h-8 w-8 mt-1">
                   {msg.role === "user" ? (
                     <>
-                      <AvatarImage src="" /> {/* ユーザーアイコンがあれば */}
+                      <AvatarImage src={userAvatarUrl || ""} /> {/* ユーザーアイコンがあれば */}
                       <AvatarFallback className="bg-slate-200 dark:bg-slate-700"><User className="h-4 w-4 text-slate-600 dark:text-slate-300" /></AvatarFallback>
                     </>
                   ) : (
