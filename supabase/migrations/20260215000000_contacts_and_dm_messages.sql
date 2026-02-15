@@ -1,63 +1,31 @@
--- Contacts and 1:1 DM tables with RLS policies
-
-create table if not exists public.contacts (
-  user_id uuid not null references auth.users (id) on delete cascade,
-  other_user_id uuid not null references auth.users (id) on delete cascade,
-  created_at timestamptz not null default timezone('utc'::text, now()),
-  constraint contacts_pkey primary key (user_id, other_user_id),
-  constraint contacts_not_self check (user_id <> other_user_id)
+CREATE TABLE IF NOT EXISTS contacts (
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  other_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, other_user_id),
+  CONSTRAINT contacts_no_self CHECK (user_id != other_user_id)
 );
 
-alter table public.contacts enable row level security;
-
-drop policy if exists "contacts_select_own" on public.contacts;
-create policy "contacts_select_own"
-  on public.contacts
-  for select
-  using (auth.uid() = user_id);
-
-drop policy if exists "contacts_insert_own" on public.contacts;
-create policy "contacts_insert_own"
-  on public.contacts
-  for insert
-  with check (auth.uid() = user_id and user_id <> other_user_id);
-
-drop policy if exists "contacts_delete_own" on public.contacts;
-create policy "contacts_delete_own"
-  on public.contacts
-  for delete
-  using (auth.uid() = user_id);
-
-create table if not exists public.dm_messages (
-  id bigint generated always as identity primary key,
-  sender_id uuid not null references auth.users (id) on delete cascade,
-  receiver_id uuid not null references auth.users (id) on delete cascade,
-  content text not null,
-  created_at timestamptz not null default timezone('utc'::text, now()),
-  constraint dm_messages_not_self check (sender_id <> receiver_id),
-  constraint dm_messages_content_not_blank check (length(btrim(content)) > 0)
+CREATE TABLE IF NOT EXISTS dm_messages (
+  id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT dm_messages_no_self CHECK (sender_id != receiver_id)
 );
 
-alter table public.dm_messages enable row level security;
+CREATE INDEX IF NOT EXISTS idx_dm_messages_thread ON dm_messages (sender_id, receiver_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dm_messages_receiver_created ON dm_messages (receiver_id, created_at DESC);
 
-drop policy if exists "dm_messages_select_participants" on public.dm_messages;
-create policy "dm_messages_select_participants"
-  on public.dm_messages
-  for select
-  using (auth.uid() = sender_id or auth.uid() = receiver_id);
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE dm_messages ENABLE ROW LEVEL SECURITY;
 
-drop policy if exists "dm_messages_insert_sender_only" on public.dm_messages;
-create policy "dm_messages_insert_sender_only"
-  on public.dm_messages
-  for insert
-  with check (auth.uid() = sender_id and sender_id <> receiver_id);
+CREATE POLICY contacts_select_own ON contacts FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY contacts_insert_own ON contacts FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY contacts_delete_own ON contacts FOR DELETE USING (auth.uid() = user_id);
 
-create index if not exists idx_dm_messages_thread
-  on public.dm_messages (
-    least(sender_id, receiver_id),
-    greatest(sender_id, receiver_id),
-    created_at desc
-  );
-
-create index if not exists idx_dm_messages_receiver_created
-  on public.dm_messages (receiver_id, created_at desc);
+CREATE POLICY dm_messages_select_participant ON dm_messages FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+CREATE POLICY dm_messages_insert_sender ON dm_messages FOR INSERT
+  WITH CHECK (auth.uid() = sender_id);

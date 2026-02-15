@@ -1,153 +1,94 @@
-// components/layout/MatchingList.tsx
-'use client';
-
+import { User, Zap, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { User } from 'lucide-react';
-import { MatchUser } from './MatchingContainer';
-import { Big5Vector } from '@/lib/types';
-
-const TRAIT_MAPPING = [
-  { 
-    key: 'e', label: '外向性', leftLabel: '内向', rightLabel: '外向',
-    color: 'bg-orange-500 border-orange-600', barColor: 'bg-orange-50/50' 
-  },
-  { 
-    key: 'a', label: '協調性', leftLabel: '独立', rightLabel: '協調',
-    color: 'bg-emerald-500 border-emerald-600', barColor: 'bg-emerald-50/50' 
-  },
-  { 
-    key: 'c', label: '勤勉性', leftLabel: '衝動', rightLabel: '計画',
-    color: 'bg-blue-500 border-blue-600', barColor: 'bg-blue-50/50' 
-  },
-  { 
-    key: 'n', label: '情動性', leftLabel: '安定', rightLabel: '敏感',
-    color: 'bg-rose-500 border-rose-600', barColor: 'bg-rose-50/50' 
-  },
-  { 
-    key: 'o', label: '創造性', leftLabel: '保守', rightLabel: '革新',
-    color: 'bg-purple-500 border-purple-600', barColor: 'bg-purple-50/50' 
-  },
-] as const;
+import type { MatchingResult } from '@/lib/types';
 
 interface MatchingListProps {
-  matches: MatchUser[];
-  currentSlotIndex: number;
+    candidates: MatchingResult[];
 }
 
-export default function MatchingList({ matches, currentSlotIndex }: MatchingListProps) {
-  
-  if (matches.length === 0) {
+function MatchingCard({ candidate }: { candidate: MatchingResult }) {
     return (
-      <div className="py-20 text-center border border-dashed border-zinc-300 rounded-3xl bg-zinc-50">
-        <p className="text-zinc-500 font-medium">条件に合致するユーザーが見つかりませんでした。</p>
-        <p className="text-zinc-400 text-sm mt-2">別のベクトル要素を選択して再検索してみてください。</p>
-      </div>
+        <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            {/* Sparkle background effect */}
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Sparkles size={100} className="text-indigo-500" />
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6 relative z-10">
+
+                {/* Left: Avatar & Name & Score */}
+                <div className="flex flex-col items-center gap-3 shrink-0 w-32">
+                    <div className="w-20 h-20 bg-zinc-100 rounded-full flex items-center justify-center border border-zinc-200 overflow-hidden">
+                        {candidate.avatarUrl ? (
+                            <img src={candidate.avatarUrl} alt={candidate.displayName} className="w-full h-full object-cover" />
+                        ) : (
+                            <User className="text-zinc-400" size={32} />
+                        )}
+                    </div>
+
+                    <h3 className="text-sm font-bold text-zinc-900 text-center leading-tight line-clamp-2 w-full">{candidate.displayName}</h3>
+
+                    <div className="flex flex-col items-center bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100 w-full">
+                        <div className="flex items-center gap-1">
+                            <Zap size={14} className="text-rose-500 fill-rose-500" />
+                            <span className="text-xs font-bold text-rose-400">共鳴スコア</span>
+                        </div>
+                        <span className="text-xl font-black text-rose-500 leading-none">{(candidate.resonanceScore * 100).toFixed(1)}</span>
+                    </div>
+                </div>
+
+                {/* Right: Info */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div className="flex items-start justify-between mb-2">
+                        <div>
+                            <p className="text-xs text-zinc-500 bg-zinc-100 inline-block px-2 py-1 rounded-md mb-2">
+                                分人 {candidate.matchedSlotIndexSelf} と共鳴
+                            </p>
+                        </div>
+
+                        <Link
+                            href={`/matching/${candidate.userId}?slot=${candidate.matchedSlotIndexSelf}&targetSlot=${candidate.matchedSlotIndexOther}&score=${candidate.resonanceScore}`}
+                            className="px-4 py-2 bg-zinc-900 text-white text-sm font-bold rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                        >
+                            詳細を見る
+                        </Link>
+                    </div>
+
+                    <div className="space-y-3">
+                        {/* Bio Summary */}
+                        <div className="bg-zinc-50 p-3 rounded-lg border border-zinc-100">
+                            <p className="text-xs text-zinc-500 font-bold mb-1">自己紹介</p>
+                            <p className="text-sm text-zinc-700 line-clamp-2">{candidate.bio || "自己紹介なし"}</p>
+                        </div>
+
+                        {/* Persona Summary */}
+                        <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100/50">
+                            <p className="text-xs text-indigo-400 font-bold mb-1">分人要約</p>
+                            <p className="text-sm text-zinc-700 line-clamp-2">{candidate.personaSummary || "要約なし"}</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     );
-  }
+}
 
-  return (
-    <div className="space-y-4">
-      {matches.map((match) => (
-        <Link 
-          key={match.id} 
-          href={`/matching/${match.id}?slot=${currentSlotIndex}`}
-          className="block flex flex-col xl:flex-row items-stretch gap-6 p-5 border border-zinc-200 rounded-2xl bg-white shadow-sm hover:shadow-md hover:border-rose-200 transition-all cursor-pointer group"
-        >
-          {/* 左側: アイコンと名前 (w-64でMyProfileCardと統一) */}
-          <div className="flex xl:flex-col items-center xl:justify-center gap-4 xl:w-64 xl:border-r xl:border-zinc-100 xl:pr-6 shrink-0">
-            <div className="w-16 h-16 bg-zinc-100 border border-zinc-200 rounded-full flex items-center justify-center text-zinc-500 shadow-inner group-hover:scale-105 transition-transform group-hover:bg-rose-50 group-hover:text-rose-400 group-hover:border-rose-100">
-              <User strokeWidth={1.5} size={32} />
+export default function MatchingList({ candidates }: MatchingListProps) {
+    if (candidates.length === 0) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center text-zinc-400">
+                <Sparkles size={48} className="mb-4 opacity-20" />
+                <p>共鳴する相手が見つかりませんでした</p>
             </div>
-            <div className="flex flex-col xl:items-center justify-center items-start min-w-0 flex-1 xl:flex-none xl:w-full text-left xl:text-center">
-              <h3 className="text-xl font-bold text-zinc-900 group-hover:text-rose-600 transition-colors truncate w-full">{match.name}</h3>
-              
-              <div className="mt-2 bg-rose-50 px-4 py-1.5 rounded-lg border border-rose-100/50 flex flex-col items-center min-w-[80px]">
-                <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider leading-none mb-1">共鳴スコア</span>
-                <span className="text-2xl font-black text-rose-500 leading-none">
-                  {match.resonanceScore}
-                </span>
-              </div>
-            </div>
-          </div>
+        );
+    }
 
-          {/* 右側: ベクトル ＋ 要約文 */}
-          <div className="flex flex-1 flex-col gap-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              
-              {/* 1. 自己ベクトル */}
-              <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
-                <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
-                  自己ベクトル (現実)
-                </p>
-                <div className="space-y-3">
-                  {TRAIT_MAPPING.map((trait) => {
-                    const val = (match.selfVector[trait.key] ?? 0.5) * 100;
-                    return (
-                      <div key={`self-${trait.key}`} className="relative h-4">
-                        <div className="relative flex justify-between items-end mb-1 px-1 h-3">
-                          <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
-                          <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
-                            {trait.label}
-                          </span>
-                          <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
-                        </div>
-
-                        <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
-                           <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
-                           {/* ドット縮小 w-2.5 h-2.5 */}
-                           <div 
-                             className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
-                             style={{ left: `calc(${val}% - 5px)` }}
-                           ></div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 2. 共鳴ベクトル */}
-              <div className="flex-1 bg-zinc-50/50 rounded-xl p-3 border border-zinc-200">
-                <p className="text-[10px] font-bold text-zinc-600 border-b border-zinc-200 pb-2 mb-2 text-center tracking-wider">
-                  共鳴ベクトル (理想)
-                </p>
-                <div className="space-y-3">
-                  {TRAIT_MAPPING.map((trait) => {
-                    const val = (match.resonanceVector[trait.key] ?? 0.5) * 100;
-                    return (
-                      <div key={`res-${trait.key}`} className="relative h-4">
-                        <div className="relative flex justify-between items-end mb-1 px-1 h-3">
-                          <span className="text-[9px] text-zinc-400 font-medium">{trait.leftLabel}</span>
-                          <span className="absolute left-1/2 -translate-x-1/2 bottom-0 text-[10px] font-bold text-zinc-600">
-                            {trait.label}
-                          </span>
-                          <span className="text-[9px] text-zinc-400 font-medium">{trait.rightLabel}</span>
-                        </div>
-
-                        <div className={`h-2.5 w-full rounded-full relative ${trait.barColor}`}>
-                           <div className="absolute top-1/2 -translate-y-1/2 w-full h-px bg-zinc-300/40"></div>
-                           {/* ドット縮小 w-2.5 h-2.5 */}
-                           <div 
-                             className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border shadow-sm ${trait.color}`}
-                             style={{ left: `calc(${val}% - 5px)` }}
-                           ></div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-zinc-50 rounded-xl p-3 border border-zinc-100">
-              <p className="text-[10px] font-semibold text-zinc-400 mb-0.5">分人要約文</p>
-              <p className="text-xs text-zinc-700 leading-relaxed line-clamp-2">
-                {match.personaSummary}
-              </p>
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
+    return (
+        <div className="flex flex-col gap-4 pb-20">
+            {candidates.map((candidate) => (
+                <MatchingCard key={candidate.userId} candidate={candidate} />
+            ))}
+        </div>
+    );
 }

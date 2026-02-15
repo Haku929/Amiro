@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/login-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,13 +14,10 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginForm />
-          
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-blue-500 hover:underline">
-              トップページに戻る（テスト用）
-            </Link>
-          </div>
+          <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+          </Suspense>
+
         </CardContent>
       </Card>
     </div>

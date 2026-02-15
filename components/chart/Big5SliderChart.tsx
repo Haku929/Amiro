@@ -8,57 +8,56 @@ import { cn } from "@/lib/utils";
 // Constants / Definitions
 // -----------------------------------------------------------------------------
 
-// Labels directly from the reference image
 const TRAIT_CONFIG = [
-  { 
-    key: "e", 
-    label: "外向性", 
-    left: "外向(E)", 
-    right: "内向(I)", 
-    color: "bg-orange-500", 
-    lightColor: "bg-orange-100",
-    dotColor: "bg-orange-500",
-    mirrorDotColor: "bg-orange-200 border-orange-500" 
-  },
-  { 
-    key: "a", 
-    label: "協調性", 
-    left: "協調(A)", 
-    right: "排他(H)", 
-    color: "bg-emerald-500", 
-    lightColor: "bg-emerald-100",
-    dotColor: "bg-emerald-500",
-    mirrorDotColor: "bg-emerald-200 border-emerald-500"
-  },
-  { 
-    key: "c", 
-    label: "勤勉性", 
-    left: "勤勉(C)", 
-    right: "怠惰(R)", 
-    color: "bg-blue-500", 
-    lightColor: "bg-blue-100",
-    dotColor: "bg-blue-500",
-    mirrorDotColor: "bg-blue-200 border-blue-500"
-  },
-  { 
-    key: "n", 
-    label: "情動性", 
-    left: "論理(N)", 
-    right: "情動(T)", 
-    color: "bg-rose-500", 
-    lightColor: "bg-rose-100",
-    dotColor: "bg-rose-500",
-    mirrorDotColor: "bg-rose-200 border-rose-500"
-  },
-  { 
-    key: "o", 
-    label: "創造性", 
-    left: "創造(O)", 
-    right: "保守(S)", 
-    color: "bg-purple-500", 
+  {
+    key: "o",
+    label: "開放性",
+    left: "保守的",
+    right: "開放的",
+    color: "bg-purple-500",
     lightColor: "bg-purple-100",
     dotColor: "bg-purple-500",
-    mirrorDotColor: "bg-purple-200 border-purple-500"
+    mirrorDotColor: "bg-purple-200 border-purple-500",
+  },
+  {
+    key: "c",
+    label: "誠実性",
+    left: "衝動的",
+    right: "計画的",
+    color: "bg-blue-500",
+    lightColor: "bg-blue-100",
+    dotColor: "bg-blue-500",
+    mirrorDotColor: "bg-blue-200 border-blue-500",
+  },
+  {
+    key: "e",
+    label: "外向性",
+    left: "内向的",
+    right: "外向的",
+    color: "bg-orange-500",
+    lightColor: "bg-orange-100",
+    dotColor: "bg-orange-500",
+    mirrorDotColor: "bg-orange-200 border-orange-500",
+  },
+  {
+    key: "a",
+    label: "協調性",
+    left: "独立的",
+    right: "協調的",
+    color: "bg-emerald-500",
+    lightColor: "bg-emerald-100",
+    dotColor: "bg-emerald-500",
+    mirrorDotColor: "bg-emerald-200 border-emerald-500",
+  },
+  {
+    key: "n",
+    label: "神経症傾向",
+    left: "安定",
+    right: "敏感",
+    color: "bg-rose-500",
+    lightColor: "bg-rose-100",
+    dotColor: "bg-rose-500",
+    mirrorDotColor: "bg-rose-200 border-rose-500",
   },
 ] as const;
 
@@ -147,14 +146,14 @@ type Big5SliderChartProps = {
 export function Big5SliderChart({ selfVector, resonanceVector, className }: Big5SliderChartProps) {
   return (
     <div className={cn("space-y-6", className)}>
-      {/* Legend */}
-      <div className="flex justify-center items-center gap-6 text-xs text-muted-foreground bg-muted/30 py-2 rounded-lg">
+      {/* Legend - same style as plot: solid = self, light+border = mirror */}
+      <div className="flex justify-center items-center gap-6 text-xs text-foreground bg-muted/30 py-2 rounded-lg">
         <div className="flex items-center gap-2">
-          <span className="block w-3 h-3 rounded-full bg-slate-500"></span>
+          <span className="block size-3 shrink-0 rounded-full bg-blue-500" aria-hidden />
           <span>あなた (Self)</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="block w-3 h-3 rounded-full bg-slate-200 border border-slate-400"></span>
+          <span className="block size-3 shrink-0 rounded-full border-2 border-blue-500 bg-blue-200 box-border" aria-hidden />
           <span>鏡 (Mirror)</span>
         </div>
       </div>

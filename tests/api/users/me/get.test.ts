@@ -40,6 +40,7 @@ vi.mock("@/lib/supabase/server", () => ({
                 user_id: "user-uuid-1",
                 display_name: "Test User",
                 avatar_url: "https://example.com/avatar.png",
+                bio: null,
               },
               error: null,
             }),
@@ -77,6 +78,7 @@ describe("GET /api/users/me", () => {
       user_id: "mock-user-no-env",
       display_name: "Mock User (no env)",
       avatar_url: null as string | null,
+      bio: null as string | null,
     };
     const mockSlots = [
       {
@@ -128,6 +130,7 @@ describe("GET /api/users/me", () => {
     expect(json.userId).toBe(mockProfile.user_id);
     expect(json.displayName).toBe(mockProfile.display_name);
     expect(json.avatarUrl).toBe(mockProfile.avatar_url);
+    expect(json.bio).toBe(mockProfile.bio);
     expect(json.slots).toHaveLength(1);
     expect(json.slots[0].slotIndex).toBe(mockSlots[0].slot_index);
     expect(json.slots[0].selfVector).toEqual(mockSlots[0].self_vector);
@@ -201,6 +204,7 @@ describe("GET /api/users/me", () => {
     expect(json.userId).toBe("user-uuid-1");
     expect(json.displayName).toBe("Test User");
     expect(json.avatarUrl).toBe("https://example.com/avatar.png");
+    expect(json.bio).toBe(null);
     expect(Array.isArray(json.slots)).toBe(true);
     expect(json.slots).toHaveLength(1);
     expect(json.slots[0].slotIndex).toBe(1);
