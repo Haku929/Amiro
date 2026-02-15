@@ -66,7 +66,7 @@ export default function DmListPage() {
 
   if (status === "loading") {
     return (
-      <div className="h-screen flex items-center justify-center bg-zinc-50">
+      <div className="h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <Loader2 className="animate-spin text-zinc-400" size={32} />
       </div>
     );

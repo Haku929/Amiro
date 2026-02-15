@@ -153,7 +153,7 @@ export default function SlotManager() {
             }
             return (
               <div key={index} className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 flex flex-col items-center justify-center bg-zinc-50/30 dark:bg-zinc-900/30 text-zinc-400 dark:text-zinc-600 transition-colors hover:bg-zinc-50/60 dark:hover:bg-zinc-800/20 min-h-[400px]">
-                <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
+                <div className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
                   <Plus size={28} className="text-zinc-300 dark:text-zinc-500" />
                 </div>
                 <p className="text-lg font-bold text-zinc-500 dark:text-zinc-500">Slot {index}</p>

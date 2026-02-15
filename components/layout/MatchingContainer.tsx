@@ -64,7 +64,7 @@ export default function MatchingContainer() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-zinc-50">
+      <div className="h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <Loader2 className="animate-spin text-zinc-400" size={32} />
       </div>
     );
@@ -72,17 +72,17 @@ export default function MatchingContainer() {
 
   if (error || !profile) {
     return (
-      <div className="h-screen flex items-center justify-center bg-zinc-50 text-red-500">
+      <div className="h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 text-red-500">
         <p>{error || 'プロフィールの取得に失敗しました'}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex h-[calc(100vh-120px)] w-full max-w-[1600px] mx-auto overflow-hidden bg-zinc-50 rounded-3xl border border-zinc-200 shadow-2xl">
+    <div className="flex h-[calc(100vh-120px)] w-full max-w-[1600px] mx-auto overflow-hidden bg-zinc-50 dark:bg-zinc-950 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl">
 
       {/* Left Panel: My Profile (Fixed) */}
-      <div className="hidden md:flex w-80 flex-col border-r border-zinc-200 bg-white/50 p-6 z-10 shrink-0">
+      <div className="hidden md:flex w-80 flex-col border-r border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 p-6 z-10 shrink-0">
         <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">You (あなた)</h2>
         <div className="flex-1 overflow-hidden">
           <MyProfileCard
@@ -94,10 +94,10 @@ export default function MatchingContainer() {
       </div>
 
       {/* Right Panel: Matching List (Scrollable) */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-white/30 relative">
-        <div className="p-6 border-b border-zinc-200 bg-white/80 backdrop-blur-sm z-10 sticky top-0 shrink-0 flex justify-between items-center">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-white/30 dark:bg-zinc-900/30 relative">
+        <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm z-10 sticky top-0 shrink-0 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-black text-zinc-900 tracking-tight">共鳴マッチング</h1>
+            <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight">共鳴マッチング</h1>
             <p className="text-zinc-500 text-sm">あなたのイロと共鳴するユーザー</p>
           </div>
         </div>
