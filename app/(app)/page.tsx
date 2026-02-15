@@ -30,8 +30,8 @@ class SeededRandom {
   // mean: 平均, stdDev: 標準偏差
   normal(mean: number, stdDev: number): number {
     let u = 0, v = 0;
-    while(u === 0) u = this.next(); // 0を回避 (log(0)を防ぐ)
-    while(v === 0) v = this.next();
+    while (u === 0) u = this.next(); // 0を回避 (log(0)を防ぐ)
+    while (v === 0) v = this.next();
     const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     return mean + z * stdDev;
   }
@@ -119,29 +119,29 @@ export default function HomePage() {
         // 2. シチュエーションを取得 (API or Mock)
         let situations: string[] = [];
         try {
-            // APIが503/500を返す可能性があるためtry-catch
-            const res = await fetch(`/api/ai/situations?date=${dateStr}`);
-            if (res.ok) {
-                const data = await res.json();
-                if (data.situations && Array.isArray(data.situations) && data.situations.length === 3) {
-                    situations = data.situations;
-                }
+          // APIが503/500を返す可能性があるためtry-catch
+          const res = await fetch(`/api/ai/situations?date=${dateStr}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.situations && Array.isArray(data.situations) && data.situations.length === 3) {
+              situations = data.situations;
             }
+          }
         } catch (e) {
-            console.warn("Failed to fetch situations via API, using fallback.", e);
+          console.warn("Failed to fetch situations via API, using fallback.", e);
         }
 
         // 失敗時や不足時はフォールバックを使用 (インデックスはランダムではなく固定またはシード依存でもよいが、簡易的に固定リストfallback)
         if (situations.length < 3) {
-            const indices = [0, 1, 2].map(i => Math.floor(rng.range(0, FALLBACK_SITUATIONS.length)));
-             // 重複排除ロジックは簡易版では省略、またはFALLBACK順に割り当て
-            situations = FALLBACK_SITUATIONS.slice(0, 3);
+          const indices = [0, 1, 2].map(i => Math.floor(rng.range(0, FALLBACK_SITUATIONS.length)));
+          // 重複排除ロジックは簡易版では省略、またはFALLBACK順に割り当て
+          situations = FALLBACK_SITUATIONS.slice(0, 3);
         }
 
         // 3. 3枚のカードを生成
         const newCards: AiCard[] = situations.map((situation, i) => {
           const template = CARD_TEMPLATES[i % CARD_TEMPLATES.length];
-          
+
           // 正規分布でBig5を生成 (mean=0.5, stdDev=0.18, clamp 0.1~0.9)
           const generateTrait = () => {
             // 生成
@@ -182,15 +182,15 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="h-screen flex items-center justify-center bg-zinc-50">
+        <Loader2 className="animate-spin text-zinc-400" size={32} />
       </div>
     );
   }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-10 space-y-12">
-      
+
       {/* ページヘッダー部分 */}
       <div className="text-center space-y-4">
         <Link href="/" className="inline-block mb-10">
@@ -206,81 +206,82 @@ export default function HomePage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {cards.map((ai) => {
           const query = new URLSearchParams({
-             situation: ai.situation,
-             s_o: ai.big5.o.toString(), 
-             o: ai.big5.o.toString(),
-             c: ai.big5.c.toString(),
-             e: ai.big5.e.toString(),
-             a: ai.big5.a.toString(),
-             n: ai.big5.n.toString(),
+            situation: ai.situation,
+            s_o: ai.big5.o.toString(),
+            o: ai.big5.o.toString(),
+            c: ai.big5.c.toString(),
+            e: ai.big5.e.toString(),
+            a: ai.big5.a.toString(),
+            n: ai.big5.n.toString(),
           });
-          
+
           return (
-          <div 
-            key={ai.id} 
-            className="h-full border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col items-center text-center space-y-6"
-          >
-            {/* アイコン部分 */}
-            <div className={`w-36 h-36 rounded-full flex items-center justify-center text-7xl border ${ai.colorClass} transition-transform duration-300 group-hover:scale-110`}>
-              {ai.icon}
-            </div>
-            
-            {/* テキスト部分 */}
-            <div className="flex-grow space-y-3">
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{ai.name}</h2>
-              <div className="text-sm font-mono bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded inline-block text-zinc-500">
-                 {ai.situation}
+            <div
+              key={ai.id}
+              className="h-full border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col items-center text-center space-y-6"
+            >
+              {/* アイコン部分 */}
+              <div className={`w-36 h-36 rounded-full flex items-center justify-center text-7xl border ${ai.colorClass} transition-transform duration-300 group-hover:scale-110`}>
+                {ai.icon}
               </div>
-              <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                {ai.description}
-              </p>
-            </div>
-            
-            {/* アクションボタン (ホバーでBig5表示) */}
-            <div className="w-full pt-4 mt-auto relative">
-              <Link 
-                href={`/chat?${query.toString()}`}
-                className="group/btn relative block w-full py-4 px-5 bg-zinc-900 dark:bg-zinc-700 text-white dark:text-zinc-100 text-base font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-600 transition-colors shadow-sm"
-              >
-                このAIと話す
 
-                {/* Big5 Tooltip (ボタンの下に表示) */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-64 bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-700 opacity-0 invisible translate-y-2 group-hover/btn:opacity-100 group-hover/btn:visible group-hover/btn:translate-y-0 transition-all duration-300 z-50 pointer-events-none text-left">
-                  {/* 装飾: 吹き出しの三角 */}
-                  <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-white dark:bg-zinc-800 border-t border-l border-zinc-100 dark:border-zinc-700 transform rotate-45"></div>
-                  
-                  <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 text-center mb-2 border-b border-zinc-50 dark:border-zinc-700 pb-2">性格特性 (Big5)</p>
-                  <div className="space-y-2.5">
-                  {TRAIT_LABELS.map((trait) => {
-                    // @ts-ignore
-                    const val = ai.big5[trait.key] * 100;
-                    return (
-                      <div key={trait.key} className="flex items-center gap-2 text-xs">
-                        <span className="w-8 text-right text-zinc-500 dark:text-zinc-400 font-mono scale-90">{trait.key.toUpperCase()}</span>
-                        
-                        {/* バーではなく点で表示 */}
-                        <div className="flex-1 relative h-4 flex items-center">
-                          {/* 背景線 */}
-                          <div className="absolute w-full h-0.5 bg-zinc-100 dark:bg-zinc-700 rounded-full"></div>
-                          {/* ドット */}
-                          <div 
-                            className={`absolute w-3 h-3 rounded-full border border-white dark:border-zinc-800 shadow-sm ${trait.color}`}
-                            style={{ left: `calc(${val}% - 6px)` }}
-                          ></div>
-                        </div>
-
-                        <span className="w-6 text-right text-zinc-400 dark:text-zinc-500 font-mono scale-90">{Math.round(val)}</span>
-                      </div>
-                    );
-                  })}
-                  </div>
+              {/* テキスト部分 */}
+              <div className="flex-grow space-y-3">
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{ai.name}</h2>
+                <div className="text-sm font-mono bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded inline-block text-zinc-500">
+                  {ai.situation}
                 </div>
-              </Link>
+                <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                  {ai.description}
+                </p>
+              </div>
+
+              {/* アクションボタン (ホバーでBig5表示) */}
+              <div className="w-full pt-4 mt-auto relative">
+                <Link
+                  href={`/chat?${query.toString()}`}
+                  className="group/btn relative block w-full py-4 px-5 bg-zinc-900 dark:bg-zinc-700 text-white dark:text-zinc-100 text-base font-medium rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-600 transition-colors shadow-sm"
+                >
+                  このAIと話す
+
+                  {/* Big5 Tooltip (ボタンの下に表示) */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-64 bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-700 opacity-0 invisible translate-y-2 group-hover/btn:opacity-100 group-hover/btn:visible group-hover/btn:translate-y-0 transition-all duration-300 z-50 pointer-events-none text-left">
+                    {/* 装飾: 吹き出しの三角 */}
+                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-white dark:bg-zinc-800 border-t border-l border-zinc-100 dark:border-zinc-700 transform rotate-45"></div>
+
+                    <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 text-center mb-2 border-b border-zinc-50 dark:border-zinc-700 pb-2">性格特性 (Big5)</p>
+                    <div className="space-y-2.5">
+                      {TRAIT_LABELS.map((trait) => {
+                        // @ts-ignore
+                        const val = ai.big5[trait.key] * 100;
+                        return (
+                          <div key={trait.key} className="flex items-center gap-2 text-xs">
+                            <span className="w-8 text-right text-zinc-500 dark:text-zinc-400 font-mono scale-90">{trait.key.toUpperCase()}</span>
+
+                            {/* バーではなく点で表示 */}
+                            <div className="flex-1 relative h-4 flex items-center">
+                              {/* 背景線 */}
+                              <div className="absolute w-full h-0.5 bg-zinc-100 dark:bg-zinc-700 rounded-full"></div>
+                              {/* ドット */}
+                              <div
+                                className={`absolute w-3 h-3 rounded-full border border-white dark:border-zinc-800 shadow-sm ${trait.color}`}
+                                style={{ left: `calc(${val}% - 6px)` }}
+                              ></div>
+                            </div>
+
+                            <span className="w-6 text-right text-zinc-400 dark:text-zinc-500 font-mono scale-90">{Math.round(val)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </Link>
+              </div>
             </div>
-          </div>
-        )})}
+          )
+        })}
       </div>
-      
+
     </div>
   );
 }
