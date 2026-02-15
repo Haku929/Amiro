@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/login-form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import AmiroLogo from "@/components/ui/AmiroLogo";
 
 export default function LoginPage() {
   return (
@@ -9,7 +10,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center pt-8 pb-4">
           <Link href="/" className="flex justify-center">
-            <img src="/amiro_logo.svg" alt="Amiro" className="h-[5.25rem] md:h-24 w-auto" />
+            <AmiroLogo className="h-[5.25rem] md:h-24 w-auto" />
           </Link>
         </CardHeader>
         <CardContent>

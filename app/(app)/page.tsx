@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import AmiroLogo from '@/components/ui/AmiroLogo';
 
 // -----------------------------------------------------------------------------
 // Helper: Seeded Random Generator (Linear Congruential Generator)
@@ -182,7 +183,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-zinc-50">
+      <div className="h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <Loader2 className="animate-spin text-zinc-400" size={32} />
       </div>
     );
@@ -194,7 +195,7 @@ export default function HomePage() {
       {/* ページヘッダー部分 */}
       <div className="text-center space-y-4">
         <Link href="/" className="inline-block mb-10">
-          <img src="/amiro_logo.svg" alt="Amiro" className="h-[5.25rem] md:h-24 w-auto mx-auto" />
+          <AmiroLogo className="h-[5.25rem] md:h-24 w-auto mx-auto" />
         </Link>
         <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100">今日の「鏡」を選ぶ</h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
